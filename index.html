@@ -645,7 +645,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .ai-detect-box.ai-plate span{background:var(--ok);color:#032018;}
   @keyframes aiBoxIn{from{opacity:0;transform:scale(1.15);}to{opacity:1;transform:scale(1);}}
   @keyframes aiBoxOut{from{opacity:1;}to{opacity:0;}}
-  @media(max-width:980px){.ai-detect-box{display:none;}}
+  @media(max-width:640px){.ai-detect-box span{font-size:8px;padding:1.5px 5px;top:-15px;}}
   @media(prefers-reduced-motion:reduce){.ai-detect-box{display:none;}}
 
   /* ================= AI Capture Card — real snapshot thumbnail pulled from /assets/ai-samples, shown next to a detection box ================= */
@@ -670,7 +670,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   @keyframes aiCardOut{from{opacity:1;}to{opacity:0;}}
   @keyframes accScan{0%{top:-22%;}100%{top:100%;}}
   @keyframes accRecBlink{50%{opacity:.25;}}
-  @media(max-width:980px){.ai-capture-card{display:none;}}
+  @media(max-width:640px){.ai-capture-card{width:70px;}.ai-capture-card .acc-caption{font-size:7px;padding:3px 5px 4px;}.ai-capture-card .acc-rec,.ai-capture-card .acc-ts{font-size:6px;}}
   @media(prefers-reduced-motion:reduce){.ai-capture-card{display:none;}}
 
   /* ================= Hologram status ticker — cycles LIVE / Network Stable / Threat Detected / Threat Blocked ================= */
@@ -679,7 +679,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .hero-hologram .hg-text.hg-alert{color:var(--danger);text-shadow:0 0 12px color-mix(in srgb, var(--danger) 70%, transparent);}
   .hero-hologram .hg-text.hg-ok{color:var(--ok);text-shadow:0 0 12px color-mix(in srgb, var(--ok) 70%, transparent);}
   @keyframes hgFlicker{0%{opacity:0;transform:translateY(4px);}8%{opacity:1;transform:translateY(0);}85%{opacity:1;}100%{opacity:0;}}
-  @media(max-width:980px){.hero-hologram{display:none;}}
+  @media(max-width:640px){.hero-hologram .hg-text{font-size:9.5px;}}
 
   /* ================= Threat attack simulation: a red dot approaches, firewall flashes, then "Blocked ✓" ================= */
   .net-pulse.pk-threat{fill:var(--danger);filter:drop-shadow(0 0 6px var(--danger)) drop-shadow(0 0 10px var(--danger));}
@@ -718,7 +718,11 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   @keyframes hcbPulse{0%{transform:scale(.85);opacity:.55;}100%{transform:scale(1.55);opacity:0;}}
   @keyframes hcbLed{0%,100%{opacity:1;}50%{opacity:.25;}}
   @keyframes hcbGlint{0%,100%{opacity:.35;}50%{opacity:1;}}
-  @media(max-width:980px){.hero-corner-badge{display:none;}}
+  /* On phones the badge is moved by JS to sit inside the compact .hero-visual (see the
+     "Live scan beam" script) instead of floating over the headline text, and scaled down
+     to match the smaller diagram. */
+  .hero-visual .hero-corner-badge{position:absolute;top:4%;left:4%;z-index:4;transform:scale(.74);transform-origin:top left;}
+  @media(max-width:480px){.hero-visual .hero-corner-badge{transform:scale(.62);}}
   @media(prefers-reduced-motion:reduce){.hero-corner-badge *{animation:none;}}
 
   /* Background depth: drifting particles + faint noise + slow gradient wash */
@@ -4350,6 +4354,31 @@ function initCountUp(){
   });
 })();
 
+/* ================= Mobile placement for the ANPR badge — moved inside the compact
+   hero-visual (instead of floating over the stacked headline text) below 980px ================= */
+(function(){
+  const badge = document.querySelector('.hero-corner-badge');
+  const heroVisual = document.getElementById('netVisual');
+  if(!badge || !heroVisual) return;
+  const desktopParent = badge.parentNode;
+  const desktopNext = badge.nextSibling;
+  let isMobilePlaced = null;
+  function place(){
+    const mobile = window.innerWidth <= 980;
+    if(mobile === isMobilePlaced) return;
+    if(mobile){
+      heroVisual.insertBefore(badge, heroVisual.firstChild);
+    } else if(desktopParent){
+      if(desktopNext && desktopNext.parentNode === desktopParent) desktopParent.insertBefore(badge, desktopNext);
+      else desktopParent.appendChild(badge);
+    }
+    isMobilePlaced = mobile;
+  }
+  place();
+  window.addEventListener('resize', place);
+  window.addEventListener('orientationchange', place);
+})();
+
 /* ================= Live scan beam — sweeps out of the camera lens and lights up each node it crosses ================= */
 (function(){
   const hero = document.querySelector('.hero');
@@ -4360,8 +4389,6 @@ function initCountUp(){
   if(!hero || !badge || !wrap || !beam || !nodes.length) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  // only run the sweep once the badge is actually visible (it's hidden below 980px)
-  if(getComputedStyle(badge).display === 'none') return;
   badge.classList.add('hcb-armed');
 
   // the badge is now the real trigger for the AI capture cards — clicking/tapping it
@@ -4394,7 +4421,7 @@ function initCountUp(){
         // a full outbound sweep just completed — this is the badge "catching" a plate/person,
         // so fire the real capture-card scan instead of it happening on an unrelated timer
         sweepsSinceScan++;
-        if(sweepsSinceScan >= 2 && !document.hidden && window.innerWidth >= 980){
+        if(sweepsSinceScan >= 2 && !document.hidden && window.innerWidth >= 340){
           sweepsSinceScan = 0;
           if(window.__aiSpawnScan) window.__aiSpawnScan();
         }
@@ -4515,7 +4542,7 @@ function initCountUp(){
   let ambientTimer = null;
   function spawnBoxes(){
     if(ambientTimer){ clearTimeout(ambientTimer); ambientTimer = null; }
-    if(document.hidden || window.innerWidth < 980){ scheduleNext(); return; }
+    if(document.hidden || window.innerWidth < 340){ scheduleNext(); return; }
     layer.innerHTML = '';
     const count = 1 + Math.floor(Math.random()*2);
     for(let i=0;i<count;i++){

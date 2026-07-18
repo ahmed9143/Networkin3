@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم | Delta IT Solutions</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --navy-950:#050d18;--navy-900:#0b1e3d;--navy-800:#10294f;--navy-700:#173a6b;
+    --cable-blue:#2f6fed;--cable-orange:#ff7a2f;--paper:#081525;--paper-2:#0b1e3d;
+    --ink:#f4f6f9;--ink-soft:#9fb0d1;--line:#173a6b;--ok:#1fae6b;--danger:#ff5c5c;--radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',sans-serif;}
+  button,input,select,textarea{font-family:'Cairo',sans-serif;}
+  .hidden{display:none !important;}
+
+  /* Login */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:40px;width:100%;max-width:380px;}
+  .login-card h1{font-size:20px;margin:0 0 6px;}
+  .login-card p{color:var(--ink-soft);font-size:13.5px;margin:0 0 24px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;margin-bottom:6px;font-weight:600;}
+  .field input, .field select, .field textarea{width:100%;background:var(--navy-800);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);outline:none;font-size:14px;}
+  .field textarea{resize:vertical;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:.2s;}
+  .btn-primary{background:var(--cable-orange);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .btn-block{width:100%;}
+  .error-msg{color:var(--danger);font-size:13px;margin-top:10px;min-height:16px;}
+
+  /* Layout */
+  #adminApp{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+  aside{background:var(--navy-950);border-left:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;}
+  aside .brand{display:flex;align-items:center;gap:10px;margin-bottom:30px;padding:0 6px;}
+  aside .brand .mark{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  aside .brand .mark svg{width:28px;height:28px;}
+  aside .brand b{font-size:15px;}
+  aside .brand small{display:block;color:var(--ink-soft);font-size:10.5px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:8px;color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:4px;transition:.2s;}
+  .nav-item:hover{background:var(--navy-800);color:var(--ink);}
+  .nav-item.active{background:var(--cable-orange);color:#fff;}
+  aside .logout{margin-top:auto;}
+  main.content{padding:30px 34px;overflow-x:auto;}
+  .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
+  .topline h2{margin:0;font-size:22px;}
+  .topline p{margin:4px 0 0;color:var(--ink-soft);font-size:13.5px;}
+
+  .tab-view{display:none;}
+  .tab-view.active{display:block;}
+
+  table{width:100%;border-collapse:collapse;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  th,td{padding:12px 14px;text-align:right;font-size:13.5px;border-bottom:1px solid var(--line);}
+  th{background:var(--navy-800);color:var(--ink-soft);font-weight:700;font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+  td img{width:42px;height:42px;object-fit:cover;border-radius:6px;background:var(--navy-800);}
+  .row-actions{display:flex;gap:8px;}
+  .icon-btn{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .icon-btn.danger:hover{background:var(--danger);border-color:var(--danger);}
+  .icon-btn.edit:hover{background:var(--cable-blue);border-color:var(--cable-blue);}
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;}
+  .badge.on{background:#1fae6b33;color:var(--ok);}
+  .badge.off{background:#ff5c5c33;color:var(--danger);}
+  .empty-row td{text-align:center;color:var(--ink-soft);padding:40px;}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+  .modal-box h3{margin:0 0 20px;font-size:18px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;}
+  .img-preview{width:100%;height:140px;object-fit:cover;border-radius:8px;background:var(--navy-800);margin-bottom:10px;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;margin:10px 0;}
+  .checkbox-row input{width:auto;}
+
+  .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
+  .mission-control-banner{background:linear-gradient(120deg,#6D5EF71a,#00E5FF12);border:1px solid #6D5EF755;border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;}
+  .mission-control-banner .mc-greeting{font-size:20px;font-weight:800;margin-bottom:6px;}
+  .mission-control-banner .mc-summary{font-size:14px;color:var(--ink-soft);line-height:1.8;}
+  .mission-control-banner .mc-summary b{color:var(--cable-blue);font-weight:800;}
+  .stat-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;}
+  .insight-card{display:flex;gap:12px;align-items:flex-start;background:var(--paper-2);border:1px solid var(--line);border-right:3px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.7;}
+  .insight-card.warn{border-right-color:#ff7a2f;}
+  .insight-card.danger{border-right-color:#ff5c5c;}
+  .insight-card.ok{border-right-color:#1fae6b;}
+  .insight-card .ic{font-size:19px;flex-shrink:0;}
+  .insight-card b{display:block;margin-bottom:3px;}
+  .insight-card span{color:var(--ink-soft);}
+
+  /* Command Palette (Ctrl+K) */
+  #cmdkOverlay{position:fixed;inset:0;background:#000a;backdrop-filter:blur(4px);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding-top:12vh;}
+  #cmdkOverlay.open{display:flex;}
+  .cmdk-box{width:100%;max-width:560px;background:var(--paper-2);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -20px #000a;overflow:hidden;animation:cmdkIn .18s ease;}
+  @keyframes cmdkIn{from{opacity:0;transform:translateY(-8px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .cmdk-input-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);}
+  .cmdk-input-row input{flex:1;background:transparent;border:none;outline:none;color:var(--ink);font-size:15px;font-family:inherit;}
+  .cmdk-list{max-height:360px;overflow-y:auto;padding:8px;}
+  .cmdk-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13.5px;}
+  .cmdk-item .ic{font-size:16px;width:22px;text-align:center;}
+  .cmdk-item .meta{margin-inline-start:auto;color:var(--ink-soft);font-size:11px;}
+  .cmdk-item.active,.cmdk-item:hover{background:var(--navy-800);}
+  .cmdk-empty{padding:24px;text-align:center;color:var(--ink-soft);font-size:13px;}
+  .cmdk-hint{padding:8px 16px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:11px;display:flex;gap:14px;}
+  .cmdk-hint kbd{background:var(--navy-800);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono';}
+  .chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px;}
+  .chart-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .chart-card h3{margin:0 0 14px;font-size:14.5px;color:var(--ink);}
+  @media(max-width:900px){.chart-grid{grid-template-columns:1fr;}}
+  .stat-card span{display:block;color:var(--ink-soft);font-size:12.5px;margin-bottom:6px;}
+  .stat-card b{font-size:22px;font-family:'JetBrains Mono';}
+
+  .img-manager{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+  .img-manager .thumb-wrap{position:relative;width:70px;height:70px;}
+  .img-manager .thumb-wrap img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
+  .img-manager .thumb-wrap button{position:absolute;top:-6px;left:-6px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1;}
+
+  select#orderStatusFilter{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:13px;}
+  select.status-select{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 8px;font-size:12.5px;}
+
+  /* Bulk Import */
+  .topline-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .import-modal .modal-box{max-width:560px;}
+  .file-drop{border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;background:var(--navy-800);}
+  .file-drop small{display:block;color:var(--ink-soft);margin-top:6px;font-size:12px;}
+  .import-progress-wrap{margin-top:16px;}
+  .import-progress-bar{width:100%;height:16px;border-radius:20px;background:var(--navy-800);border:1px solid var(--line);overflow:hidden;}
+  .import-progress-bar > div{height:100%;width:0%;background:linear-gradient(90deg,var(--cable-blue),var(--cable-orange));transition:width .2s;}
+  .import-progress-label{font-size:12.5px;color:var(--ink-soft);margin-top:8px;text-align:center;}
+  .import-log{margin-top:12px;max-height:160px;overflow-y:auto;background:var(--navy-800);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:'JetBrains Mono';font-size:11.5px;line-height:1.9;}
+  .import-log .ok{color:var(--ok);}
+  .import-log .fail{color:var(--danger);}
+  .import-log .upd{color:var(--cable-blue);}
+  .import-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  .import-summary .box{background:var(--navy-800);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;}
+  .import-summary .box b{display:block;font-size:18px;font-family:'JetBrains Mono';}
+  .import-summary .box span{font-size:11.5px;color:var(--ink-soft);}
+  .template-link{font-size:12.5px;color:var(--cable-blue);cursor:pointer;text-decoration:underline;background:none;border:none;padding:0;font-family:inherit;}
+
+  /* Search & Filters row */
+  .filters-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+  .filters-row input[type="text"]{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 14px;font-size:13.5px;min-width:220px;flex:1;}
+  .filters-row select{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 14px;font-size:13.5px;}
+
+  .btn-sm{padding:6px 12px;font-size:12px;}
+  .bulk-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:color-mix(in srgb, var(--cable-orange) 10%, var(--navy-800));border:1px solid color-mix(in srgb, var(--cable-orange) 35%, var(--line));border-radius:12px;padding:12px 16px;margin-bottom:14px;animation:bulkToolbarIn .18s ease both;}
+  @keyframes bulkToolbarIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .bt-count{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13.5px;color:var(--ink);}
+  .bt-count b{color:var(--cable-orange);font-family:'JetBrains Mono';}
+  .bt-link{background:none;border:none;color:var(--cable-blue);font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;}
+  .bt-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .bt-actions select{background:var(--navy-800);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:12px;}
+
+  th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+  th.sortable:hover{color:var(--cable-blue);}
+  .sort-ic{display:inline-block;width:10px;font-size:10px;color:var(--cable-blue);}
+
+  .pagination-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:14px;}
+  .pg-info{font-size:12.5px;color:var(--ink-soft);}
+  .pg-controls{display:flex;align-items:center;gap:10px;font-size:13px;}
+  .pg-controls span{font-family:'JetBrains Mono';min-width:20px;text-align:center;}
+  .pg-controls button:disabled{opacity:.4;cursor:not-allowed;}
+  tr.low-stock-row td{background:#ff7a2f14;}
+  tr.out-stock-row td{background:#ff5c5c14;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>لوحة تحكم Delta IT Solutions</h1>
+    <p>سجل دخولك لإدارة المنتجات والأقسام</p>
+    <div class="field"><label>البريد الإلكتروني</label><input type="email" id="loginEmail" placeholder="admin@example.com"></div>
+    <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+    <button class="btn btn-primary btn-block" onclick="doLogin()">تسجيل الدخول</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+</div>
+
+<div id="cmdkOverlay" onclick="if(event.target===this) closeCmdk()">
+  <div class="cmdk-box">
+    <div class="cmdk-input-row">
+      <span>🔎</span>
+      <input type="text" id="cmdkInput" placeholder="اكتب اسم صفحة أو أمر... (مثال: منتجات، إضافة منتج، طلبات)" oninput="cmdkFilter()" onkeydown="cmdkKeyNav(event)">
+    </div>
+    <div class="cmdk-list" id="cmdkList"></div>
+    <div class="cmdk-hint">
+      <span><kbd>↑</kbd> <kbd>↓</kbd> للتنقل</span>
+      <span><kbd>Enter</kbd> للتنفيذ</span>
+      <span><kbd>Esc</kbd> للإغلاق</span>
+    </div>
+  </div>
+</div>
+
+<div id="adminApp" class="hidden">
+  <aside>
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 100 100" width="24" height="24"><defs><linearGradient id="logoGradAdm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#logoGradAdm)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/><line x1="50" y1="29" x2="50" y2="17" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><line x1="66" y1="38" x2="76" y2="31" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><line x1="34" y1="38" x2="24" y2="31" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="50" cy="15" r="4" fill="#fff"/><circle cx="78" cy="29" r="4" fill="#fff"/><circle cx="22" cy="29" r="4" fill="#fff"/></svg></div>
+      <div><b>Delta IT Solutions</b><small>لوحة التحكم</small></div>
+    </div>
+    <div class="nav-item" onclick="openCmdk()" style="display:flex;align-items:center;justify-content:space-between;background:var(--paper);border:1px solid var(--line);border-radius:8px;">
+      <span>🔎 بحث سريع</span><kbd style="background:var(--navy-800);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono';font-size:11px;">Ctrl K</kbd>
+    </div>
+    <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 لوحة التحكم</div>
+    <div class="nav-item" data-tab="products" onclick="switchTab('products')">📦 المنتجات</div>
+    <div class="nav-item" data-tab="categories" onclick="switchTab('categories')">🗂️ الأقسام</div>
+    <div class="nav-item" data-tab="coupons" onclick="switchTab('coupons')">🏷️ الكوبونات</div>
+    <div class="nav-item" data-tab="orders" onclick="switchTab('orders')">🧾 الطلبات والإحصائيات</div>
+    <div class="nav-item" data-tab="quotes" onclick="switchTab('quotes')">📋 طلبات المقايسة</div>
+    <div class="nav-item" data-tab="downloads" onclick="switchTab('downloads')">📁 التنزيلات</div>
+    <div class="nav-item logout" onclick="doLogout()">🚪 تسجيل الخروج</div>
+  </aside>
+
+  <main class="content">
+    <div class="tab-view active" id="tab-dashboard">
+      <div class="mission-control-banner" id="missionControlBanner">
+        <div class="mc-greeting" id="mcGreeting">صباح الخير 👋</div>
+        <div class="mc-summary" id="mcSummary">جاري تجهيز ملخص اليوم...</div>
+      </div>
+      <div class="section-head">
+        <div><h2>📊 لوحة التحكم</h2><p>نظرة سريعة على أداء المتجر</p></div>
+      </div>
+      <div class="stat-cards" id="dashStatsRow" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card"><span>إجمالي المبيعات (مؤكدة/مكتملة)</span><b id="dashRevenue">0 ج.م</b></div>
+        <div class="stat-card"><span>عدد الطلبات (30 يوم)</span><b id="dashOrders30">0</b></div>
+        <div class="stat-card" style="border-color:#ff7a2f66;"><span>⚠️ منتجات ناقصة/نافدة</span><b id="dashLowStock" style="color:var(--cable-orange);">0</b></div>
+        <div class="stat-card"><span>طلبات مقايسة جديدة</span><b id="dashNewQuotes">0</b></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>📈 المبيعات آخر 14 يوم</h3>
+          <canvas id="chartSalesTrend" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>🏆 أفضل 5 منتجات مبيعًا</h3>
+          <canvas id="chartTopProducts" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>📦 حالة المخزون</h3>
+          <canvas id="chartStockStatus" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>💳 طرق الدفع المستخدمة</h3>
+          <canvas id="chartPaymentMethods" height="180"></canvas>
+        </div>
+      </div>
+      <div class="section-head" style="margin-top:28px;">
+        <div><h2>💡 رؤى ذكية (Smart Insights)</h2><p>ملاحظات مبنية على بياناتك الفعلية دلوقتي — مش أرقام عشوائية</p></div>
+      </div>
+      <div id="smartInsightsBox" class="insights-grid"></div>
+    </div>
+
+    <div class="tab-view" id="tab-products">
+      <div class="topline">
+        <div><h2>المنتجات</h2><p id="prodCountLabel">جاري التحميل...</p></div>
+        <div class="topline-actions">
+          <button class="btn btn-outline" onclick="exportProductsCSV()">⬇️ تصدير Excel/CSV</button>
+          <button class="btn btn-outline" onclick="openImportModal()">📥 استيراد منتجات</button>
+          <button class="btn btn-primary" onclick="openProductModal()">+ إضافة منتج</button>
+        </div>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><span>إجمالي المنتجات</span><b id="statProdTotal">0</b></div>
+        <div class="stat-card" style="border-color:#ff7a2f66;"><span>⚠️ على وشك النفاد (أقل من 5)</span><b id="statProdLowStock" style="color:var(--cable-orange);">0</b></div>
+        <div class="stat-card" style="border-color:#ff5c5c66;"><span>❌ غير متوفر بالمخزون</span><b id="statProdOutStock" style="color:var(--danger);">0</b></div>
+      </div>
+
+      <div class="filters-row">
+        <input type="text" id="prodSearchInput" placeholder="🔍 ابحث بالاسم أو الماركة..." oninput="prodCurrentPage=1;renderProductsTable()">
+        <select id="prodCategoryFilter" onchange="prodCurrentPage=1;renderProductsTable()"><option value="">كل الأقسام</option></select>
+        <label class="checkbox-row" style="margin:0;"><input type="checkbox" id="prodLowStockFilter" onchange="prodCurrentPage=1;renderProductsTable()"><span style="font-size:13px;">إظهار الأصناف الناقصة فقط</span></label>
+        <select id="prodPageSize" onchange="prodCurrentPage=1;renderProductsTable()">
+          <option value="25">25 لكل صفحة</option>
+          <option value="50">50 لكل صفحة</option>
+          <option value="100">100 لكل صفحة</option>
+          <option value="all">عرض الكل</option>
+        </select>
+      </div>
+
+      <div class="bulk-toolbar" id="bulkToolbar" style="display:none;">
+        <div class="bt-count">✅ محدد <b id="bulkSelCount">0</b> منتج
+          <button class="bt-link" onclick="selectAllFilteredProducts()">تحديد كل النتائج المطابقة (<span id="bulkFilteredCount">0</span>)</button>
+          <button class="bt-link" onclick="clearProductSelection()">إلغاء التحديد</button>
+        </div>
+        <div class="bt-actions">
+          <button class="btn btn-outline btn-sm" onclick="bulkToggleFeatured(true)">⭐ تمييز</button>
+          <button class="btn btn-outline btn-sm" onclick="bulkToggleFeatured(false)">إلغاء التمييز</button>
+          <select id="bulkCategorySelect"><option value="">↪️ نقل لقسم آخر...</option></select>
+          <button class="btn btn-outline btn-sm" onclick="bulkChangeCategory()">تطبيق النقل</button>
+          <button class="btn btn-outline btn-sm" onclick="exportProductsCSV(true)">⬇️ تصدير المحدد</button>
+          <button class="btn btn-danger btn-sm" id="bulkDeleteBtn" onclick="bulkDeleteProducts()">🗑️ حذف المحدد</button>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr>
+          <th style="width:34px;"><input type="checkbox" id="prodSelectAll" onchange="toggleSelectAllProducts(this)"></th>
+          <th>صورة</th>
+          <th class="sortable" onclick="setSortField('name')">الاسم <span class="sort-ic" id="sortIc-name"></span></th>
+          <th>النوع</th>
+          <th class="sortable" onclick="setSortField('category')">القسم <span class="sort-ic" id="sortIc-category"></span></th>
+          <th>الماركة</th>
+          <th class="sortable" onclick="setSortField('price')">السعر <span class="sort-ic" id="sortIc-price"></span></th>
+          <th class="sortable" onclick="setSortField('stock')">المخزون <span class="sort-ic" id="sortIc-stock"></span></th>
+          <th>مميز</th>
+          <th>الأكثر مبيعًا</th>
+          <th>إجراءات</th>
+        </tr></thead>
+        <tbody id="productsTableBody"><tr class="empty-row"><td colspan="11">جاري التحميل...</td></tr></tbody>
+      </table>
+
+      <div class="pagination-row" id="prodPaginationRow" style="display:none;">
+        <div class="pg-info" id="pgInfo">-</div>
+        <div class="pg-controls">
+          <button class="btn btn-outline btn-sm" onclick="changeProdPage(-1)">‹ السابق</button>
+          <span id="pgCurrent">1</span>
+          <button class="btn btn-outline btn-sm" onclick="changeProdPage(1)">التالي ›</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-view" id="tab-categories">
+      <div class="topline">
+        <div><h2>الأقسام</h2><p>الأقسام التي تظهر في الموقع وفي فلاتر المنتجات</p></div>
+        <button class="btn btn-primary" onclick="openCategoryModal()">+ إضافة قسم</button>
+      </div>
+      <table>
+        <thead><tr><th>الأيقونة</th><th>الاسم</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+        <tbody id="categoriesTableBody"><tr class="empty-row"><td colspan="4">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="tab-view" id="tab-coupons">
+      <div class="topline">
+        <div><h2>الكوبونات</h2><p>أكواد خصم يقدر العميل يستخدمها في السلة</p></div>
+        <button class="btn btn-primary" onclick="openCouponModal()">+ إضافة كوبون</button>
+      </div>
+      <table>
+        <thead><tr><th>الكود</th><th>نوع الخصم</th><th>القيمة</th><th>أقل طلب</th><th>الاستخدام</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody id="couponsTableBody"><tr class="empty-row"><td colspan="7">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="tab-view" id="tab-orders">
+      <div class="topline">
+        <div><h2>الطلبات والإحصائيات</h2><p>كل الطلبات اللي جت من الموقع</p></div>
+        <select id="orderStatusFilter" onchange="renderOrdersTable()">
+          <option value="all">كل الحالات</option>
+          <option value="pending">قيد الانتظار</option>
+          <option value="pending_payment">في انتظار التحويل</option>
+          <option value="confirmed">مؤكد</option>
+          <option value="shipped">تم الشحن</option>
+          <option value="completed">مكتمل</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card"><span>إجمالي الطلبات</span><b id="statTotalOrders">0</b></div>
+        <div class="stat-card"><span>إجمالي المبيعات</span><b id="statTotalRevenue">0 ج.م</b></div>
+        <div class="stat-card"><span>متوسط قيمة الطلب</span><b id="statAvgOrder">0 ج.م</b></div>
+        <div class="stat-card"><span>الأكثر مبيعًا</span><b id="statTopProduct" style="font-size:14px;">-</b></div>
+      </div>
+      <table>
+        <thead><tr><th>المرجع</th><th>المنتجات</th><th>الإجمالي</th><th>طريقة الدفع</th><th>الحالة</th><th>التحميل الرقمي</th><th>التاريخ</th><th></th></tr></thead>
+        <tbody id="ordersTableBody"><tr class="empty-row"><td colspan="8">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="tab-view" id="tab-quotes">
+      <div class="topline">
+        <div><h2>طلبات المقايسة</h2><p>الطلبات اللي بتوصل من صفحة "اطلب مقايسة" في الموقع</p></div>
+        <select id="quoteStatusFilter" onchange="renderQuotesTable()">
+          <option value="all">كل الحالات</option>
+          <option value="new">جديد</option>
+          <option value="contacted">تم التواصل</option>
+          <option value="quoted">تم تسعير</option>
+          <option value="closed">مغلق</option>
+        </select>
+      </div>
+      <div class="stat-cards" style="grid-template-columns:repeat(2,1fr);">
+        <div class="stat-card"><span>إجمالي الطلبات</span><b id="statQuotesTotal">0</b></div>
+        <div class="stat-card" style="border-color:#ff7a2f66;"><span>🆕 طلبات جديدة لسه محتاجة متابعة</span><b id="statQuotesNew" style="color:var(--cable-orange);">0</b></div>
+      </div>
+      <table>
+        <thead><tr><th>الاسم</th><th>الهاتف</th><th>التفاصيل</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
+        <tbody id="quotesTableBody"><tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="tab-view" id="tab-downloads">
+      <div class="topline">
+        <div><h2>التنزيلات</h2><p>ملفات عامة مجانية (كتالوجات/أدلة استخدام) بتظهر لأي زائر في صفحة "التنزيلات"</p></div>
+        <button class="btn btn-primary" onclick="openDownloadModal()">+ إضافة ملف</button>
+      </div>
+      <table>
+        <thead><tr><th>العنوان</th><th>القسم</th><th>الحجم</th><th>إجراءات</th></tr></thead>
+        <tbody id="downloadsTableBody"><tr class="empty-row"><td colspan="4">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Download File Modal -->
+<div class="modal-overlay" id="downloadModalOverlay">
+  <div class="modal-box">
+    <h3 id="downloadModalTitle">إضافة ملف تنزيل</h3>
+    <input type="hidden" id="downloadId">
+    <div class="field"><label>العنوان</label><input type="text" id="downloadTitle" placeholder="مثال: كتالوج كاميرات المراقبة 2026"></div>
+    <div class="field"><label>الوصف (اختياري)</label><textarea id="downloadDescription" rows="2"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>القسم</label>
+        <select id="downloadCategory">
+          <option value="عام">عام</option>
+          <option value="كتالوج">كتالوج</option>
+          <option value="دليل استخدام">دليل استخدام</option>
+          <option value="برامج تشغيل">برامج تشغيل</option>
+        </select>
+      </div>
+      <div class="field"><label>حجم الملف (اختياري، مثال: 2.4 MB)</label><input type="text" id="downloadSizeLabel" placeholder="2.4 MB"></div>
+    </div>
+    <div class="field"><label>الملف</label><input type="file" id="downloadFileInput"></div>
+    <div id="downloadCurrentFileNote" style="font-size:12px;color:var(--ink-soft);margin-top:-6px;"></div>
+    <div class="error-msg" id="downloadModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeDownloadModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveDownload()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Coupon Modal -->
+<div class="modal-overlay" id="couponModalOverlay">
+  <div class="modal-box">
+    <h3 id="couponModalTitle">إضافة كوبون</h3>
+    <input type="hidden" id="couponId">
+    <div class="field"><label>الكود (بالإنجليزي بدون مسافات)</label><input type="text" id="couponCode" placeholder="SAVE10"></div>
+    <div class="grid2">
+      <div class="field"><label>نوع الخصم</label>
+        <select id="couponType"><option value="percent">نسبة %</option><option value="fixed">مبلغ ثابت ج.م</option></select>
+      </div>
+      <div class="field"><label>قيمة الخصم</label><input type="number" id="couponValue" placeholder="10"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>أقل قيمة للطلب (اختياري)</label><input type="number" id="couponMinOrder" placeholder="0"></div>
+      <div class="field"><label>عدد مرات الاستخدام (اختياري)</label><input type="number" id="couponUsageLimit" placeholder="بلا حدود"></div>
+    </div>
+    <div class="field"><label>تاريخ الانتهاء (اختياري)</label><input type="date" id="couponExpiresAt"></div>
+    <div class="checkbox-row"><input type="checkbox" id="couponActive" checked><label for="couponActive">الكوبون مفعل</label></div>
+    <div class="error-msg" id="couponModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeCouponModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveCoupon()">حفظ الكوبون</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="productModalOverlay">
+  <div class="modal-box">
+    <h3 id="productModalTitle">إضافة منتج</h3>
+    <input type="hidden" id="prodId">
+    <div class="field">
+      <label>صور المنتج (تقدر تختار أكتر من صورة)</label>
+      <div class="img-manager" id="prodImgManager"></div>
+      <input type="file" id="prodImageFile" accept="image/*" multiple>
+    </div>
+    <div class="field"><label>اسم المنتج</label><input type="text" id="prodName" placeholder="مثال: كاميرا خارجية 4K"></div>
+    <div class="field"><label>الوصف</label><textarea id="prodDesc" rows="3" placeholder="وصف مختصر للمنتج"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>السعر (ج.م)</label><input type="number" id="prodPrice" placeholder="1500"></div>
+      <div class="field"><label>السعر قبل الخصم (اختياري)</label><input type="number" id="prodOldPrice" placeholder="1800"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>القسم</label><select id="prodCategory"></select></div>
+      <div class="field"><label>الكمية بالمخزون</label><input type="number" id="prodStock" placeholder="10"></div>
+    </div>
+    <div class="field"><label>الماركة (اختياري - مثال: Dahua, Hikvision, Dell)</label><input type="text" id="prodBrand" placeholder="اسم الماركة"></div>
+
+    <div class="field" style="background:var(--navy-800,#10294f);border:1px solid var(--line,#173a6b);border-radius:10px;padding:14px 16px;">
+      <label style="font-weight:800;display:block;margin-bottom:10px;">🧭 مواصفات دقيقة (تُستخدم في مساعد اختيار الكاميرا وفلتر البصمة)</label>
+      <small style="display:block;color:var(--ink-soft,#9fb0d1);font-size:12px;margin-bottom:12px;">سيبها "غير محدد" لو المنتج مش كاميرا/جهاز تسجيل/جهاز بصمة، أو لو المواصفة دي مش مناسبة له.</small>
+      <div class="grid2">
+        <div class="field"><label>مكان التركيب (للكاميرات)</label>
+          <select id="prodInstallationType">
+            <option value="">غير محدد</option>
+            <option value="indoor">داخلي فقط</option>
+            <option value="outdoor">خارجي فقط</option>
+            <option value="both">داخلي وخارجي</option>
+          </select>
+        </div>
+        <div class="field"><label>نوع الاتصال (كاميرات / أجهزة تسجيل)</label>
+          <select id="prodConnectionType">
+            <option value="">غير محدد</option>
+            <option value="ip">IP (شبكة)</option>
+            <option value="analog">Analog / AHD</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>عدد القنوات (لأجهزة NVR/DVR فقط)</label><input type="number" id="prodChannels" min="0" placeholder="مثال: 8"></div>
+      <div class="field">
+        <label>مميزات إضافية (تُستخدم لترشيح مساعد اختيار الكاميرا)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
+          <label class="checkbox-row" style="margin:0;"><input type="checkbox" class="prodTagCheckbox" value="full_color"><span style="font-size:13px;">🌈 ألوان كاملة ليلاً</span></label>
+          <label class="checkbox-row" style="margin:0;"><input type="checkbox" class="prodTagCheckbox" value="ir_night"><span style="font-size:13px;">🌙 رؤية ليلية IR</span></label>
+          <label class="checkbox-row" style="margin:0;"><input type="checkbox" class="prodTagCheckbox" value="audio"><span style="font-size:13px;">🎙️ صوت</span></label>
+          <label class="checkbox-row" style="margin:0;"><input type="checkbox" class="prodTagCheckbox" value="ai_detection"><span style="font-size:13px;">🧠 كشف AI</span></label>
+          <label class="checkbox-row" style="margin:0;"><input type="checkbox" class="prodTagCheckbox" value="face_recognition"><span style="font-size:13px;">🪪 تمييز وجوه</span></label>
+        </div>
+      </div>
+      <div class="field"><label>أولوية الترشيح (رقم أعلى = يظهر الأول في نتائج المساعد)</label><input type="number" id="prodRecPriority" min="0" placeholder="0"></div>
+      <div class="grid2">
+        <div class="field"><label>نوع جهاز البصمة (لو المنتج جهاز بصمة/حضور)</label>
+          <select id="prodBioType">
+            <option value="">غير محدد</option>
+            <option value="fingerprint">بصمة إصبع</option>
+            <option value="face">وجه</option>
+            <option value="card">كارت</option>
+            <option value="face_finger">وجه + بصمة</option>
+          </select>
+        </div>
+        <div class="field"><label>الاستخدام (لأجهزة البصمة)</label>
+          <select id="prodBioUse">
+            <option value="">غير محدد</option>
+            <option value="attendance">حضور وانصراف</option>
+            <option value="access">تحكم دخول (Access Control)</option>
+            <option value="both">الاتنين</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>نوع المنتج</label>
+      <select id="prodType" onchange="toggleDigitalField()">
+        <option value="physical">📦 فيزيائي (يتم شحنه)</option>
+        <option value="digital">💾 رقمي (سكريبت / برنامج / ملف يُسلَّم برابط تحميل)</option>
+      </select>
+    </div>
+    <div class="field" id="digitalFileField" style="display:none;">
+      <label>ملف المنتج الرقمي (السكريبت / البرنامج)</label>
+      <input type="file" id="prodDigitalFile">
+      <small id="digitalFileCurrentLabel" style="display:block;color:var(--ink-soft);font-size:12px;margin-top:4px;"></small>
+      <small style="display:block;color:var(--ink-soft);font-size:12px;margin-top:4px;">بيتخزن في مكان خاص وآمن. رابط التحميل الفعلي بيتولد لحظة تأكيد كل طلب من تبويب الطلبات، ومفيش حد يقدر يوصله من غير كده.</small>
+    </div>
+    <div class="field" id="digitalFileField2" style="display:none;">
+      <label>ملف إضافي (اختياري - مثلاً ملف الناتج/العينة)</label>
+      <input type="file" id="prodDigitalFile2">
+      <small id="digitalFileCurrentLabel2" style="display:block;color:var(--ink-soft);font-size:12px;margin-top:4px;"></small>
+      <small style="display:block;color:var(--ink-soft);font-size:12px;margin-top:4px;">لو حبيت ترفع للعميل ملف تاني مع السكريبت (مثلاً ملف ناتج/عينة تشغيل)، ارفعه هنا. هيتسلّم للعميل برابط تحميل منفصل بعد الدفع بنفس أمان الملف الأول.</small>
+    </div>
+
+    <div class="checkbox-row"><input type="checkbox" id="prodFeatured"><label for="prodFeatured">إظهار كمنتج مميز في الرئيسية</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="prodBestseller"><label for="prodBestseller">🔥 وضع علامة "الأكثر مبيعًا" على المنتج</label></div>
+    <div class="error-msg" id="productModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeProductModal()">إلغاء</button>
+      <button class="btn btn-primary" id="saveProductBtn" onclick="saveProduct()">حفظ المنتج</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Import Modal -->
+<div class="modal-overlay import-modal" id="importModalOverlay">
+  <div class="modal-box">
+    <h3>📥 استيراد منتجات بالجملة</h3>
+    <p style="color:var(--ink-soft);font-size:13px;margin-top:-14px;margin-bottom:18px;">
+      من ملف Excel أو CSV يحتوي أعمدة:
+      <code style="display:block;background:var(--navy-800);padding:8px 10px;border-radius:6px;margin-top:8px;font-size:11.5px;direction:ltr;text-align:left;">name, description, category, brand, price, old_price, stock, featured, bestseller, image</code>
+      <button class="template-link" onclick="downloadImportTemplate()">⬇️ تحميل نموذج CSV فاضي</button>
+    </p>
+
+    <div class="field">
+      <label>1) اختر ملف Excel أو CSV</label>
+      <div class="file-drop">
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" onchange="handleImportFileChosen()">
+        <small>الأعمدة name و price إلزامية، الباقي اختياري</small>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>2) اختر مجلد الصور (اختياري - لو عمود image فيه اسم ملف مش رابط)</label>
+      <div class="file-drop">
+        <input type="file" id="importImagesFolder" webkitdirectory directory multiple onchange="handleImportImagesChosen()">
+        <small id="importImagesCount">لو مفيش مجلد، هيتم استخدام الرابط الموجود في عمود image كما هو (لو رابط كامل)</small>
+      </div>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="importUpdateExisting" checked>
+      <label for="importUpdateExisting">تحديث المنتج تلقائيًا لو موجود بنفس الاسم (بدل تكراره)</label>
+    </div>
+
+    <div id="importPreviewLabel" style="font-size:13px;color:var(--ink-soft);margin-top:6px;"></div>
+
+    <div class="import-progress-wrap hidden" id="importProgressWrap">
+      <div class="import-progress-bar"><div id="importProgressFill"></div></div>
+      <div class="import-progress-label" id="importProgressLabel">جاري الاستيراد... 0%</div>
+      <div class="import-log" id="importLog"></div>
+      <div class="import-summary">
+        <div class="box"><b id="importCountAdded">0</b><span>منتج جديد</span></div>
+        <div class="box"><b id="importCountUpdated">0</b><span>تم تحديثه</span></div>
+        <div class="box"><b id="importCountFailed">0</b><span>فشل</span></div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="importModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeImportModal()" id="importCloseBtn">إغلاق</button>
+      <button class="btn btn-primary" id="importStartBtn" onclick="startImport()" disabled>ابدأ الاستيراد</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-overlay" id="categoryModalOverlay">
+  <div class="modal-box">
+    <h3 id="categoryModalTitle">إضافة قسم</h3>
+    <input type="hidden" id="catId">
+    <div class="field"><label>اسم القسم</label><input type="text" id="catName" placeholder="مثال: كاميرات مراقبة"></div>
+    <div class="field"><label>أيقونة (إيموجي)</label><input type="text" id="catIcon" placeholder="📷"></div>
+    <div class="field"><label>ترتيب الظهور</label><input type="number" id="catSort" placeholder="1"></div>
+    <div class="error-msg" id="categoryModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeCategoryModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveCategory()">حفظ القسم</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let categories = [];
+let products = [];
+
+/* ---------------- Image Compression ---------------- */
+// بتقلل حجم أي صورة قبل رفعها (أبعاد أقصاها 1600px وجودة 80%) لتسريع الموقع وتقليل استهلاك التخزين
+function compressImage(file, maxDim = 1600, quality = 0.8){
+  return new Promise((resolve) => {
+    if(!file.type.startsWith('image/') || file.type === 'image/gif'){
+      resolve(file); // ما تلمسش GIF المتحركة أو ملفات مش صور
+      return;
+    }
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    reader.onerror = () => resolve(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        if(width > height){ height = Math.round(height * (maxDim / width)); width = maxDim; }
+        else { width = Math.round(width * (maxDim / height)); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        if(!blob || blob.size >= file.size){ resolve(file); return; } // لو الضغط زوّد الحجم، استخدم الأصلي
+        const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+        resolve(compressedFile);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function checkSession(){
+  const { data } = await sb.auth.getSession();
+  if(data.session){ showApp(); } else { showLogin(); }
+}
+function showLogin(){ document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('adminApp').classList.add('hidden'); }
+function showApp(){ document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminApp').classList.remove('hidden'); loadAll(); }
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.innerText = '';
+  if(!email || !password){ errEl.innerText = 'برجاء إدخال البريد وكلمة المرور'; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ errEl.innerText = 'بيانات الدخول غير صحيحة'; return; }
+  showApp();
+}
+async function doLogout(){ await sb.auth.signOut(); showLogin(); }
+
+function switchTab(tab){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.tab===tab));
+  document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+/* ================= Command Palette (Ctrl+K) ================= */
+const CMDK_ACTIONS = [
+  {ic:'📊', label:'لوحة التحكم', meta:'صفحة', run:()=>switchTab('dashboard')},
+  {ic:'📦', label:'المنتجات', meta:'صفحة', run:()=>switchTab('products')},
+  {ic:'➕', label:'إضافة منتج جديد', meta:'أمر', run:()=>{switchTab('products'); openProductModal();}},
+  {ic:'📥', label:'استيراد منتجات', meta:'أمر', run:()=>{switchTab('products'); openImportModal();}},
+  {ic:'⬇️', label:'تصدير المنتجات Excel/CSV', meta:'أمر', run:()=>{switchTab('products'); exportProductsCSV();}},
+  {ic:'🗂️', label:'الأقسام', meta:'صفحة', run:()=>switchTab('categories')},
+  {ic:'🏷️', label:'الكوبونات', meta:'صفحة', run:()=>switchTab('coupons')},
+  {ic:'🧾', label:'الطلبات والإحصائيات', meta:'صفحة', run:()=>switchTab('orders')},
+  {ic:'📋', label:'طلبات المقايسة', meta:'صفحة', run:()=>switchTab('quotes')},
+  {ic:'📁', label:'التنزيلات', meta:'صفحة', run:()=>switchTab('downloads')},
+  {ic:'🚪', label:'تسجيل الخروج', meta:'أمر', run:()=>doLogout()},
+];
+let cmdkActiveIndex = 0;
+function openCmdk(){
+  document.getElementById('cmdkOverlay').classList.add('open');
+  const input = document.getElementById('cmdkInput');
+  input.value = '';
+  cmdkActiveIndex = 0;
+  cmdkRenderList(CMDK_ACTIONS);
+  setTimeout(()=>input.focus(), 30);
+}
+function closeCmdk(){ document.getElementById('cmdkOverlay').classList.remove('open'); }
+function cmdkFilter(){
+  const q = document.getElementById('cmdkInput').value.trim().toLowerCase();
+  cmdkActiveIndex = 0;
+  if(!q){ cmdkRenderList(CMDK_ACTIONS); return; }
+  const filtered = CMDK_ACTIONS.filter(a => a.label.toLowerCase().includes(q));
+  // بحث حي كمان في المنتجات نفسها (يفتح صفحة المنتجات ويطبّق البحث)
+  const prodMatches = (typeof products !== 'undefined' ? products : [])
+    .filter(p => (p.name||'').toLowerCase().includes(q)).slice(0,5)
+    .map(p => ({ic:'📦', label:p.name, meta:'منتج', run:()=>{ switchTab('products'); const s=document.getElementById('prodSearchInput'); if(s){s.value=p.name; renderProductsTable();} }}));
+  cmdkRenderList([...filtered, ...prodMatches]);
+}
+function cmdkRenderList(list){
+  const box = document.getElementById('cmdkList');
+  if(!list.length){ box.innerHTML = '<div class="cmdk-empty">مفيش نتائج مطابقة</div>'; return; }
+  box.innerHTML = list.map((a,i)=>`<div class="cmdk-item ${i===cmdkActiveIndex?'active':''}" data-idx="${i}" onmousemove="cmdkActiveIndex=${i};cmdkHighlight()" onclick="cmdkRun(${i})"><span class="ic">${a.ic}</span><span>${a.label}</span><span class="meta">${a.meta}</span></div>`).join('');
+  box.dataset.count = list.length;
+  window._cmdkCurrentList = list;
+}
+function cmdkHighlight(){
+  document.querySelectorAll('.cmdk-item').forEach((el,i)=>el.classList.toggle('active', i===cmdkActiveIndex));
+}
+function cmdkRun(i){
+  const list = window._cmdkCurrentList || [];
+  const item = list[i];
+  closeCmdk();
+  if(item) item.run();
+}
+function cmdkKeyNav(e){
+  const list = window._cmdkCurrentList || [];
+  if(e.key === 'ArrowDown'){ e.preventDefault(); cmdkActiveIndex = Math.min(list.length-1, cmdkActiveIndex+1); cmdkHighlight(); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); cmdkActiveIndex = Math.max(0, cmdkActiveIndex-1); cmdkHighlight(); }
+  else if(e.key === 'Enter'){ e.preventDefault(); cmdkRun(cmdkActiveIndex); }
+  else if(e.key === 'Escape'){ closeCmdk(); }
+}
+document.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='k'){
+    e.preventDefault();
+    const overlay = document.getElementById('cmdkOverlay');
+    overlay.classList.contains('open') ? closeCmdk() : openCmdk();
+  } else if(e.key === 'Escape'){
+    closeCmdk();
+  }
+});
+
+/* ================= Smart Insights (مبنية على بياناتك الفعلية) ================= */
+function renderSmartInsights(){
+  const box = document.getElementById('smartInsightsBox');
+  if(!box) return;
+  const insights = [];
+
+  const noImage = products.filter(p => !((p.images && p.images[0]) || p.image_url));
+  if(noImage.length){
+    insights.push({cls:'warn', ic:'🖼️', title:`${noImage.length} منتج من غير صورة`, text:'منتجات بدون صورة بتقلل نسبة الثقة والتفاعل من العميل — أول ما تقدر ضيف صورة واحدة على الأقل.'});
+  }
+  const noDesc = products.filter(p => !p.description || p.description.trim().length < 15);
+  if(noDesc.length){
+    insights.push({cls:'warn', ic:'📝', title:`${noDesc.length} منتج بوصف ناقص`, text:'الوصف القصير أو الفاضي بيأثر على ظهور المنتج في البحث وثقة العميل قبل الشراء.'});
+  }
+  const outStock = products.filter(p => (p.product_type||'physical')!=='digital' && p.stock<=0);
+  if(outStock.length){
+    insights.push({cls:'danger', ic:'❌', title:`${outStock.length} منتج نافد تمامًا`, text:'المنتجات دي لسه ظاهرة للعميل وممكن تسبب طلب مايتنفذش — راجعها أو خفي ظهورها مؤقتًا.'});
+  }
+  const catCounts = {};
+  (typeof categories !== 'undefined' ? categories : []).forEach(c => catCounts[c.name || c.id] = 0);
+  products.forEach(p => { if(catCounts[p.category] !== undefined) catCounts[p.category]++; });
+  const emptyCats = Object.entries(catCounts).filter(([,c])=>c===0).map(([n])=>n);
+  if(emptyCats.length){
+    insights.push({cls:'warn', ic:'🗂️', title:`${emptyCats.length} قسم فاضي من غير منتجات`, text:`الأقسام: ${emptyCats.slice(0,4).join('، ')}${emptyCats.length>4?'...':''} — قسم فاضي بيدي انطباع إن المتجر غير مكتمل.`});
+  }
+  const totalQuotes = quotes.length;
+  const closedQuotes = quotes.filter(q=>q.status==='closed').length;
+  if(totalQuotes>0){
+    const rate = Math.round((closedQuotes/totalQuotes)*100);
+    insights.push({cls: rate>=30?'ok':'warn', ic:'📈', title:`معدل إغلاق طلبات المقايسة ${rate}%`, text:`من إجمالي ${totalQuotes} طلب مقايسة، ${closedQuotes} اتقفلوا كـ"مكتمل". لو النسبة قليلة، جرب تسرّع المتابعة مع العملاء الجداد.`});
+  }
+  const newQuotesCount = quotes.filter(q=>q.status==='new').length;
+  if(newQuotesCount>0){
+    insights.push({cls:'danger', ic:'⏳', title:`${newQuotesCount} طلب مقايسة لسه ماتراجعش`, text:'كل يوم تأخير في الرد على طلب مقايسة بيقلل فرصة تحويله لعميل فعلي.'});
+  }
+  if(!insights.length){
+    insights.push({cls:'ok', ic:'✅', title:'كل حاجة شكلها كويس', text:'مفيش ملاحظات حرجة على البيانات الحالية دلوقتي.'});
+  }
+  box.innerHTML = insights.map(i => `<div class="insight-card ${i.cls}"><span class="ic">${i.ic}</span><div><b>${i.title}</b><span>${i.text}</span></div></div>`).join('');
+}
+
+let coupons = [];
+let orders = [];
+let quotes = [];
+let downloadsAdmin = [];
+
+async function loadAll(){
+  const { data: catData } = await sb.from('categories').select('*').order('sort_order',{ascending:true});
+  const { data: prodData } = await sb.from('products').select('*').order('created_at',{ascending:false});
+  const { data: couponData } = await sb.from('coupons').select('*').order('created_at',{ascending:false});
+  const { data: orderData } = await sb.from('orders').select('*').order('created_at',{ascending:false});
+  const { data: quoteData, error: quoteErr } = await sb.from('quote_requests').select('*').order('created_at',{ascending:false});
+  const { data: dlData, error: dlErr } = await sb.from('downloads').select('*').order('sort_order',{ascending:true});
+  categories = catData || [];
+  products = prodData || [];
+  coupons = couponData || [];
+  orders = orderData || [];
+  quotes = quoteData || [];
+  downloadsAdmin = dlData || [];
+  if(quoteErr) console.error('quote_requests: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', quoteErr);
+  if(dlErr) console.error('downloads: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', dlErr);
+  renderCategoriesTable();
+  renderProductsTable();
+  populateCategorySelect();
+  renderCouponsTable();
+  renderOrdersTable();
+  renderQuotesTable();
+  renderDownloadsTable();
+  renderDashboard();
+}
+
+const LOW_STOCK_THRESHOLD = 5;
+let _charts = {};
+
+function destroyChart(key){ if(_charts[key]){ _charts[key].destroy(); delete _charts[key]; } }
+
+const STATUS_LABELS_ADM = { pending:'قيد الانتظار', pending_payment:'في انتظار التحويل', confirmed:'مؤكد', shipped:'تم الشحن', completed:'مكتمل', cancelled:'ملغي' };
+
+function renderMissionControlBanner({ newQuotesCount, lowStockCount, orders30, revenue }){
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'صباح الخير' : (h < 18 ? 'مساء الخير' : 'مساء النور');
+  const nameEl = document.getElementById('mcGreeting');
+  if(nameEl) nameEl.innerText = `${greet} 👋`;
+  const parts = [];
+  parts.push(`لديك <b>${newQuotesCount}</b> طلب مقايسة بانتظار الرد`);
+  parts.push(`<b>${orders30}</b> طلب خلال آخر 30 يوم`);
+  if(lowStockCount > 0) parts.push(`⚠️ <b>${lowStockCount}</b> منتج على وشك النفاد`);
+  parts.push(`إجمالي مبيعات مؤكدة: <b>${revenue.toLocaleString('ar-EG')} ج.م</b>`);
+  const s = document.getElementById('mcSummary');
+  if(s) s.innerHTML = parts.join(' &nbsp;•&nbsp; ');
+}
+
+function renderDashboard(){
+  if(typeof Chart === 'undefined') return; // لو الشبكة مانعة تحميل Chart.js من الـ CDN
+  const activeOrders = orders.filter(o => o.status !== 'cancelled');
+
+  // ---- كروت الإحصائيات العلوية (بدون أي استعلام إضافي لقاعدة البيانات) ----
+  const revenue = orders.filter(o => ['confirmed','shipped','completed'].includes(o.status))
+    .reduce((s,o)=> s + Number(o.total||0), 0);
+  document.getElementById('dashRevenue').innerText = revenue.toLocaleString('ar-EG') + ' ج.م';
+
+  const cutoff30 = Date.now() - 30*24*60*60*1000;
+  document.getElementById('dashOrders30').innerText = orders.filter(o => new Date(o.created_at).getTime() >= cutoff30).length;
+
+  const lowStockCount = products.filter(p => (p.product_type||'physical') !== 'digital' && p.stock < LOW_STOCK_THRESHOLD).length;
+  const newQuotesCount = quotes.filter(q => q.status === 'new').length;
+  document.getElementById('dashLowStock').innerText = lowStockCount;
+  document.getElementById('dashNewQuotes').innerText = newQuotesCount;
+  renderSmartInsights();
+  renderMissionControlBanner({ newQuotesCount, lowStockCount, orders30: orders.filter(o => new Date(o.created_at).getTime() >= cutoff30).length, revenue });
+
+  // ---- 1) اتجاه المبيعات آخر 14 يوم ----
+  const days = [];
+  const dayTotals = [];
+  for(let i=13;i>=0;i--){
+    const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
+    days.push(d);
+    dayTotals.push(0);
+  }
+  activeOrders.forEach(o=>{
+    const od = new Date(o.created_at); od.setHours(0,0,0,0);
+    const idx = days.findIndex(d => d.getTime() === od.getTime());
+    if(idx > -1) dayTotals[idx] += Number(o.total||0);
+  });
+  destroyChart('sales');
+  _charts.sales = new Chart(document.getElementById('chartSalesTrend'), {
+    type: 'line',
+    data: {
+      labels: days.map(d => d.toLocaleDateString('ar-EG', {day:'numeric', month:'numeric'})),
+      datasets: [{ label:'المبيعات (ج.م)', data: dayTotals, borderColor:'#ff7a2f', backgroundColor:'#ff7a2f33', fill:true, tension:.35, pointRadius:3 }]
+    },
+    options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // ---- 2) أفضل 5 منتجات مبيعًا (من العناصر المخزّنة داخل الطلبات نفسها) ----
+  const qtyByName = {};
+  activeOrders.forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      qtyByName[it.name] = (qtyByName[it.name]||0) + Number(it.qty||0);
+    });
+  });
+  const topProducts = Object.entries(qtyByName).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  destroyChart('top');
+  _charts.top = new Chart(document.getElementById('chartTopProducts'), {
+    type: 'bar',
+    data: {
+      labels: topProducts.map(x=>x[0].length>18 ? x[0].slice(0,18)+'…' : x[0]),
+      datasets: [{ label:'الكمية المباعة', data: topProducts.map(x=>x[1]), backgroundColor:'#2f6fed' }]
+    },
+    options: { responsive:true, indexAxis:'y', plugins:{legend:{display:false}} }
+  });
+
+  // ---- 3) حالة المخزون ----
+  const physical = products.filter(p => (p.product_type||'physical') !== 'digital');
+  const inStock = physical.filter(p=>p.stock >= LOW_STOCK_THRESHOLD).length;
+  const low = physical.filter(p=>p.stock > 0 && p.stock < LOW_STOCK_THRESHOLD).length;
+  const out = physical.filter(p=>p.stock <= 0).length;
+  destroyChart('stock');
+  _charts.stock = new Chart(document.getElementById('chartStockStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: ['متوفر', 'شارف على النفاد', 'نفد من المخزون'],
+      datasets: [{ data:[inStock, low, out], backgroundColor:['#1fae6b','#ff7a2f','#ff5c5c'] }]
+    },
+    options: { responsive:true, plugins:{legend:{position:'bottom'}} }
+  });
+
+  // ---- 4) طرق الدفع ----
+  const codCount = orders.filter(o=>o.payment_method==='whatsapp_cod').length;
+  const bankCount = orders.filter(o=>o.payment_method==='bank_transfer').length;
+  destroyChart('pay');
+  _charts.pay = new Chart(document.getElementById('chartPaymentMethods'), {
+    type: 'pie',
+    data: {
+      labels: ['واتساب (عند الاستلام)', 'تحويل بنكي/إنستاباي'],
+      datasets: [{ data:[codCount, bankCount], backgroundColor:['#25D366','#2f6fed'] }]
+    },
+    options: { responsive:true, plugins:{legend:{position:'bottom'}} }
+  });
+}
+
+let prodSortField = 'created_at';
+let prodSortDir = 'desc';
+let prodCurrentPage = 1;
+let selectedProductIds = new Set();
+
+function setSortField(field){
+  if(prodSortField === field){ prodSortDir = prodSortDir === 'asc' ? 'desc' : 'asc'; }
+  else { prodSortField = field; prodSortDir = (field==='name' || field==='category') ? 'asc' : 'desc'; }
+  prodCurrentPage = 1;
+  renderProductsTable();
+}
+
+function renderProductsTable(){
+  const body = document.getElementById('productsTableBody');
+  document.getElementById('prodCountLabel').innerText = `${products.length} منتج`;
+
+  // الإحصائيات دايمًا محسوبة على كل المنتجات (مش بس المفلترة)
+  const lowStockCount = products.filter(p => (p.stock ?? 0) > 0 && (p.stock ?? 0) < LOW_STOCK_THRESHOLD).length;
+  const outStockCount = products.filter(p => (p.stock ?? 0) <= 0).length;
+  const elTotal = document.getElementById('statProdTotal');
+  const elLow = document.getElementById('statProdLowStock');
+  const elOut = document.getElementById('statProdOutStock');
+  if(elTotal) elTotal.innerText = products.length;
+  if(elLow) elLow.innerText = lowStockCount;
+  if(elOut) elOut.innerText = outStockCount;
+
+  // تحديث أيقونات الترتيب في رؤوس الأعمدة
+  ['name','category','price','stock'].forEach(f => {
+    const ic = document.getElementById('sortIc-' + f);
+    if(ic) ic.innerText = (prodSortField === f) ? (prodSortDir === 'asc' ? '▲' : '▼') : '';
+  });
+
+  const pgRow = document.getElementById('prodPaginationRow');
+
+  if(products.length===0){
+    body.innerHTML = '<tr class="empty-row"><td colspan="11">لا توجد منتجات بعد. اضغط "إضافة منتج"</td></tr>';
+    selectedProductIds.clear(); updateBulkToolbar();
+    if(pgRow) pgRow.style.display = 'none';
+    return;
+  }
+
+  // تطبيق البحث والفلاتر
+  const searchEl = document.getElementById('prodSearchInput');
+  const catEl = document.getElementById('prodCategoryFilter');
+  const lowOnlyEl = document.getElementById('prodLowStockFilter');
+  const q = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const catFilter = catEl ? catEl.value : '';
+  const lowOnly = lowOnlyEl ? lowOnlyEl.checked : false;
+
+  let list = products;
+  if(q) list = list.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q));
+  if(catFilter) list = list.filter(p => p.category === catFilter);
+  if(lowOnly) list = list.filter(p => (p.stock ?? 0) < LOW_STOCK_THRESHOLD);
+
+  if(list.length===0){
+    body.innerHTML = '<tr class="empty-row"><td colspan="11">لا توجد منتجات مطابقة لبحثك/فلترك.</td></tr>';
+    updateBulkToolbar();
+    if(pgRow) pgRow.style.display = 'none';
+    return;
+  }
+
+  // الترتيب
+  const dir = prodSortDir === 'asc' ? 1 : -1;
+  list = [...list].sort((a,b) => {
+    let av, bv;
+    switch(prodSortField){
+      case 'name': av=(a.name||'').toLowerCase(); bv=(b.name||'').toLowerCase(); break;
+      case 'category': av=(a.category||'').toLowerCase(); bv=(b.category||'').toLowerCase(); break;
+      case 'price': av=Number(a.price)||0; bv=Number(b.price)||0; break;
+      case 'stock': av=Number(a.stock)||0; bv=Number(b.stock)||0; break;
+      default: av=a.created_at||''; bv=b.created_at||'';
+    }
+    if(av < bv) return -1*dir;
+    if(av > bv) return 1*dir;
+    return 0;
+  });
+
+  // شيل من التحديد أي منتج مش موجود دلوقتي في القايمة الظاهرة أصلاً (اتحذف/اتفلتر بره)
+  const visibleIds = new Set(list.map(p => String(p.id)));
+  [...selectedProductIds].forEach(id => { if(!visibleIds.has(id)) selectedProductIds.delete(id); });
+
+  // Pagination
+  const pageSizeEl = document.getElementById('prodPageSize');
+  const pageSizeVal = pageSizeEl ? pageSizeEl.value : '25';
+  const pageSize = pageSizeVal === 'all' ? list.length : parseInt(pageSizeVal, 10);
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  if(prodCurrentPage > totalPages) prodCurrentPage = totalPages;
+  if(prodCurrentPage < 1) prodCurrentPage = 1;
+  const startIdx = (prodCurrentPage - 1) * pageSize;
+  const pageList = pageSizeVal === 'all' ? list : list.slice(startIdx, startIdx + pageSize);
+
+  if(pgRow){
+    pgRow.style.display = 'flex';
+    const infoEl = document.getElementById('pgInfo');
+    const curEl = document.getElementById('pgCurrent');
+    if(infoEl) infoEl.innerText = `عرض ${startIdx+1}–${Math.min(startIdx+pageSize, list.length)} من ${list.length}`;
+    if(curEl) curEl.innerText = `صفحة ${prodCurrentPage} من ${totalPages}`;
+    const btns = pgRow.querySelectorAll('.pg-controls button');
+    if(btns[0]) btns[0].disabled = prodCurrentPage <= 1;
+    if(btns[1]) btns[1].disabled = prodCurrentPage >= totalPages;
+  }
+
+  body.innerHTML = pageList.map(p => {
+    const stock = p.stock ?? 0;
+    const rowClass = stock <= 0 ? 'out-stock-row' : (stock < LOW_STOCK_THRESHOLD ? 'low-stock-row' : '');
+    const stockLabel = stock <= 0 ? `<b style="color:var(--danger);">${stock}</b>` : (stock < LOW_STOCK_THRESHOLD ? `<b style="color:var(--cable-orange);">${stock} ⚠️</b>` : stock);
+    const pid = String(p.id);
+    return `
+    <tr class="${rowClass}">
+      <td><input type="checkbox" class="prodRowCheck" data-id="${pid}" ${selectedProductIds.has(pid)?'checked':''} onchange="toggleProductSelect('${pid}', this.checked)"></td>
+      <td><img src="${(p.images && p.images[0]) || p.image_url || 'https://placehold.co/80x80/10294f/9fb0d1?text=IMG'}"></td>
+      <td>${p.name}</td>
+      <td>${p.product_type==='digital' ? '<span class="badge on">💾 رقمي</span>' : '<span class="badge off">📦 فيزيائي</span>'}</td>
+      <td>${p.category || '-'}</td>
+      <td>${p.brand || '-'}</td>
+      <td>${Number(p.price).toLocaleString('ar-EG')} ج.م</td>
+      <td>${stockLabel}</td>
+      <td><span class="badge ${p.featured?'on':'off'}">${p.featured?'مميز':'عادي'}</span></td>
+      <td><span class="badge ${p.is_bestseller?'on':'off'}">${p.is_bestseller?'🔥 نعم':'لا'}</span></td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick='openProductModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="icon-btn danger" onclick="deleteProduct('${p.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const selectAllEl = document.getElementById('prodSelectAll');
+  if(selectAllEl){
+    const allChecked = pageList.length>0 && pageList.every(p => selectedProductIds.has(String(p.id)));
+    selectAllEl.checked = allChecked;
+    selectAllEl.indeterminate = !allChecked && pageList.some(p => selectedProductIds.has(String(p.id)));
+  }
+  window._prodFilteredList = list; // متاح لزرار "تحديد كل النتائج المطابقة"
+  updateBulkToolbar();
+}
+
+function changeProdPage(delta){
+  prodCurrentPage += delta;
+  renderProductsTable();
+}
+
+/* ---------------- Bulk selection & actions ---------------- */
+
+function toggleProductSelect(id, checked){
+  id = String(id);
+  if(checked) selectedProductIds.add(id); else selectedProductIds.delete(id);
+  updateBulkToolbar();
+  const selectAllEl = document.getElementById('prodSelectAll');
+  if(selectAllEl){
+    const rowChecks = [...document.querySelectorAll('.prodRowCheck')];
+    const allChecked = rowChecks.length>0 && rowChecks.every(cb => cb.checked);
+    selectAllEl.checked = allChecked;
+    selectAllEl.indeterminate = !allChecked && rowChecks.some(cb => cb.checked);
+  }
+}
+
+function toggleSelectAllProducts(checkboxEl){
+  const rowChecks = [...document.querySelectorAll('.prodRowCheck')];
+  rowChecks.forEach(cb => {
+    cb.checked = checkboxEl.checked;
+    if(checkboxEl.checked) selectedProductIds.add(cb.dataset.id); else selectedProductIds.delete(cb.dataset.id);
+  });
+  updateBulkToolbar();
+}
+
+function selectAllFilteredProducts(){
+  const list = window._prodFilteredList || [];
+  list.forEach(p => selectedProductIds.add(String(p.id)));
+  renderProductsTable();
+}
+
+function clearProductSelection(){
+  selectedProductIds.clear();
+  renderProductsTable();
+}
+
+function updateBulkToolbar(){
+  const toolbar = document.getElementById('bulkToolbar');
+  const countEl = document.getElementById('bulkSelCount');
+  const filteredCountEl = document.getElementById('bulkFilteredCount');
+  if(!toolbar) return;
+  const count = selectedProductIds.size;
+  if(countEl) countEl.innerText = count;
+  if(filteredCountEl) filteredCountEl.innerText = (window._prodFilteredList || []).length;
+  toolbar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+async function bulkDeleteProducts(){
+  const ids = [...selectedProductIds];
+  if(ids.length === 0) return;
+  if(!confirm(`متأكد إنك عايز تحذف ${ids.length} منتج مرة واحدة؟ الإجراء ده مش هينفع يتراجع عنه.`)) return;
+
+  const btn = document.getElementById('bulkDeleteBtn');
+  const originalLabel = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerText = 'جاري الحذف...'; }
+
+  const { error } = await sb.from('products').delete().in('id', ids);
+
+  if(error){
+    alert('حدث خطأ أثناء الحذف الجماعي. اتأكد من اتصال الإنترنت وحاول تاني.');
+    console.error(error);
+    if(btn){ btn.disabled = false; btn.innerHTML = originalLabel; }
+    return;
+  }
+
+  selectedProductIds.clear();
+  await loadAll();
+}
+
+async function bulkToggleFeatured(value){
+  const ids = [...selectedProductIds];
+  if(ids.length === 0) return;
+  if(!confirm(`${value ? 'تمييز' : 'إلغاء تمييز'} ${ids.length} منتج؟`)) return;
+  const { error } = await sb.from('products').update({ featured: value }).in('id', ids);
+  if(error){ alert('حدث خطأ أثناء التحديث الجماعي.'); console.error(error); return; }
+  await loadAll();
+}
+
+async function bulkChangeCategory(){
+  const ids = [...selectedProductIds];
+  if(ids.length === 0) return;
+  const sel = document.getElementById('bulkCategorySelect');
+  const cat = sel ? sel.value : '';
+  if(!cat){ alert('اختار القسم الجديد الأول من القائمة.'); return; }
+  if(!confirm(`نقل ${ids.length} منتج لقسم "${cat}"؟`)) return;
+  const { error } = await sb.from('products').update({ category: cat }).in('id', ids);
+  if(error){ alert('حدث خطأ أثناء نقل الأقسام.'); console.error(error); return; }
+  await loadAll();
+}
+
+function exportProductsCSV(selectedOnly){
+  let list = products;
+  if(selectedOnly){
+    if(selectedProductIds.size === 0){ alert('مفيش منتجات محددة للتصدير.'); return; }
+    list = products.filter(p => selectedProductIds.has(String(p.id)));
+  }
+  if(list.length === 0){ alert('لا توجد منتجات لتصديرها بعد.'); return; }
+  const headers = ['name','description','category','brand','price','old_price','stock','featured','bestseller','image'];
+  const escapeCsv = (v) => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const rows = list.map(p => [
+    p.name, p.description || '', p.category || '', p.brand || '',
+    p.price ?? 0, p.old_price ?? '', p.stock ?? 0,
+    p.featured ? 'TRUE' : 'FALSE', p.is_bestseller ? 'TRUE' : 'FALSE',
+    (p.images && p.images[0]) || p.image_url || ''
+  ].map(escapeCsv).join(','));
+  const csv = headers.join(',') + '\n' + rows.join('\n') + '\n';
+  const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `منتجات${selectedOnly ? '_محدد' : ''}_${dateStr}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+function renderCategoriesTable(){
+  const body = document.getElementById('categoriesTableBody');
+  if(categories.length===0){ body.innerHTML = '<tr class="empty-row"><td colspan="4">لا توجد أقسام بعد.</td></tr>'; return; }
+  body.innerHTML = categories.map(c => `
+    <tr>
+      <td style="font-size:20px;">${c.icon || '📦'}</td>
+      <td>${c.name}</td>
+      <td>${c.sort_order ?? 0}</td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick='openCategoryModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="icon-btn danger" onclick="deleteCategory('${c.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function populateCategorySelect(){
+  const sel = document.getElementById('prodCategory');
+  sel.innerHTML = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('') || '<option value="">أضف قسم أولاً</option>';
+
+  const filterSel = document.getElementById('prodCategoryFilter');
+  if(filterSel){
+    const current = filterSel.value;
+    filterSel.innerHTML = '<option value="">كل الأقسام</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    filterSel.value = current;
+  }
+
+  const bulkCatSel = document.getElementById('bulkCategorySelect');
+  if(bulkCatSel){
+    bulkCatSel.innerHTML = '<option value="">↪️ نقل لقسم آخر...</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  }
+}
+
+/* ---------------- Product Modal ---------------- */
+let currentProdImages = [];
+function renderProdImgManager(){
+  const el = document.getElementById('prodImgManager');
+  el.innerHTML = currentProdImages.map((url, i) => `
+    <div class="thumb-wrap">
+      <img src="${url}">
+      <button onclick="removeProdImage(${i})">×</button>
+    </div>`).join('');
+}
+function removeProdImage(i){ currentProdImages.splice(i,1); renderProdImgManager(); }
+
+function openProductModal(p){
+  document.getElementById('productModalError').innerText = '';
+  populateCategorySelect();
+  document.getElementById('prodImageFile').value = '';
+  if(p && p.id){
+    document.getElementById('productModalTitle').innerText = 'تعديل منتج';
+    document.getElementById('prodId').value = p.id;
+    document.getElementById('prodName').value = p.name || '';
+    document.getElementById('prodDesc').value = p.description || '';
+    document.getElementById('prodPrice').value = p.price || '';
+    document.getElementById('prodOldPrice').value = p.old_price || '';
+    document.getElementById('prodCategory').value = p.category || '';
+    document.getElementById('prodStock').value = p.stock ?? 0;
+    document.getElementById('prodBrand').value = p.brand || '';
+    document.getElementById('prodFeatured').checked = !!p.featured;
+    document.getElementById('prodBestseller').checked = !!p.is_bestseller;
+    document.getElementById('prodType').value = p.product_type || 'physical';
+    document.getElementById('prodInstallationType').value = p.installation_type || '';
+    document.getElementById('prodConnectionType').value = p.connection_type || '';
+    document.getElementById('prodChannels').value = p.channels ?? '';
+    document.getElementById('prodBioType').value = p.bio_type || '';
+    document.getElementById('prodBioUse').value = p.bio_use || '';
+    document.getElementById('prodRecPriority').value = p.recommendation_priority ?? 0;
+    const existingTags = Array.isArray(p.tags) ? p.tags : [];
+    document.querySelectorAll('.prodTagCheckbox').forEach(cb => cb.checked = existingTags.includes(cb.value));
+    currentProdDigitalPath = p.digital_file_path || null;
+    document.getElementById('digitalFileCurrentLabel').innerText = currentProdDigitalPath ? ('الملف الحالي: ' + currentProdDigitalPath.split('/').pop()) : 'لم يتم رفع ملف بعد.';
+    currentProdDigitalPath2 = p.digital_file_path_2 || null;
+    document.getElementById('digitalFileCurrentLabel2').innerText = currentProdDigitalPath2 ? ('الملف الحالي: ' + currentProdDigitalPath2.split('/').pop()) : 'لم يتم رفع ملف بعد.';
+    currentProdImages = (p.images && p.images.length) ? [...p.images] : (p.image_url ? [p.image_url] : []);
+  } else {
+    document.getElementById('productModalTitle').innerText = 'إضافة منتج';
+    document.getElementById('prodId').value = '';
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodDesc').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodOldPrice').value = '';
+    document.getElementById('prodStock').value = 0;
+    document.getElementById('prodBrand').value = '';
+    document.getElementById('prodFeatured').checked = false;
+    document.getElementById('prodBestseller').checked = false;
+    document.getElementById('prodType').value = 'physical';
+    document.getElementById('prodInstallationType').value = '';
+    document.getElementById('prodConnectionType').value = '';
+    document.getElementById('prodChannels').value = '';
+    document.getElementById('prodBioType').value = '';
+    document.getElementById('prodBioUse').value = '';
+    document.getElementById('prodRecPriority').value = 0;
+    document.querySelectorAll('.prodTagCheckbox').forEach(cb => cb.checked = false);
+    currentProdDigitalPath = null;
+    document.getElementById('digitalFileCurrentLabel').innerText = '';
+    currentProdDigitalPath2 = null;
+    document.getElementById('digitalFileCurrentLabel2').innerText = '';
+    currentProdImages = [];
+  }
+  document.getElementById('prodDigitalFile').value = '';
+  document.getElementById('prodDigitalFile2').value = '';
+  toggleDigitalField();
+  renderProdImgManager();
+  document.getElementById('productModalOverlay').classList.add('open');
+}
+
+let currentProdDigitalPath = null;
+let currentProdDigitalPath2 = null;
+
+function toggleDigitalField(){
+  const isDigital = document.getElementById('prodType').value === 'digital';
+  document.getElementById('digitalFileField').style.display = isDigital ? 'block' : 'none';
+  document.getElementById('digitalFileField2').style.display = isDigital ? 'block' : 'none';
+}
+function closeProductModal(){ document.getElementById('productModalOverlay').classList.remove('open'); }
+
+async function saveProduct(){
+  const errEl = document.getElementById('productModalError');
+  errEl.innerText = '';
+  const name = document.getElementById('prodName').value.trim();
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  if(!name || isNaN(price)){ errEl.innerText = 'برجاء إدخال اسم المنتج والسعر على الأقل'; return; }
+
+  const saveBtn = document.getElementById('saveProductBtn');
+  saveBtn.disabled = true; saveBtn.innerText = 'جاري الحفظ...';
+
+  try{
+    const files = Array.from(document.getElementById('prodImageFile').files || []);
+    const newUrls = [];
+    for(const file of files){
+      const compressed = await compressImage(file);
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2,7)}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+      const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+      if(upErr) throw upErr;
+      const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+      newUrls.push(pub.publicUrl);
+    }
+    const images = [...currentProdImages, ...newUrls];
+
+    const productType = document.getElementById('prodType').value;
+    let digitalFilePath = currentProdDigitalPath;
+    const digitalFile = document.getElementById('prodDigitalFile').files[0];
+    if(productType === 'digital' && digitalFile){
+      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2,7)}_${digitalFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      const { error: dUpErr } = await sb.storage.from('digital-products').upload(safeName, digitalFile, { upsert:true });
+      if(dUpErr) throw dUpErr;
+      digitalFilePath = safeName;
+    }
+    let digitalFilePath2 = currentProdDigitalPath2;
+    const digitalFile2 = document.getElementById('prodDigitalFile2').files[0];
+    if(productType === 'digital' && digitalFile2){
+      const safeName2 = `${Date.now()}_${Math.random().toString(36).slice(2,7)}_${digitalFile2.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      const { error: dUpErr2 } = await sb.storage.from('digital-products').upload(safeName2, digitalFile2, { upsert:true });
+      if(dUpErr2) throw dUpErr2;
+      digitalFilePath2 = safeName2;
+    }
+
+    const payload = {
+      name,
+      description: document.getElementById('prodDesc').value.trim(),
+      price,
+      old_price: document.getElementById('prodOldPrice').value ? parseFloat(document.getElementById('prodOldPrice').value) : null,
+      category: document.getElementById('prodCategory').value,
+      stock: parseInt(document.getElementById('prodStock').value) || 0,
+      brand: document.getElementById('prodBrand').value.trim() || null,
+      featured: document.getElementById('prodFeatured').checked,
+      is_bestseller: document.getElementById('prodBestseller').checked,
+      installation_type: document.getElementById('prodInstallationType').value || null,
+      connection_type: document.getElementById('prodConnectionType').value || null,
+      channels: document.getElementById('prodChannels').value ? parseInt(document.getElementById('prodChannels').value) : null,
+      bio_type: document.getElementById('prodBioType').value || null,
+      bio_use: document.getElementById('prodBioUse').value || null,
+      tags: Array.from(document.querySelectorAll('.prodTagCheckbox:checked')).map(cb => cb.value),
+      recommendation_priority: parseInt(document.getElementById('prodRecPriority').value) || 0,
+      images: images,
+      image_url: images[0] || null,
+      product_type: productType,
+      digital_file_path: productType === 'digital' ? digitalFilePath : null,
+      digital_file_path_2: productType === 'digital' ? digitalFilePath2 : null
+    };
+
+    const id = document.getElementById('prodId').value;
+    let error;
+    if(id){
+      ({ error } = await sb.from('products').update(payload).eq('id', id));
+    } else {
+      ({ error } = await sb.from('products').insert(payload));
+    }
+    if(error) throw error;
+    closeProductModal();
+    await loadAll();
+  }catch(e){
+    console.error(e);
+    errEl.innerText = 'حدث خطأ أثناء الحفظ: ' + (e.message || 'تأكد من إعداد Supabase');
+  }finally{
+    saveBtn.disabled = false; saveBtn.innerText = 'حفظ المنتج';
+  }
+}
+
+async function deleteProduct(id){
+  if(!confirm('متأكد إنك عايز تحذف المنتج ده؟')) return;
+  const { error } = await sb.from('products').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+/* ---------------- Bulk Import ---------------- */
+let importRows = [];        // الصفوف المقروءة من Excel/CSV بعد التطبيع
+let importImageFiles = {};  // { 'dell5520.jpg': File }
+let importRunning = false;
+
+function openImportModal(){
+  importRows = [];
+  importImageFiles = {};
+  importRunning = false;
+  document.getElementById('importFile').value = '';
+  document.getElementById('importImagesFolder').value = '';
+  document.getElementById('importImagesCount').innerText = 'لو مفيش مجلد، هيتم استخدام الرابط الموجود في عمود image كما هو (لو رابط كامل)';
+  document.getElementById('importPreviewLabel').innerText = '';
+  document.getElementById('importModalError').innerText = '';
+  document.getElementById('importProgressWrap').classList.add('hidden');
+  document.getElementById('importProgressFill').style.width = '0%';
+  document.getElementById('importLog').innerHTML = '';
+  document.getElementById('importCountAdded').innerText = '0';
+  document.getElementById('importCountUpdated').innerText = '0';
+  document.getElementById('importCountFailed').innerText = '0';
+  document.getElementById('importStartBtn').disabled = true;
+  document.getElementById('importStartBtn').innerText = 'ابدأ الاستيراد';
+  document.getElementById('importCloseBtn').innerText = 'إغلاق';
+  document.getElementById('importModalOverlay').classList.add('open');
+}
+function closeImportModal(){
+  if(importRunning && !confirm('الاستيراد لسه شغال، متأكد عايز تقفل؟')) return;
+  document.getElementById('importModalOverlay').classList.remove('open');
+}
+
+// أسماء أعمدة مرنة (تقبل عربي/إنجليزي واختلاف حالة الأحرف)
+const IMPORT_COLUMN_ALIASES = {
+  name: ['name','الاسم','اسم المنتج'],
+  description: ['description','الوصف','desc'],
+  category: ['category','القسم','التصنيف'],
+  brand: ['brand','الماركة'],
+  price: ['price','السعر'],
+  old_price: ['old_price','oldprice','السعر قبل الخصم','السعر القديم'],
+  stock: ['stock','المخزون','الكمية'],
+  featured: ['featured','مميز'],
+  bestseller: ['bestseller','is_bestseller','الأكثر مبيعا','الأكثر مبيعًا'],
+  image: ['image','صورة','image_url','الصورة']
+};
+
+function normalizeHeaderKey(header){
+  const h = String(header || '').trim().toLowerCase();
+  for(const key in IMPORT_COLUMN_ALIASES){
+    if(IMPORT_COLUMN_ALIASES[key].some(alias => alias.toLowerCase() === h)) return key;
+  }
+  return null;
+}
+
+function parseBool(v){
+  if(typeof v === 'boolean') return v;
+  const s = String(v || '').trim().toLowerCase();
+  return ['true','1','yes','نعم','صح'].includes(s);
+}
+
+function handleImportFileChosen(){
+  const fileInput = document.getElementById('importFile');
+  const errEl = document.getElementById('importModalError');
+  errEl.innerText = '';
+  document.getElementById('importStartBtn').disabled = true;
+  importRows = [];
+  const file = fileInput.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try{
+      const wb = XLSX.read(e.target.result, { type:'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
+      if(rawRows.length === 0){ errEl.innerText = 'الملف فاضي أو الصيغة غير مدعومة'; return; }
+
+      // بناء خريطة الأعمدة من أول صف
+      const firstRowHeaders = Object.keys(rawRows[0]);
+      const headerMap = {};
+      firstRowHeaders.forEach(h => { const key = normalizeHeaderKey(h); if(key) headerMap[key] = h; });
+
+      if(!headerMap.name || !headerMap.price){
+        errEl.innerText = 'الملف لازم يحتوي على الأقل عمودي name و price';
+        return;
+      }
+
+      importRows = rawRows.map(row => ({
+        name: String(row[headerMap.name] || '').trim(),
+        description: headerMap.description ? String(row[headerMap.description] || '').trim() : '',
+        category: headerMap.category ? String(row[headerMap.category] || '').trim() : '',
+        brand: headerMap.brand ? String(row[headerMap.brand] || '').trim() : '',
+        price: parseFloat(row[headerMap.price]) || 0,
+        old_price: headerMap.old_price && row[headerMap.old_price] !== '' ? parseFloat(row[headerMap.old_price]) : null,
+        stock: headerMap.stock ? (parseInt(row[headerMap.stock]) || 0) : 0,
+        featured: headerMap.featured ? parseBool(row[headerMap.featured]) : false,
+        is_bestseller: headerMap.bestseller ? parseBool(row[headerMap.bestseller]) : false,
+        image: headerMap.image ? String(row[headerMap.image] || '').trim() : ''
+      })).filter(r => r.name); // تجاهل الصفوف الفاضية
+
+      document.getElementById('importPreviewLabel').innerText = `تم قراءة ${importRows.length} منتج من الملف، جاهز للاستيراد.`;
+      document.getElementById('importStartBtn').disabled = importRows.length === 0;
+    }catch(err){
+      console.error(err);
+      errEl.innerText = 'تعذر قراءة الملف: ' + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function handleImportImagesChosen(){
+  const files = Array.from(document.getElementById('importImagesFolder').files || []);
+  importImageFiles = {};
+  files.forEach(f => {
+    // اسم الملف فقط (بدون مسار المجلد) مطابقة case-insensitive
+    const baseName = f.name.toLowerCase();
+    importImageFiles[baseName] = f;
+  });
+  document.getElementById('importImagesCount').innerText = `تم اختيار ${files.length} صورة من المجلد`;
+}
+
+function importLog(msg, cls){
+  const el = document.getElementById('importLog');
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  line.innerText = msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function startImport(){
+  if(importRunning) return;
+  if(importRows.length === 0){ document.getElementById('importModalError').innerText = 'من فضلك اختر ملف أولاً'; return; }
+  importRunning = true;
+
+  const startBtn = document.getElementById('importStartBtn');
+  const closeBtn = document.getElementById('importCloseBtn');
+  startBtn.disabled = true; startBtn.innerText = 'جاري الاستيراد...';
+  closeBtn.innerText = 'إخفاء (الاستيراد مستمر)';
+  document.getElementById('importModalError').innerText = '';
+  document.getElementById('importProgressWrap').classList.remove('hidden');
+  document.getElementById('importLog').innerHTML = '';
+
+  const updateExisting = document.getElementById('importUpdateExisting').checked;
+  const existingByName = {};
+  products.forEach(p => { existingByName[String(p.name || '').trim().toLowerCase()] = p; });
+
+  let added = 0, updated = 0, failed = 0;
+  const total = importRows.length;
+
+  for(let i = 0; i < total; i++){
+    const row = importRows[i];
+    try{
+      let imageUrl = null;
+      if(row.image){
+        if(/^https?:\/\//i.test(row.image)){
+          // رابط كامل جاهز - يُستخدم مباشرة بدون رفع
+          imageUrl = row.image;
+        } else {
+          const matchFile = importImageFiles[row.image.toLowerCase()];
+          if(matchFile){
+            const compressed = await compressImage(matchFile);
+            const safeName = `${Date.now()}_${Math.random().toString(36).slice(2,7)}_${matchFile.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+            const { error: upErr } = await sb.storage.from('products').upload(safeName, compressed, { upsert:true });
+            if(upErr) throw upErr;
+            const { data: pub } = sb.storage.from('products').getPublicUrl(safeName);
+            imageUrl = pub.publicUrl;
+          } else {
+            importLog(`⚠️ "${row.name}": لم يتم إيجاد صورة باسم "${row.image}" في المجلد المختار`, 'fail');
+          }
+        }
+      }
+
+      const payload = {
+        name: row.name,
+        description: row.description,
+        price: row.price,
+        old_price: row.old_price,
+        category: row.category,
+        stock: row.stock,
+        brand: row.brand || null,
+        featured: row.featured,
+        is_bestseller: row.is_bestseller
+      };
+
+      const existing = updateExisting ? existingByName[row.name.trim().toLowerCase()] : null;
+
+      if(existing){
+        const images = imageUrl ? [imageUrl, ...(existing.images || [])] : (existing.images || []);
+        payload.images = images;
+        payload.image_url = images[0] || existing.image_url || null;
+        const { error } = await sb.from('products').update(payload).eq('id', existing.id);
+        if(error) throw error;
+        updated++;
+        importLog(`✏️ تحديث: ${row.name}`, 'upd');
+      } else {
+        payload.images = imageUrl ? [imageUrl] : [];
+        payload.image_url = imageUrl || null;
+        const { error } = await sb.from('products').insert(payload);
+        if(error) throw error;
+        added++;
+        importLog(`✔ إضافة: ${row.name}`, 'ok');
+      }
+    }catch(err){
+      console.error(err);
+      failed++;
+      importLog(`✖ فشل: ${row.name} — ${err.message || 'خطأ غير معروف'}`, 'fail');
+    }
+
+    const pct = Math.round(((i+1) / total) * 100);
+    document.getElementById('importProgressFill').style.width = pct + '%';
+    document.getElementById('importProgressLabel').innerText = `جاري الاستيراد... ${pct}% — تم ${i+1} من ${total}`;
+    document.getElementById('importCountAdded').innerText = added;
+    document.getElementById('importCountUpdated').innerText = updated;
+    document.getElementById('importCountFailed').innerText = failed;
+  }
+
+  document.getElementById('importProgressLabel').innerText = `✅ اكتمل الاستيراد: ${added} جديد، ${updated} تحديث، ${failed} فشل من ${total}`;
+  importRunning = false;
+  startBtn.innerText = 'تم الانتهاء';
+  closeBtn.innerText = 'إغلاق وتحديث القائمة';
+  await loadAll();
+}
+
+function downloadImportTemplate(){
+  const headers = ['name','description','category','brand','price','old_price','stock','featured','bestseller','image'];
+  const sampleRow = ['Dell Latitude 5520','Laptop Core i5','كمبيوتر ولابتوبات','Dell','25000','27000','5','TRUE','FALSE','dell5520.jpg'];
+  const csv = headers.join(',') + '\n' + sampleRow.join(',') + '\n';
+  const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'نموذج_استيراد_منتجات.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- Category Modal ---------------- */
+function openCategoryModal(c){
+  document.getElementById('categoryModalError').innerText = '';
+  if(c && c.id){
+    document.getElementById('categoryModalTitle').innerText = 'تعديل قسم';
+    document.getElementById('catId').value = c.id;
+    document.getElementById('catName').value = c.name || '';
+    document.getElementById('catIcon').value = c.icon || '';
+    document.getElementById('catSort').value = c.sort_order ?? 0;
+  } else {
+    document.getElementById('categoryModalTitle').innerText = 'إضافة قسم';
+    document.getElementById('catId').value = '';
+    document.getElementById('catName').value = '';
+    document.getElementById('catIcon').value = '';
+    document.getElementById('catSort').value = categories.length;
+  }
+  document.getElementById('categoryModalOverlay').classList.add('open');
+}
+function closeCategoryModal(){ document.getElementById('categoryModalOverlay').classList.remove('open'); }
+
+async function saveCategory(){
+  const errEl = document.getElementById('categoryModalError');
+  errEl.innerText = '';
+  const name = document.getElementById('catName').value.trim();
+  if(!name){ errEl.innerText = 'برجاء إدخال اسم القسم'; return; }
+  const payload = {
+    name,
+    icon: document.getElementById('catIcon').value.trim() || '📦',
+    sort_order: parseInt(document.getElementById('catSort').value) || 0
+  };
+  const id = document.getElementById('catId').value;
+  let error;
+  if(id){ ({ error } = await sb.from('categories').update(payload).eq('id', id)); }
+  else { ({ error } = await sb.from('categories').insert(payload)); }
+  if(error){ errEl.innerText = 'حدث خطأ: ' + error.message; return; }
+  closeCategoryModal();
+  await loadAll();
+}
+
+async function deleteCategory(id){
+  if(!confirm('حذف القسم لن يحذف المنتجات المرتبطة به لكنها ستحتاج لتصنيف جديد. متابعة؟')) return;
+  const { error } = await sb.from('categories').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+/* ---------------- Coupons ---------------- */
+function renderCouponsTable(){
+  const body = document.getElementById('couponsTableBody');
+  if(coupons.length===0){ body.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد كوبونات بعد.</td></tr>'; return; }
+  body.innerHTML = coupons.map(c => `
+    <tr>
+      <td><b>${c.code}</b></td>
+      <td>${c.discount_type === 'percent' ? 'نسبة %' : 'مبلغ ثابت'}</td>
+      <td>${c.discount_type === 'percent' ? c.discount_value + '%' : Number(c.discount_value).toLocaleString('ar-EG') + ' ج.م'}</td>
+      <td>${c.min_order ? Number(c.min_order).toLocaleString('ar-EG') + ' ج.م' : '-'}</td>
+      <td>${c.used_count || 0}${c.usage_limit ? ' / ' + c.usage_limit : ''}</td>
+      <td><span class="badge ${c.active?'on':'off'}">${c.active?'مفعل':'موقوف'}</span></td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick='openCouponModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="icon-btn danger" onclick="deleteCoupon('${c.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openCouponModal(c){
+  document.getElementById('couponModalError').innerText = '';
+  if(c && c.id){
+    document.getElementById('couponModalTitle').innerText = 'تعديل كوبون';
+    document.getElementById('couponId').value = c.id;
+    document.getElementById('couponCode').value = c.code || '';
+    document.getElementById('couponType').value = c.discount_type || 'percent';
+    document.getElementById('couponValue').value = c.discount_value || '';
+    document.getElementById('couponMinOrder').value = c.min_order || '';
+    document.getElementById('couponUsageLimit').value = c.usage_limit || '';
+    document.getElementById('couponExpiresAt').value = c.expires_at ? c.expires_at.slice(0,10) : '';
+    document.getElementById('couponActive').checked = c.active !== false;
+  } else {
+    document.getElementById('couponModalTitle').innerText = 'إضافة كوبون';
+    document.getElementById('couponId').value = '';
+    document.getElementById('couponCode').value = '';
+    document.getElementById('couponType').value = 'percent';
+    document.getElementById('couponValue').value = '';
+    document.getElementById('couponMinOrder').value = '';
+    document.getElementById('couponUsageLimit').value = '';
+    document.getElementById('couponExpiresAt').value = '';
+    document.getElementById('couponActive').checked = true;
+  }
+  document.getElementById('couponModalOverlay').classList.add('open');
+}
+function closeCouponModal(){ document.getElementById('couponModalOverlay').classList.remove('open'); }
+
+async function saveCoupon(){
+  const errEl = document.getElementById('couponModalError');
+  errEl.innerText = '';
+  const code = document.getElementById('couponCode').value.trim().toUpperCase();
+  const value = parseFloat(document.getElementById('couponValue').value);
+  if(!code || isNaN(value)){ errEl.innerText = 'برجاء إدخال الكود وقيمة الخصم'; return; }
+  const payload = {
+    code,
+    discount_type: document.getElementById('couponType').value,
+    discount_value: value,
+    min_order: document.getElementById('couponMinOrder').value ? parseFloat(document.getElementById('couponMinOrder').value) : 0,
+    usage_limit: document.getElementById('couponUsageLimit').value ? parseInt(document.getElementById('couponUsageLimit').value) : null,
+    expires_at: document.getElementById('couponExpiresAt').value || null,
+    active: document.getElementById('couponActive').checked
+  };
+  const id = document.getElementById('couponId').value;
+  let error;
+  if(id){ ({ error } = await sb.from('coupons').update(payload).eq('id', id)); }
+  else { ({ error } = await sb.from('coupons').insert(payload)); }
+  if(error){ errEl.innerText = 'حدث خطأ: ' + error.message; return; }
+  closeCouponModal();
+  await loadAll();
+}
+
+async function deleteCoupon(id){
+  if(!confirm('متأكد إنك عايز تحذف الكوبون ده؟')) return;
+  const { error } = await sb.from('coupons').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+/* ---------------- Orders & Analytics ---------------- */
+const STATUS_LABELS = {
+  pending: 'قيد الانتظار',
+  pending_payment: 'في انتظار التحويل',
+  confirmed: 'مؤكد',
+  shipped: 'تم الشحن',
+  completed: 'مكتمل',
+  cancelled: 'ملغي'
+};
+const PAYMENT_LABELS = {
+  whatsapp_cod: '💬 عند الاستلام',
+  bank_transfer: '🏦 تحويل بنكي'
+};
+
+function renderOrdersTable(){
+  const filter = document.getElementById('orderStatusFilter') ? document.getElementById('orderStatusFilter').value : 'all';
+  const list = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+
+  // stats always computed from all orders (not just filtered view)
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((s,o)=> s + Number(o.total||0), 0);
+  const avgOrder = totalOrders ? totalRevenue / totalOrders : 0;
+  const productCount = {};
+  orders.forEach(o => (o.items||[]).forEach(it => { productCount[it.name] = (productCount[it.name]||0) + it.qty; }));
+  let topProduct = '-';
+  let topQty = 0;
+  Object.keys(productCount).forEach(name => { if(productCount[name] > topQty){ topQty = productCount[name]; topProduct = name; } });
+
+  document.getElementById('statTotalOrders').innerText = totalOrders;
+  document.getElementById('statTotalRevenue').innerText = totalRevenue.toLocaleString('ar-EG') + ' ج.م';
+  document.getElementById('statAvgOrder').innerText = Math.round(avgOrder).toLocaleString('ar-EG') + ' ج.م';
+  document.getElementById('statTopProduct').innerText = topProduct;
+
+  const body = document.getElementById('ordersTableBody');
+  if(list.length===0){ body.innerHTML = '<tr class="empty-row"><td colspan="8">لا توجد طلبات مطابقة.</td></tr>'; return; }
+  body.innerHTML = list.map(o => {
+    const hasDigital = (o.items||[]).some(it => it.product_type === 'digital');
+    let digitalCell = '-';
+    if(hasDigital){
+      if(o.download_ready){
+        digitalCell = `<button class="icon-btn" title="نسخ رسالة روابط التحميل" onclick="copyDigitalLinksMsg('${o.id}')">📋 نسخ الروابط</button>`;
+      } else {
+        digitalCell = `<button class="icon-btn" title="توليد روابط تحميل آمنة لهذا الطلب" onclick="generateDigitalLinks('${o.id}')">🔑 توليد رابط تحميل</button>`;
+      }
+    }
+    return `
+    <tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;" title="${o.id}">${o.order_ref || o.id.slice(0,8)}</td>
+      <td style="max-width:220px;">${(o.items||[]).map(it => `${it.name} × ${it.qty}${it.product_type==='digital'?' 💾':''}`).join('، ')}</td>
+      <td>${Number(o.total).toLocaleString('ar-EG')} ج.م</td>
+      <td>${PAYMENT_LABELS[o.payment_method] || o.payment_method}</td>
+      <td>
+        <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+          ${Object.keys(STATUS_LABELS).map(s => `<option value="${s}" ${o.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td>${digitalCell}</td>
+      <td>${new Date(o.created_at).toLocaleDateString('ar-EG')}</td>
+      <td><button class="icon-btn danger" onclick="deleteOrder('${o.id}')">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateOrderStatus(id, status){
+  // بنستخدم دالة السيرفر الآمنة عشان لو الطلب اتلغى أو اتفعّل تاني بعد
+  // الإلغاء، المخزون يترجع/يتخصم تلقائيًا وبشكل ذري بدل ما يفضل غلط.
+  const { error } = await sb.rpc('update_order_status_secure', { target_order_id: id, new_status: status });
+  if(error){ alert(error.message || 'حدث خطأ أثناء تحديث الحالة'); console.error(error); return; }
+  const o = orders.find(x=>x.id===id);
+  if(o) o.status = status;
+  renderOrdersTable();
+  // حدّث كمية المخزون المعروضة في تبويب المنتجات كمان
+  loadAll();
+
+  // لو الطلب بقى "مؤكد" وفيه منتج رقمي ولسه مالوش رابط تحميل، ولّد الرابط أوتوماتيك
+  if(status === 'confirmed' && o && !o.download_ready){
+    const hasDigital = (o.items||[]).some(it => it.product_type === 'digital');
+    if(hasDigital){
+      await generateDigitalLinks(id, { silent: true });
+    }
+  }
+}
+
+async function deleteOrder(id){
+  if(!confirm('حذف الطلب نهائيًا؟')) return;
+  const { error } = await sb.from('orders').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+/* ---------------- تسليم المنتجات الرقمية (سكريبتات/برامج) ---------------- */
+const DIGITAL_LINK_EXPIRY_SECONDS = 60 * 60 * 24 * 7; // 7 أيام
+
+async function generateDigitalLinks(orderId, opts){
+  const silent = !!(opts && opts.silent);
+  const order = orders.find(o => o.id === orderId);
+  if(!order) return;
+  const digitalItems = (order.items||[]).filter(it => it.product_type === 'digital');
+  if(!digitalItems.length){ if(!silent) alert('لا يوجد منتجات رقمية في هذا الطلب.'); return; }
+
+  const links = [];
+  const missingFiles = [];
+  for(const it of digitalItems){
+    const product = products.find(p => p.id === it.product_id);
+    if(!product || !product.digital_file_path){
+      missingFiles.push(it.name);
+      continue;
+    }
+    const downloadFileName = product.digital_file_path.split('/').pop();
+    const { data, error } = await sb.storage.from('digital-products').createSignedUrl(product.digital_file_path, DIGITAL_LINK_EXPIRY_SECONDS, { download: downloadFileName });
+    if(error){ console.error(error); alert(`تعذر توليد رابط تحميل لـ "${it.name}": ${error.message}`); continue; }
+    links.push({ name: it.name, url: data.signedUrl });
+
+    // ملف إضافي اختياري (مثلاً ملف الناتج/العينة) - بيتسلّم برابط منفصل لو موجود
+    if(product.digital_file_path_2){
+      const downloadFileName2 = product.digital_file_path_2.split('/').pop();
+      const { data: data2, error: error2 } = await sb.storage.from('digital-products').createSignedUrl(product.digital_file_path_2, DIGITAL_LINK_EXPIRY_SECONDS, { download: downloadFileName2 });
+      if(error2){ console.error(error2); alert(`تعذر توليد رابط تحميل للملف الإضافي لـ "${it.name}": ${error2.message}`); }
+      else { links.push({ name: `${it.name} (ملف إضافي)`, url: data2.signedUrl }); }
+    }
+  }
+
+  // لازم ننبّه دايمًا (سواء أوتوماتيك أو يدوي) لو فيه ملف لسه مرفوعش، غير كده الأدمن هيفتكر إن كل حاجة تمت
+  if(missingFiles.length){
+    alert(`تنبيه: المنتج/المنتجات (${missingFiles.join('، ')}) رقمية لكن لم يتم رفع ملف لها من إدارة المنتجات بعد. لن يظهر رابط تحميل للعميل لغاية ما ترفع الملف وتولّد الرابط تاني.`);
+  }
+
+  if(!links.length) return;
+
+  const { error: updErr } = await sb.from('orders').update({ digital_link: JSON.stringify(links), download_ready: true }).eq('id', orderId);
+  if(updErr){ alert('حدث خطأ أثناء حفظ الروابط'); console.error(updErr); return; }
+
+  order.digital_link = JSON.stringify(links);
+  order.download_ready = true;
+  renderOrdersTable();
+  copyDigitalLinksMsg(orderId);
+  if(!silent){
+    alert('تم توليد روابط التحميل بنجاح (صالحة 7 أيام)، وتم نسخ رسالة جاهزة للصقها في واتساب.');
+  } else {
+    alert(`تم تأكيد الطلب وتوليد رابط التحميل أوتوماتيك (صالح 7 أيام)، وتم نسخ رسالة جاهزة للصقها في واتساب للعميل "${order.customer_name || ''}".`);
+  }
+}
+
+function copyDigitalLinksMsg(orderId){
+  const order = orders.find(o => o.id === orderId);
+  if(!order || !order.digital_link) return;
+  let links = [];
+  try{ links = JSON.parse(order.digital_link); }catch(e){ return; }
+  let msg = `✅ *تم تأكيد طلبك* (${order.order_ref || orderId.slice(0,8)})\n\nروابط التحميل الخاصة بك (صالحة لمدة 7 أيام):\n\n`;
+  links.forEach(l => { msg += `📦 ${l.name}:\n${l.url}\n\n`; });
+  msg += 'من فضلك حمّل الملف قبل انتهاء صلاحية الرابط.';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).catch(()=>{});
+  }
+}
+
+/* ---------------- طلبات المقايسة ---------------- */
+const QUOTE_STATUS_LABELS = { new: 'جديد', contacted: 'تم التواصل', quoted: 'تم تسعير', closed: 'مغلق' };
+
+function renderQuotesTable(){
+  const filter = document.getElementById('quoteStatusFilter') ? document.getElementById('quoteStatusFilter').value : 'all';
+  const list = filter === 'all' ? quotes : quotes.filter(q => q.status === filter);
+
+  document.getElementById('statQuotesTotal').innerText = quotes.length;
+  document.getElementById('statQuotesNew').innerText = quotes.filter(q => q.status === 'new').length;
+
+  const body = document.getElementById('quotesTableBody');
+  if(!list.length){ body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد طلبات مقايسة بعد. تأكد من تشغيل ملف supabase-additions.sql إذا كانت هذه أول مرة.</td></tr>'; return; }
+  body.innerHTML = list.map(q => `
+    <tr>
+      <td>${q.customer_name}</td>
+      <td>${q.customer_phone ? `<a href="https://wa.me/${(q.customer_phone||'').replace(/[^0-9]/g,'')}" target="_blank">${q.customer_phone}</a>` : '-'}</td>
+      <td style="max-width:280px;white-space:pre-wrap;">${q.details}</td>
+      <td>
+        <select class="status-select" onchange="updateQuoteStatus('${q.id}', this.value)">
+          ${Object.keys(QUOTE_STATUS_LABELS).map(s => `<option value="${s}" ${q.status===s?'selected':''}>${QUOTE_STATUS_LABELS[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td>${new Date(q.created_at).toLocaleDateString('ar-EG')}</td>
+      <td><button class="icon-btn danger" onclick="deleteQuote('${q.id}')">🗑️</button></td>
+    </tr>`).join('');
+}
+
+async function updateQuoteStatus(id, status){
+  const { error } = await sb.from('quote_requests').update({ status }).eq('id', id);
+  if(error){ alert('حدث خطأ أثناء تحديث الحالة'); console.error(error); return; }
+  const q = quotes.find(x=>x.id===id);
+  if(q) q.status = status;
+  renderQuotesTable();
+}
+
+async function deleteQuote(id){
+  if(!confirm('حذف طلب المقايسة نهائيًا؟')) return;
+  const { error } = await sb.from('quote_requests').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+/* ---------------- التنزيلات (كتالوجات/أدلة عامة) ---------------- */
+function renderDownloadsTable(){
+  const body = document.getElementById('downloadsTableBody');
+  if(!downloadsAdmin.length){ body.innerHTML = '<tr class="empty-row"><td colspan="4">لا توجد ملفات بعد. تأكد من تشغيل ملف supabase-additions.sql إذا كانت هذه أول مرة.</td></tr>'; return; }
+  body.innerHTML = downloadsAdmin.map(d => `
+    <tr>
+      <td>${d.title}</td>
+      <td>${d.category || '-'}</td>
+      <td>${d.file_size_label || '-'}</td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick="openDownloadModal('${d.id}')">✏️</button>
+        <button class="icon-btn danger" onclick="deleteDownload('${d.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openDownloadModal(id){
+  document.getElementById('downloadModalError').innerText = '';
+  document.getElementById('downloadFileInput').value = '';
+  document.getElementById('downloadCurrentFileNote').innerText = '';
+  if(id){
+    const d = downloadsAdmin.find(x=>x.id===id);
+    document.getElementById('downloadModalTitle').innerText = 'تعديل ملف';
+    document.getElementById('downloadId').value = d.id;
+    document.getElementById('downloadTitle').value = d.title;
+    document.getElementById('downloadDescription').value = d.description || '';
+    document.getElementById('downloadCategory').value = d.category || 'عام';
+    document.getElementById('downloadSizeLabel').value = d.file_size_label || '';
+    document.getElementById('downloadCurrentFileNote').innerText = 'اترك حقل الملف فارغًا للاحتفاظ بالملف الحالي، أو اختر ملف جديد لاستبداله.';
+  } else {
+    document.getElementById('downloadModalTitle').innerText = 'إضافة ملف تنزيل';
+    document.getElementById('downloadId').value = '';
+    document.getElementById('downloadTitle').value = '';
+    document.getElementById('downloadDescription').value = '';
+    document.getElementById('downloadCategory').value = 'عام';
+    document.getElementById('downloadSizeLabel').value = '';
+  }
+  document.getElementById('downloadModalOverlay').classList.add('open');
+}
+function closeDownloadModal(){ document.getElementById('downloadModalOverlay').classList.remove('open'); }
+
+async function saveDownload(){
+  const errEl = document.getElementById('downloadModalError');
+  errEl.innerText = '';
+  const id = document.getElementById('downloadId').value;
+  const title = document.getElementById('downloadTitle').value.trim();
+  const description = document.getElementById('downloadDescription').value.trim();
+  const category = document.getElementById('downloadCategory').value;
+  const file_size_label = document.getElementById('downloadSizeLabel').value.trim();
+  const fileInput = document.getElementById('downloadFileInput');
+  const file = fileInput.files[0];
+
+  if(!title){ errEl.innerText = 'برجاء إدخال العنوان'; return; }
+  if(!id && !file){ errEl.innerText = 'برجاء اختيار ملف للرفع'; return; }
+
+  let file_path = null;
+  if(file){
+    const safeName = `${Date.now()}-${file.name}`.replace(/\s+/g,'_');
+    const { error: upErr } = await sb.storage.from('public-downloads').upload(safeName, file, { upsert: true });
+    if(upErr){ errEl.innerText = 'حدث خطأ أثناء رفع الملف: ' + upErr.message; return; }
+    file_path = safeName;
+  }
+
+  const payload = { title, description, category, file_size_label: file_size_label || null };
+  if(file_path) payload.file_path = file_path;
+
+  let error;
+  if(id){ ({ error } = await sb.from('downloads').update(payload).eq('id', id)); }
+  else { ({ error } = await sb.from('downloads').insert(payload)); }
+  if(error){ errEl.innerText = 'حدث خطأ: ' + error.message; return; }
+  closeDownloadModal();
+  await loadAll();
+}
+
+async function deleteDownload(id){
+  if(!confirm('حذف هذا الملف نهائيًا؟')) return;
+  const d = downloadsAdmin.find(x=>x.id===id);
+  const { error } = await sb.from('downloads').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  if(d && d.file_path){ await sb.storage.from('public-downloads').remove([d.file_path]); }
+  await loadAll();
+}
+
+checkSession();
+</script>
+</body>
+</html>

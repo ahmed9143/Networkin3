@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Disallow: /admin.html
+Disallow: /config/
+Disallow: /secrets/
+
+Sitemap: https://delta-it-solutions.vercel.app/sitemap.xml

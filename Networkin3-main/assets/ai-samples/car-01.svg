@@ -1,0 +1,45 @@
+<svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg1" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#0c1330"/>
+      <stop offset="100%" stop-color="#050816"/>
+    </radialGradient>
+    <linearGradient id="body1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3f86ff"/>
+      <stop offset="100%" stop-color="#1a4fcc"/>
+    </linearGradient>
+    <linearGradient id="glass1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfe0ff"/>
+      <stop offset="100%" stop-color="#8fb2f2"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="240" fill="url(#bg1)"/>
+  <g opacity=".18" stroke="#2F7BFF" stroke-width="1">
+    <line x1="0" y1="60" x2="320" y2="60"/>
+    <line x1="0" y1="120" x2="320" y2="120"/>
+    <line x1="0" y1="180" x2="320" y2="180"/>
+  </g>
+  <ellipse cx="160" cy="196" rx="108" ry="12" fill="#000" opacity=".35"/>
+  <!-- car body: front 3/4 -->
+  <path d="M70 190 C68 150 82 118 110 104 L128 96 C142 90 178 90 192 96 L214 106 C244 120 258 150 256 190 Z" fill="url(#body1)"/>
+  <path d="M110 104 L128 96 C142 90 178 90 192 96 L214 106 C216 118 214 128 200 128 L124 128 C110 128 108 116 110 104Z" fill="url(#glass1)" opacity=".92"/>
+  <rect x="118" y="128" width="88" height="8" rx="3" fill="#0c1330" opacity=".5"/>
+  <!-- headlights -->
+  <ellipse cx="94" cy="150" rx="10" ry="7" fill="#eaf2ff"/>
+  <ellipse cx="228" cy="150" rx="10" ry="7" fill="#eaf2ff"/>
+  <!-- grille -->
+  <rect x="132" y="148" width="58" height="18" rx="4" fill="#0c1330" opacity=".55"/>
+  <!-- wheels -->
+  <circle cx="104" cy="196" r="20" fill="#0a0f22"/>
+  <circle cx="104" cy="196" r="9" fill="#4a5773"/>
+  <circle cx="220" cy="196" r="20" fill="#0a0f22"/>
+  <circle cx="220" cy="196" r="9" fill="#4a5773"/>
+  <!-- detection frame -->
+  <g stroke="#2F7BFF" stroke-width="2.4" fill="none" opacity=".95">
+    <path d="M56 82 v-14 h14"/>
+    <path d="M264 82 v-14 h-14"/>
+    <path d="M56 206 v14 h14"/>
+    <path d="M264 206 v14 h-14"/>
+  </g>
+  <text x="160" y="228" text-anchor="middle" font-family="monospace" font-size="11" fill="#8fb2f2" letter-spacing="2">CAR · MATCH 98%</text>
+</svg>

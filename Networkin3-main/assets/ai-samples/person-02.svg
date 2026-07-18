@@ -1,0 +1,32 @@
+<svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgp2" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#151033"/>
+      <stop offset="100%" stop-color="#050816"/>
+    </radialGradient>
+    <linearGradient id="fig2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b193ff"/>
+      <stop offset="100%" stop-color="#8A5CFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="240" fill="url(#bgp2)"/>
+  <g opacity=".15" stroke="#8A5CFF" stroke-width="1">
+    <line x1="0" y1="60" x2="320" y2="60"/><line x1="0" y1="120" x2="320" y2="120"/><line x1="0" y1="180" x2="320" y2="180"/>
+  </g>
+  <ellipse cx="160" cy="216" rx="36" ry="7" fill="#000" opacity=".3"/>
+  <!-- standing figure, front-facing -->
+  <g fill="url(#fig2)">
+    <circle cx="160" cy="52" r="17"/>
+    <path d="M132 76 C132 68 146 62 160 62 C174 62 188 68 188 76 L192 128 C192 136 182 138 178 130 L172 92 L176 150 C178 160 144 160 146 150 L150 92 L144 130 C140 138 130 136 132 128Z"/>
+    <path d="M146 150 L138 208 C137 214 125 214 126 206 L136 150Z"/>
+    <path d="M176 150 L186 208 C187 214 199 214 198 206 L186 150Z"/>
+  </g>
+  <!-- detection frame -->
+  <g stroke="#8A5CFF" stroke-width="2.4" fill="none" opacity=".95">
+    <path d="M104 28 v-14 h14"/>
+    <path d="M240 28 v-14 h-14"/>
+    <path d="M104 216 v14 h14"/>
+    <path d="M240 216 v14 h-14"/>
+  </g>
+  <text x="160" y="232" text-anchor="middle" font-family="monospace" font-size="11" fill="#d3c2ff" letter-spacing="2">PERSON · TRACKED</text>
+</svg>

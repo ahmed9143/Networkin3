@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مهندس المقايسات والشبكات الذكي | Delta IT Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { background: #060d1a; color: #f8fafc; font-family: 'Cairo', sans-serif; padding: 40px 20px; }
+  .wizard-card { background: #0b192c; border: 1px solid #1e3a5f; border-radius: 12px; padding: 32px; max-width: 600px; margin: 0 auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+  h2 { margin-top: 0; color: #f97316; font-weight: 800; text-align: center; }
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn 0.4s ease; }
+  label { display: block; font-weight: 600; margin-bottom: 12px; font-size: 15px; }
+  select, input { width: 100%; background: #10223b; border: 1px solid #1e3a5f; border-radius: 8px; padding: 12px; color: white; outline: none; margin-bottom: 20px; font-size: 14px; }
+  .btn { background: #f97316; color: white; font-weight: 700; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 15px; }
+  .btn:hover { background: #ea580c; }
+  .result-box { background: #1e293b; padding: 16px; border-radius: 8px; border-right: 4px solid #3b82f6; margin-top: 16px; font-size: 14px; line-height: 1.8; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="wizard-card">
+  <h2>📐 مهندس المقايسات التفاعلي الفوري</h2>
+  <hr style="border-color:#1e3a5f; margin-bottom: 24px;">
+
+  <!-- Step 1 -->
+  <div class="step active" id="step1">
+    <label>1) إيه طبيعة المكان والمنشأة المستهدفة؟</label>
+    <select id="facilityType">
+      <option value="مستشفى أو مركز طبي 🏥">مستشفى أو مركز طبي 🏥</option>
+      <option value="شركة أو بيئة أعمال 🏢">شركة أو بيئة أعمال 🏢</option>
+      <option value="فيلات أو مجمعات سكنية 🏡">فيلا أو مجمع سكني 🏡</option>
+      <option value="مصنع أو مخزن عملاق 🏭">مصنع أو مخزن عملاق 🏭</option>
+    </select>
+    <button class="btn" onclick="goToStep(2)">التالي: حجم التغطية</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="step2">
+    <label>2) ما هو عدد نقاط الشبكة (Data Ports) أو الكاميرات التقريبي المطلوبة؟</label>
+    <select id="systemSize" onchange="calculatePreliminaryHardware()">
+      <option value="1-4">نطاق صغير جداً (من 1 إلى 4 نقاط)</option>
+      <option value="5-16">نطاق متوسط (من 5 إلى 16 نقطة مراقبة/شبكة)</option>
+      <option value="17-32">نطاق واسع (من 17 إلى 32 نقطة متكاملة)</option>
+      <option value="32+">بنية تحتية متكاملة للمؤسسات الكبرى (أكثر من 32 نقطة)</option>
+    </select>
+    
+    <div id="hardwareOutput" class="result-box"></div>
+    <button class="btn" onclick="goToStep(3)" style="margin-top:14px;">التالي: بيانات الاتصال والمتابعة</button>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="step3">
+    <label>3) أدخل اسمك ورقم الهاتف لرفع التخطيط وحفظ المقايسة فوراً</label>
+    <input type="text" id="custName" placeholder="الاسم الكريم أو اسم المؤسسة">
+    <input type="text" id="custPhone" placeholder="رقم الهاتف (واتساب)">
+    <button class="btn" onclick="submitWizardData()">🚀 إرسال وحفظ المقايسة الذكية</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let facility = ""; let size = ""; let details = "";
+
+function goToStep(stepNum) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + stepNum).classList.add('active');
+  if(stepNum === 2) {
+    facility = document.getElementById('facilityType').value;
+    calculatePreliminaryHardware();
+  }
+}
+
+function calculatePreliminaryHardware() {
+  size = document.getElementById('systemSize').value;
+  let recommendation = "";
+  if (size === "1-4") {
+    recommendation = "• المقترح المبدئي: NVR 4-Channels مدمج مع سويتش PoE 4 المناسب للأصناف (Tiandy/UNV).";
+  } else if (size === "5-16") {
+    recommendation = "• المقترح المبدئي: مسجل دقة NVR 16-Channel مع مفتاح توزيع ذكي Switch PoE 16-Port جيجابت لتغطية تدفق السيرفرات المتزامن.";
+  } else {
+    recommendation = "• المقترح المبدئي: خادم مركزي/مسجل عالي الأداء NVR 32-Channel مدمج مع شبكة سويتشات متتالية 24-Port Switch PoE بالإضافة لنظام توزيع الرفوف Rackmount وهندسة كابلات فئة Cat6.";
+  }
+  details = recommendation;
+  document.getElementById('hardwareOutput').innerHTML = `<b>💡 تحليل البنية التلقائي:</b><br>${recommendation}`;
+}
+
+async function submitWizardData() {
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  
+  if(!name || !phone) return alert('برجاء تزويد النظام ببيانات التواصل لتأكيد استلام المخطط');
+
+  await sb.from('quote_requests').insert({
+    customer_name: name,
+    customer_phone: phone,
+    facility_type: facility,
+    coverage_metrics: `نطاق الحجم المستهدف: ${size}`,
+    details: `مخرجات معالج المقايسة الآلي الفوري للمنشأة:\n ${details}`,
+    status: 'new'
+  });
+
+  alert('تم رفع وتحليل المخطط بنجاح! سيقوم مهندس أنظمة IT والمراقبة لدينا بالتواصل معك وتأكيد الأسعار فوراً.');
+  window.location.reload();
+}
+</script>
+</body>
+</html>

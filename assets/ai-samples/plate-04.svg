@@ -1,0 +1,32 @@
+<svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgpl4" cx="50%" cy="38%" r="80%">
+      <stop offset="0%" stop-color="#2a1c0c"/>
+      <stop offset="100%" stop-color="#050816"/>
+    </radialGradient>
+    <linearGradient id="bumper4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a3320"/>
+      <stop offset="100%" stop-color="#20150f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="240" fill="url(#bgpl4)"/>
+  <g opacity=".15" stroke="#FF8A3D" stroke-width="1">
+    <line x1="0" y1="70" x2="320" y2="70"/><line x1="0" y1="170" x2="320" y2="170"/>
+  </g>
+  <rect x="0" y="150" width="320" height="90" fill="url(#bumper4)"/>
+  <rect x="0" y="150" width="320" height="6" fill="#6b5136"/>
+  <rect x="64" y="96" width="192" height="60" rx="6" fill="#f2f5fb"/>
+  <rect x="64" y="96" width="192" height="60" rx="6" fill="none" stroke="#c7cede" stroke-width="2"/>
+  <rect x="64" y="96" width="34" height="60" rx="6" fill="#FF8A3D"/>
+  <text x="81" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#fff">DIT</text>
+  <text x="81" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fff0e3">EG</text>
+  <text x="180" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="800" fill="#111a2e" letter-spacing="3">5518</text>
+  <g stroke="#FF8A3D" stroke-width="2.6" fill="none">
+    <path d="M54 96 v-10 h12"/>
+    <path d="M266 96 v-10 h-12"/>
+    <path d="M54 156 v10 h12"/>
+    <path d="M266 156 v10 h-12"/>
+  </g>
+  <line x1="64" y1="126" x2="256" y2="126" stroke="#FF8A3D" stroke-width="1.5" opacity=".55"/>
+  <text x="160" y="182" text-anchor="middle" font-family="monospace" font-size="12" fill="#ffc79a" letter-spacing="2">DIT 5518 · MATCH</text>
+</svg>

@@ -252,6 +252,26 @@ create policy "Auth manage downloads" on public.downloads for all
 create index if not exists idx_downloads_category on public.downloads (category);
 
 -- ============================================================
+-- 7ب) إعدادات الموقع العامة (Site Settings) — key/value JSON
+--     تستخدمها admin.html عشان الأدمن يتحكم في محتوى الموقع
+--     (عروض الشريط العلوي، نصوص مساعد اختيار الكاميرا...) من غير
+--     ما يحتاج يعدّل كود index.html. الموقع بيقرأها بس (public read)،
+--     والتعديل/الكتابة للأدمن المسجل دخول بس.
+-- ============================================================
+create table if not exists public.site_settings (
+  key text primary key,
+  value jsonb not null,
+  updated_at timestamptz default now()
+);
+alter table public.site_settings enable row level security;
+drop policy if exists "Public read site_settings" on public.site_settings;
+drop policy if exists "Auth manage site_settings" on public.site_settings;
+
+create policy "Public read site_settings" on public.site_settings for select using (true);
+create policy "Auth manage site_settings" on public.site_settings for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- ============================================================
 -- 8) Storage Buckets
 -- ============================================================
 insert into storage.buckets (id, name, public) values ('products','products', true)

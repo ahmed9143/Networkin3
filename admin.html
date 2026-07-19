@@ -53,6 +53,13 @@
   aside .logout{margin-top:auto;}
   main.content{padding:30px 34px;overflow-x:auto;}
   .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
+  .promo-offer-row{display:grid;grid-template-columns:1fr 2fr 2fr auto;gap:10px;align-items:center;margin-bottom:10px;}
+  .promo-offer-row input{width:100%;}
+  .finder-step-block{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .finder-step-block h4{margin:0 0 10px;font-size:14px;}
+  .finder-opt-row{display:grid;grid-template-columns:70px 1fr;gap:10px;margin-bottom:8px;align-items:center;}
+  @media(max-width:760px){.promo-offer-row{grid-template-columns:1fr;}}
   .topline h2{margin:0;font-size:22px;}
   .topline p{margin:4px 0 0;color:var(--ink-soft);font-size:13.5px;}
 
@@ -219,6 +226,7 @@
     <div class="nav-item" data-tab="orders" onclick="switchTab('orders')">🧾 الطلبات والإحصائيات</div>
     <div class="nav-item" data-tab="quotes" onclick="switchTab('quotes')">📋 طلبات المقايسة</div>
     <div class="nav-item" data-tab="downloads" onclick="switchTab('downloads')">📁 التنزيلات</div>
+    <div class="nav-item" data-tab="sitesettings" onclick="switchTab('sitesettings')">🎛️ إعدادات الموقع</div>
     <div class="nav-item logout" onclick="doLogout()">🚪 تسجيل الخروج</div>
   </aside>
 
@@ -408,6 +416,36 @@
         <thead><tr><th>العنوان</th><th>القسم</th><th>الحجم</th><th>إجراءات</th></tr></thead>
         <tbody id="downloadsTableBody"><tr class="empty-row"><td colspan="4">جاري التحميل...</td></tr></tbody>
       </table>
+    </div>
+
+    <div class="tab-view" id="tab-sitesettings">
+      <div class="topline">
+        <div><h2>إعدادات الموقع</h2><p>تحكم في نصوص الشريط العلوي (العروض) ونصوص "مساعد اختيار الكاميرا" في الموقع من هنا مباشرة - من غير ما تحتاج تعدّل في الكود.</p></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🎗️ عروض الشريط العلوي (Promo Bar)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">الشريط اللي بيظهر فوق الهيدر وبيدور بين العروض دي كل شوية. النص "المختصر" هو اللي بيظهر على الموبايل عشان يبقى أسهل للقراية السريعة.</p></div>
+          <button class="btn btn-primary" onclick="addPromoOfferRow()">+ إضافة عرض</button>
+        </div>
+        <div id="promoOffersList"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-primary" onclick="savePromoOffers()">💾 حفظ عروض الشريط</button>
+          <span id="promoOffersSaveMsg" style="font-size:13px;"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🎯 نصوص مساعد اختيار الكاميرا</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">عدّل عنوان كل سؤال ووصفه، وأيقونة/نص كل اختيار. ترتيب الاختيارات والقيمة الفعلية بتاعتها ثابتة (عشان الترشيح النهائي للمنتجات يفضل شغال صح) - إنت بس بتغيّر الكلام اللي بيظهر للعميل.</p></div>
+        </div>
+        <div id="finderCopyList"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-primary" onclick="saveFinderCopy()">💾 حفظ نصوص المساعد</button>
+          <button class="btn" onclick="resetFinderCopyForm()">↺ استرجاع النصوص الافتراضية</button>
+          <span id="finderCopySaveMsg" style="font-size:13px;"></span>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -714,6 +752,7 @@ const CMDK_ACTIONS = [
   {ic:'🧾', label:'الطلبات والإحصائيات', meta:'صفحة', run:()=>switchTab('orders')},
   {ic:'📋', label:'طلبات المقايسة', meta:'صفحة', run:()=>switchTab('quotes')},
   {ic:'📁', label:'التنزيلات', meta:'صفحة', run:()=>switchTab('downloads')},
+  {ic:'🎛️', label:'إعدادات الموقع', meta:'صفحة', run:()=>switchTab('sitesettings')},
   {ic:'🚪', label:'تسجيل الخروج', meta:'أمر', run:()=>doLogout()},
 ];
 let cmdkActiveIndex = 0;
@@ -815,6 +854,7 @@ let coupons = [];
 let orders = [];
 let quotes = [];
 let downloadsAdmin = [];
+let siteSettings = {};
 
 async function loadAll(){
   const { data: catData } = await sb.from('categories').select('*').order('sort_order',{ascending:true});
@@ -823,14 +863,18 @@ async function loadAll(){
   const { data: orderData } = await sb.from('orders').select('*').order('created_at',{ascending:false});
   const { data: quoteData, error: quoteErr } = await sb.from('quote_requests').select('*').order('created_at',{ascending:false});
   const { data: dlData, error: dlErr } = await sb.from('downloads').select('*').order('sort_order',{ascending:true});
+  const { data: settingsData, error: settingsErr } = await sb.from('site_settings').select('*');
   categories = catData || [];
   products = prodData || [];
   coupons = couponData || [];
   orders = orderData || [];
   quotes = quoteData || [];
   downloadsAdmin = dlData || [];
+  siteSettings = {};
+  (settingsData || []).forEach(row => { siteSettings[row.key] = row.value; });
   if(quoteErr) console.error('quote_requests: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', quoteErr);
   if(dlErr) console.error('downloads: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', dlErr);
+  if(settingsErr) console.error('site_settings: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', settingsErr);
   renderCategoriesTable();
   renderProductsTable();
   populateCategorySelect();
@@ -839,6 +883,8 @@ async function loadAll(){
   renderQuotesTable();
   renderDownloadsTable();
   renderDashboard();
+  renderPromoOffersForm();
+  renderFinderCopyForm();
 }
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -2052,6 +2098,164 @@ async function deleteDownload(id){
   if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
   if(d && d.file_path){ await sb.storage.from('public-downloads').remove([d.file_path]); }
   await loadAll();
+}
+
+/* ================= إعدادات الموقع: عروض الشريط العلوي + نصوص مساعد اختيار الكاميرا =================
+   القيم متخزنة في جدول site_settings (key/value JSON) وبيقرأها index.html وقت التحميل. */
+
+const DEFAULT_PROMO_OFFERS = [
+  { brand:'Tiandy', text:'باقة Tiandy: ٤ كاميرات + NVR ٤ قنوات + هارد ١ تيرا بـ 6,000 ج.م بدل 7,800 (وفّر 1,800)', short:'باقة Tiandy 6,000 ج.م بدل 7,800' },
+  { brand:'Hikvision', text:'باقة Hikvision منزلية: كاميرتين + NVR بـ 4,250 ج.م بدل 5,100 (وفّر 850)', short:'باقة Hikvision 4,250 ج.م بدل 5,100' },
+  { brand:'Ruijie', text:'راوتر Ruijie Enterprise + نقطة وصول بـ 3,100 ج.م بدل 3,650 (وفّر 550)', short:'راوتر Ruijie 3,100 ج.م بدل 3,650' }
+];
+
+function renderPromoOffersForm(){
+  const list = document.getElementById('promoOffersList');
+  if(!list) return;
+  const offers = (siteSettings.promo_offers && Array.isArray(siteSettings.promo_offers) && siteSettings.promo_offers.length)
+    ? siteSettings.promo_offers : DEFAULT_PROMO_OFFERS;
+  list.innerHTML = '';
+  offers.forEach(o => addPromoOfferRow(o));
+}
+
+function addPromoOfferRow(offer){
+  const o = offer || { brand:'', text:'', short:'' };
+  const list = document.getElementById('promoOffersList');
+  const row = document.createElement('div');
+  row.className = 'promo-offer-row';
+  row.innerHTML = `
+    <input type="text" class="po-brand" placeholder="الماركة (مثال: Tiandy)" value="${(o.brand||'').replace(/"/g,'&quot;')}">
+    <input type="text" class="po-text" placeholder="النص الكامل (بيظهر على الديسكتوب)" value="${(o.text||'').replace(/"/g,'&quot;')}">
+    <input type="text" class="po-short" placeholder="النص المختصر (بيظهر على الموبايل)" value="${(o.short||'').replace(/"/g,'&quot;')}">
+    <button class="btn" onclick="this.closest('.promo-offer-row').remove()" title="حذف هذا العرض">🗑️</button>`;
+  list.appendChild(row);
+}
+
+async function savePromoOffers(){
+  const msg = document.getElementById('promoOffersSaveMsg');
+  const rows = document.querySelectorAll('#promoOffersList .promo-offer-row');
+  const offers = [];
+  rows.forEach(r => {
+    const brand = r.querySelector('.po-brand').value.trim();
+    const text = r.querySelector('.po-text').value.trim();
+    const short = r.querySelector('.po-short').value.trim();
+    if(text) offers.push({ brand, text, short: short || undefined });
+  });
+  if(!offers.length){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'لازم يكون في عرض واحد على الأقل بنص كامل.'; return; }
+  const { error } = await sb.from('site_settings').upsert({ key:'promo_offers', value: offers, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.promo_offers = offers;
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - التعديل هيظهر للعملاء فورًا';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
+}
+
+/* نفس بنية FINDER_STEPS الموجودة في index.html - القيم (value) دي ثابتة ومربوطة بمنطق
+   ترشيح المنتجات، فمش بتتعدّل من هنا؛ الأدمن بيعدّل بس العنوان/الوصف/الأيقونة/النص الظاهر. */
+const FINDER_COPY_DEFAULTS = [
+  { key:'sector', title:'هتستخدم الكاميرات فين؟', sub:'ده بيساعدنا نحدد نوع التركيب والدرجة المناسبة للجهاز', options:[
+      {value:'home', icon:'🏠', label:'منزل / فيلا'},
+      {value:'company', icon:'🏢', label:'شركة / مكتب'},
+      {value:'factory', icon:'🏭', label:'مصنع / مستودع'},
+      {value:'hospital', icon:'🏥', label:'مستشفى / عيادة'},
+      {value:'parking', icon:'🅿️', label:'جراج / موقف سيارات'}
+  ]},
+  { key:'location', title:'التركيب هيكون فين؟', sub:'كاميرات الخارج محتاجة مقاومة للعوامل الجوية (IP66/67)', options:[
+      {value:'indoor', icon:'🛋️', label:'داخلي فقط'},
+      {value:'outdoor', icon:'🌤️', label:'خارجي فقط'},
+      {value:'both', icon:'🔀', label:'داخلي وخارجي'}
+  ]},
+  { key:'camType', title:'نوع الكاميرا اللي محتاجها', sub:'IP أفضل للجودة العالية وربط الموبايل، Analog أوفر لو عندك تمديدات قديمة', options:[
+      {value:'ip', icon:'🌐', label:'IP (شبكة)'},
+      {value:'analog', icon:'📼', label:'Analog / AHD'},
+      {value:'unsure', icon:'🤷', label:'مش عارف - رشحلي الأنسب'}
+  ]},
+  { key:'features', title:'محتاج مميزات إضافية؟', sub:'اختار كل اللي يهمك (اختياري) وهنرشحلك بناءً عليها', options:[
+      {value:'full_color', icon:'🌈', label:'ألوان كاملة بالليل (Full Color)'},
+      {value:'ir_night', icon:'🌙', label:'رؤية ليلية بالأشعة تحت الحمراء'},
+      {value:'audio', icon:'🎙️', label:'صوت (تسجيل/تخاطب)'},
+      {value:'ai_detection', icon:'🧠', label:'كشف ذكي بالـ AI (أشخاص/سيارات)'},
+      {value:'face_recognition', icon:'🪪', label:'تمييز الوجوه'}
+  ]},
+  { key:'count', title:'محتاج كام كاميرا تقريبًا؟', sub:'العدد بيحدد عدد قنوات الـ NVR والهارد المناسب', options:[
+      {value:'small', icon:'📷', label:'1 - 4 كاميرات'},
+      {value:'medium', icon:'📷📷', label:'5 - 16 كاميرا'},
+      {value:'large', icon:'🏗️', label:'أكتر من 16 كاميرا'}
+  ]},
+  { key:'recordingDays', title:'محتاج تسجيل يفضل متاح لمدة كام يوم؟', sub:'ده بيحدد مساحة التخزين المطلوبة بدقة', options:[
+      {value:'7', icon:'📅', label:'أسبوع (7 أيام)'},
+      {value:'15', icon:'📅', label:'أسبوعين (15 يوم)'},
+      {value:'30', icon:'🗓️', label:'شهر (30 يوم)'},
+      {value:'60', icon:'🗓️', label:'شهرين (60 يوم)'}
+  ]},
+  { key:'budget', title:'الميزانية التقريبية لكل كاميرا', sub:'تقدير مبدئي - السعر النهائي بيختلف حسب الماركة والمواصفات', options:[
+      {value:'economy', icon:'💰', label:'اقتصادي (حتى 1500 ج.م)'},
+      {value:'mid', icon:'💵', label:'متوسط (1500 - 3000 ج.م)'},
+      {value:'premium', icon:'💎', label:'متقدم (أكتر من 3000 ج.م)'},
+      {value:'any', icon:'♾️', label:'بدون حد محدد'}
+  ]}
+];
+
+function mergeFinderCopy(overrides){
+  // deep-merge saved overrides on top of the defaults, keyed by step key / option value (never by index)
+  return FINDER_COPY_DEFAULTS.map(step => {
+    const so = (overrides || []).find(s => s.key === step.key);
+    return {
+      key: step.key,
+      title: (so && so.title) || step.title,
+      sub: (so && so.sub) || step.sub,
+      options: step.options.map(opt => {
+        const oo = so && Array.isArray(so.options) ? so.options.find(o => o.value === opt.value) : null;
+        return { value: opt.value, icon: (oo && oo.icon) || opt.icon, label: (oo && oo.label) || opt.label };
+      })
+    };
+  });
+}
+
+function renderFinderCopyForm(useDefaults){
+  const list = document.getElementById('finderCopyList');
+  if(!list) return;
+  const steps = useDefaults ? FINDER_COPY_DEFAULTS : mergeFinderCopy(siteSettings.finder_copy && siteSettings.finder_copy.steps);
+  list.innerHTML = steps.map(step => `
+    <div class="finder-step-block" data-step="${step.key}">
+      <h4>${step.title}</h4>
+      <div class="field"><label>عنوان السؤال</label><input type="text" class="fc-title" value="${step.title.replace(/"/g,'&quot;')}"></div>
+      <div class="field"><label>الوصف الفرعي</label><input type="text" class="fc-sub" value="${step.sub.replace(/"/g,'&quot;')}"></div>
+      <div class="fc-options">
+        ${step.options.map(opt => `
+          <div class="finder-opt-row" data-value="${opt.value}">
+            <input type="text" class="fc-opt-icon" value="${opt.icon.replace(/"/g,'&quot;')}" maxlength="4" title="أيقونة/إيموجي">
+            <input type="text" class="fc-opt-label" value="${opt.label.replace(/"/g,'&quot;')}" title="النص الظاهر للعميل">
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function resetFinderCopyForm(){
+  if(!confirm('هيرجع كل النصوص للوضع الافتراضي (لسه محتاج تدوس "حفظ" عشان يتفعّل فعليًا). متأكد؟')) return;
+  renderFinderCopyForm(true);
+}
+
+async function saveFinderCopy(){
+  const msg = document.getElementById('finderCopySaveMsg');
+  const blocks = document.querySelectorAll('#finderCopyList .finder-step-block');
+  const steps = [];
+  blocks.forEach(block => {
+    const key = block.dataset.step;
+    const title = block.querySelector('.fc-title').value.trim();
+    const sub = block.querySelector('.fc-sub').value.trim();
+    const options = [];
+    block.querySelectorAll('.finder-opt-row').forEach(row => {
+      options.push({ value: row.dataset.value, icon: row.querySelector('.fc-opt-icon').value.trim(), label: row.querySelector('.fc-opt-label').value.trim() });
+    });
+    steps.push({ key, title, sub, options });
+  });
+  const { error } = await sb.from('site_settings').upsert({ key:'finder_copy', value: { steps }, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.finder_copy = { steps };
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - التعديل هيظهر للعملاء فورًا';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
 }
 
 checkSession();

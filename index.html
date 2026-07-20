@@ -373,8 +373,8 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;}
   .btn:hover{transform:translateY(-2px);}
   .btn-primary{background:var(--grad-brand);color:#fff;box-shadow:0 8px 24px -8px #6D5EF766;}
-  .btn-cta{background:var(--grad-brand);color:#fff;box-shadow:0 8px 26px -8px color-mix(in srgb, var(--cable-blue) 65%, transparent);}
-  .btn-cta:hover{box-shadow:0 14px 34px -8px color-mix(in srgb, var(--cable-blue) 80%, transparent);filter:brightness(1.08);}
+  .btn-cta{background:var(--cta);color:#fff;box-shadow:0 8px 26px -8px #FF7A00aa;}
+  .btn-cta:hover{box-shadow:0 14px 34px -8px #FF7A00cc;}
   .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
   .btn-outline:hover{border-color:var(--cable-orange);background:var(--navy-800);}
   .hero-stats{display:flex;gap:32px;flex-wrap:wrap;}
@@ -844,22 +844,21 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .brand-stats .bs-item{display:flex;flex-direction:column;gap:2px;}
   .brand-stats .bs-item b{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--cable-blue);}
   .brand-stats .bs-item span{font-size:12px;color:var(--ink-soft);font-weight:700;}
-  /* ===== Static brand wall: a clean, fixed grid of logo-badge cards (no auto-scroll marquee).
-     Each badge has a light tile so both real uploaded logos and the generated monogram
-     fallback read clearly against the dark theme, with the brand name shown underneath. ===== */
-  .brand-wall{padding:6px 0 4px;}
-  .brand-strip-track{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:18px;}
-  .brand-chip{position:relative;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:16px 14px 13px;width:128px;transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s ease,box-shadow .25s ease;}
-  .brand-chip:hover{transform:translateY(-4px);border-color:color-mix(in srgb, var(--cable-blue) 55%, var(--line));box-shadow:0 14px 28px -14px #000a,0 0 0 1px color-mix(in srgb, var(--cable-blue) 25%, transparent);}
-  .brand-chip .bc-logo{height:44px;width:100%;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;padding:6px 10px;}
-  .brand-chip .bc-logo img{height:100%;width:auto;max-width:100%;object-fit:contain;}
-  /* the generated monogram fallback gets a colored tile instead of the plain white one,
-     so it reads as a proper badge rather than bare floating text */
-  .brand-chip.bc-mono .bc-logo{background:var(--bc-mono-bg, linear-gradient(135deg,#2F7BFF,#8A5CFF));}
-  .brand-chip .bc-name{display:block;font-size:12.5px;font-weight:800;color:var(--ink);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-  .brand-chip .bc-tip{display:block;font-size:10.5px;color:var(--ink-soft);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-  @media(max-width:640px){.brand-chip{width:104px;padding:12px 10px 10px;}.brand-chip .bc-logo{height:36px;}.brand-strip-track{gap:12px;}}
-  @media(prefers-reduced-motion:reduce){.brand-chip{transition:none;}}
+  /* ===== Infinite white logo wall — no boxes, no color, just clean wordmarks that drift
+     right-to-left and pause/lift/glow on hover, with a small category tooltip underneath ===== */
+  .brand-wall{position:relative;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);padding:14px 0 34px;}
+  .brand-strip-track{display:flex;align-items:center;gap:56px;width:max-content;direction:ltr;animation:brandWallScroll 42s linear infinite;}
+  .brand-wall:hover .brand-strip-track{animation-play-state:paused;}
+  .brand-chip{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;padding:6px 4px;}
+  .brand-chip .bc-logo{height:34px;display:flex;align-items:center;justify-content:center;filter:brightness(0) invert(1);opacity:.68;transition:opacity .3s ease,filter .3s ease,transform .3s cubic-bezier(.2,.8,.2,1);}
+  .brand-chip .bc-logo img{height:100%;width:auto;max-width:120px;object-fit:contain;}
+  .brand-chip:hover .bc-logo{opacity:1;transform:scale(1.1);filter:brightness(0) invert(1) drop-shadow(0 0 10px color-mix(in srgb, var(--cable-blue) 85%, transparent));}
+  .brand-chip .bc-name{display:none;}
+  .brand-chip .bc-tip{position:absolute;top:100%;left:50%;transform:translate(-50%,2px);white-space:nowrap;font-size:11px;font-weight:700;color:var(--cable-blue);background:color-mix(in srgb, var(--paper-2) 92%, transparent);border:1px solid color-mix(in srgb, var(--cable-blue) 40%, transparent);border-radius:8px;padding:4px 10px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:3;}
+  .brand-chip:hover .bc-tip{opacity:1;transform:translate(-50%,8px);}
+  @keyframes brandWallScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media(prefers-reduced-motion:reduce){.brand-strip-track{animation:none;}}
+  @media(max-width:640px){.brand-chip .bc-logo{height:26px;}.brand-strip-track{gap:38px;}}
 
   .prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;perspective:1200px;}
 
@@ -913,7 +912,6 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .prod-badge-left.bestseller{background:#c9860c;}
   .prod-badge-left.new{background:var(--cable-blue);}
   .prod-badge-left.digital{background:#7a3ff2;}
-  .prod-badge-left.launch{background:linear-gradient(120deg,#ff5470,#ff8a3d);}
   .digital-note{background:var(--cable-orange-dim);border:1px solid var(--cable-orange);color:var(--ink);font-size:12.5px;padding:10px 12px;border-radius:8px;margin:10px 0;line-height:1.8;}
   .wish-btn{position:absolute;bottom:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(8,21,37,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);z-index:2;line-height:1;}
   .wish-btn:hover{transform:scale(1.12);}
@@ -1561,7 +1559,6 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   <nav class="catnav">
     <div class="wrap" id="catNavMenu">
       <a class="active" data-page="home" onclick="navigateTo('home')">الرئيسية</a>
-      <a onclick="showOffersOnly()" style="color:var(--cable-orange);font-weight:800;">🔥 عروضنا</a>
 
       <div class="mega-trigger">
         <a class="nav-drop-label">الحلول ▾</a>
@@ -1618,7 +1615,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       </div>
 
       <div class="mega-trigger">
-        <a data-page="products" onclick="currentOffersOnly=false; navigateTo('products')">المنتجات ▾</a>
+        <a data-page="products" onclick="navigateTo('products')">المنتجات ▾</a>
         <div class="mega-panel mega-panel-wide">
           <div class="mega-panel-inner">
             <div class="mega-col-list" id="megaMenuList"></div>
@@ -1671,7 +1668,6 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       </div>
 
       <a data-page="track" onclick="navigateTo('track')" class="nav-pill-cta nav-pill-ghost" style="margin-inline-start:auto;">📦 تتبع الطلب</a>
-      <a onclick="openGeneralWhatsApp()" class="nav-pill-cta nav-pill-ghost" title="تواصل مباشر على واتساب" style="padding:8px 12px !important;">💬</a>
       <a data-page="contact" onclick="navigateTo('contact')" class="nav-pill-cta glow-pulse">📅 اطلب معاينة مجانية</a>
     </div>
   </nav>
@@ -2478,7 +2474,6 @@ let wishlist = JSON.parse(localStorage.getItem('it_pro_wishlist') || '[]');
 let currentCategoryFilter = 'الكل';
 let currentBrandFilter = 'الكل';
 let currentSearchQuery = '';
-let currentOffersOnly = false;
 let priceMinFilter = null;
 let priceMaxFilter = null;
 let appliedCoupon = null;
@@ -2737,17 +2732,6 @@ function isProductNew(p){
   const ageMs = Date.now() - new Date(p.created_at).getTime();
   return ageMs < (1000*60*60*24*14); // 14 يوم
 }
-/* "أول 48 ساعة": لو المنتج مضاف حديثًا (أقل من 48 ساعة) وله سعر مخفّض (old_price) مضبوط
-   من الأدمن وقت الإضافة، بنبرزه كعرض إطلاق محدود المدة بعدّاد تنازلي - بيشجع زيارة الموقع
-   بانتظام. مفيش تلاعب في السعر نفسه هنا، بس إبراز بصري لخصم حقيقي أدمن حطّه فعلاً. */
-function launchWindowHoursLeft(p){
-  if(!p.created_at) return 0;
-  const deadline = new Date(p.created_at).getTime() + (1000*60*60*48);
-  return Math.max(0, Math.ceil((deadline - Date.now()) / (1000*60*60)));
-}
-function isInLaunchWindow(p){
-  return !!(p.old_price && p.old_price > p.price) && launchWindowHoursLeft(p) > 0;
-}
 
 function categoryAccentKey(p){
   const text = ((p.category||'') + ' ' + (p.name||'')).toLowerCase();
@@ -2762,12 +2746,10 @@ function categoryAccentKey(p){
 function productCardHTML(p){
   const discount = p.old_price && p.old_price > p.price;
   const cover = (p.images && p.images.length) ? p.images[0] : (p.image_url || 'https://placehold.co/400x400/10294f/9fb0d1?text=No+Image');
-  const launch = isInLaunchWindow(p);
   const badge = discount ? `<div class="prod-badge">خصم ${Math.round(100-(p.price/p.old_price*100))}%</div>` : (p.stock>0 ? `<div class="prod-badge stock">متوفر</div>` : `<div class="prod-badge" style="background:var(--danger);">غير متوفر</div>`);
   const isDigital = p.product_type === 'digital';
   let secondaryBadge = '';
-  if(launch) secondaryBadge = `<div class="prod-badge-left launch">⏰ عرض إطلاق - ينتهي خلال ${launchWindowHoursLeft(p)} س</div>`;
-  else if(isDigital) secondaryBadge = `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
+  if(isDigital) secondaryBadge = `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
   else if(p.is_bestseller) secondaryBadge = `<div class="prod-badge-left bestseller">🔥 الأكثر مبيعًا</div>`;
   else if(isProductNew(p)) secondaryBadge = `<div class="prod-badge-left new">✨ جديد</div>`;
   const wished = isInWishlist(p.id);
@@ -3049,34 +3031,16 @@ function renderFeatured(){
 function renderProducts(){
   const el = document.getElementById('allProductsGrid');
   let list = products;
-  if(currentOffersOnly) list = list.filter(p => p.old_price && Number(p.old_price) > Number(p.price));
   if(currentCategoryFilter && currentCategoryFilter !== 'الكل') list = list.filter(p => p.category === currentCategoryFilter);
   if(currentBrandFilter && currentBrandFilter !== 'الكل') list = list.filter(p => (p.brand||'') === currentBrandFilter);
   if(currentSearchQuery) list = list.filter(p => p.name.toLowerCase().includes(currentSearchQuery.toLowerCase()));
   if(priceMinFilter !== null && !isNaN(priceMinFilter)) list = list.filter(p => Number(p.price) >= priceMinFilter);
   if(priceMaxFilter !== null && !isNaN(priceMaxFilter)) list = list.filter(p => Number(p.price) <= priceMaxFilter);
-  const offersNote = currentOffersOnly ? ' <button class="clear-btn" style="margin-right:8px;" onclick="clearOffersFilter()">✕ مسح فلتر العروض</button>' : '';
-  document.getElementById('productsCountLabel').innerHTML = `${list.length} منتج متاح${currentOffersOnly ? ' · 🔥 عروض فقط' : ''}${offersNote}`;
-  el.innerHTML = list.map(productCardHTML).join('') || (currentOffersOnly ? '<div class="empty-state">مفيش عروض مفعّلة دلوقتي - تابعنا قريب!</div>' : '<div class="empty-state">لا توجد منتجات مطابقة</div>');
-}
-
-function showOffersOnly(){
-  navigateTo('products');
-  currentOffersOnly = true;
-  currentCategoryFilter = 'الكل';
-  currentBrandFilter = 'الكل';
-  currentSearchQuery = '';
-  renderFilters();
-  renderBrandFilters();
-  renderProducts();
-}
-function clearOffersFilter(){
-  currentOffersOnly = false;
-  renderProducts();
+  document.getElementById('productsCountLabel').innerText = `${list.length} منتج متاح`;
+  el.innerHTML = list.map(productCardHTML).join('') || '<div class="empty-state">لا توجد منتجات مطابقة</div>';
 }
 
 function filterByCat(cat, btnEl){
-  currentOffersOnly = false;
   currentCategoryFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   if(btnEl) btnEl.classList.add('active');
@@ -3085,7 +3049,6 @@ function filterByCat(cat, btnEl){
 
 function selectCategoryFilter(cat){
   navigateTo('products');
-  currentOffersOnly = false;
   currentCategoryFilter = cat;
   renderFilters();
   renderProducts();
@@ -3108,7 +3071,6 @@ function renderBrandFilters(){
 }
 
 function filterByBrand(brand, btnEl){
-  currentOffersOnly = false;
   currentBrandFilter = brand;
   document.querySelectorAll('.brand-btn').forEach(b=>b.classList.remove('active'));
   if(btnEl) btnEl.classList.add('active');
@@ -3157,21 +3119,17 @@ function brandInitials(name){
   const w = words[0] || '?';
   return w.length >= 2 ? w.slice(0,2).toUpperCase() : w.toUpperCase();
 }
-function brandMonogramURI(name){
-  // Generated placeholder for brands without a real uploaded logo file. Sits on its own
-  // colored tile (set separately via brandTileGradient), so the text itself is plain white.
+function brandMonogramURI(name, index){
+  // The logo wall forces every image to a flat white silhouette (CSS filter), so this placeholder
+  // just needs a clean, solid wordmark shape — no background box, no color, matching the
+  // "white logos only, no boxes" look requested for the brand wall.
   const initials = brandInitials(name);
+  // build a properly-sized viewBox around the text so it doesn't get clipped/stretched
   const w = Math.max(64, initials.length * 34);
   const svg2 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} 56'>
-    <text x='${w/2}' y='40' font-family='Arial, Helvetica, sans-serif' font-size='34' font-weight='800' fill='#fff' text-anchor='middle' style='letter-spacing:.5px'>${initials}</text>
+    <text x='${w/2}' y='40' font-family='Arial, Helvetica, sans-serif' font-size='34' font-weight='800' fill='#111' text-anchor='middle' style='letter-spacing:.5px'>${initials}</text>
   </svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg2);
-}
-/* A distinct, pleasant gradient tile per brand (derived from its index) so the monogram
-   badges don't all look identical — same idea as GitHub/Slack's generated avatar colors. */
-function brandTileGradient(index){
-  const h1 = brandHue(index), h2 = (h1 + 42) % 360;
-  return `linear-gradient(135deg, hsl(${h1} 70% 52%), hsl(${h2} 70% 40%))`;
 }
 /* Best-effort category/product line shown under a brand on hover. Falls back to a generic line
    for brands not in the list — this is presentational copy only, not exhaustive/authoritative. */
@@ -3188,9 +3146,9 @@ const BRAND_CATEGORY = {
 function brandCategory(name){
   return BRAND_CATEGORY[String(name).toLowerCase().trim()] || 'منتجات وحلول تقنية معتمدة';
 }
-/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated monogram
-   on a colored tile. Drop actual logo files into /assets/brands/{slug}.png (or .svg) to
-   override the monogram automatically — no code changes needed. */
+/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated monogram.
+   Drop actual logo files into /assets/brands/{slug}.png (or .svg) to override the monogram
+   automatically — no code changes needed, same pattern as /assets/ai-samples. */
 window.__brandLogoFallback = function(img){
   const stage = img.dataset.stage || '0';
   if(stage === '0'){
@@ -3198,11 +3156,8 @@ window.__brandLogoFallback = function(img){
     img.src = `assets/brands/${img.dataset.slug}.svg`;
   } else {
     img.onerror = null;
-    img.src = brandMonogramURI(img.dataset.brandName);
-    if(img.parentElement){
-      img.parentElement.classList.add('bc-mono');
-      img.parentElement.style.setProperty('--bc-mono-bg', brandTileGradient(parseInt(img.dataset.idx || '0', 10)));
-    }
+    img.src = brandMonogramURI(img.dataset.brandName, parseInt(img.dataset.idx || '0', 10));
+    if(img.parentElement) img.parentElement.classList.add('bc-mono');
   }
 };
 function renderBrandStrip(){
@@ -3217,11 +3172,13 @@ function renderBrandStrip(){
     const slug = brandSlug(b);
     return `<div class="brand-chip" onclick="navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();">
       <div class="bc-logo"><img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)"></div>
-      <span class="bc-name">${b}</span>
       <span class="bc-tip">${brandCategory(b)}</span>
     </div>`;
   };
-  strip.innerHTML = brands.map(chip).join('');
+  // render the list twice back-to-back so the CSS animation can scroll exactly -50%
+  // and loop seamlessly (right-to-left) with no visible seam or reset-jump
+  const once = brands.map(chip).join('');
+  strip.innerHTML = once + once;
 }
 
 function navigateTo(page){

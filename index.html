@@ -277,6 +277,11 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   @media(max-width:640px){ .cmdk-overlay{padding:8vh 10px 0;} }
 
   .header-actions{display:flex;align-items:center;gap:16px;}
+  .header-phone{display:flex;align-items:center;gap:7px;background:var(--paper-2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;color:var(--ink);transition:var(--transition);white-space:nowrap;}
+  .header-phone:hover{border-color:var(--ok);color:var(--ok);}
+  .header-phone .hp-ic{font-size:15px;}
+  .header-phone .hp-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
+  @media(max-width:860px){.header-phone{display:none;}}
   .header-actions .item{display:flex;align-items:center;gap:7px;color:var(--ink);font-size:12.5px;cursor:pointer;position:relative;}
   .header-actions .item strong{display:block;font-size:12.5px;}
   .header-actions .item small{color:var(--ink-soft);font-size:10.5px;}
@@ -599,6 +604,11 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .hcb-label-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px var(--ok);flex:none;animation:hcbLed 2.1s ease-in-out infinite;}
   .hcb-sub{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--cable-blue);letter-spacing:.08em;}
   .hcb-sub::before{content:'ANPR-X2';padding:1px 5px;border-radius:4px;background:color-mix(in srgb, var(--cable-blue) 16%, transparent);border:1px solid color-mix(in srgb, var(--cable-blue) 35%, transparent);color:var(--cable-blue);font-size:8.5px;letter-spacing:.04em;}
+  .hcb-feats{display:flex;align-items:center;gap:5px;margin-top:3px;}
+  .hcb-feats span{font-size:8px;font-weight:700;color:var(--ink-soft);background:color-mix(in srgb, var(--paper) 55%, transparent);border:1px solid color-mix(in srgb, var(--line) 90%, transparent);border-radius:5px;padding:1.5px 5px;white-space:nowrap;}
+  .hcb-counter{margin-top:3px;font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;color:var(--ink-soft);letter-spacing:.03em;white-space:nowrap;}
+  .hcb-counter b{color:var(--ok);font-weight:800;}
+  @media(max-width:480px){.hcb-feats{display:none;}}
   @keyframes hcbFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
 
   /* ================= Camera intelligence: PTZ patrol + cursor tracking (rotates the turret head itself, not the whole badge, so the pan actually reads as a camera turning) ================= */
@@ -647,16 +657,25 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   /* ================= AI Detection boxes — SVG-free tracking rectangles that flash over the hero visual ================= */
   .ai-detect-layer{position:absolute;inset:0;pointer-events:none;z-index:6;}
   .ai-detect-box{position:absolute;z-index:6;border:1.5px solid var(--cable-blue);border-radius:3px;pointer-events:none;opacity:0;animation:aiBoxIn .35s ease-out forwards,aiBoxOut .35s ease-in 2.1s forwards;}
-  .ai-detect-box span{position:absolute;top:-17px;inset-inline-start:-1.5px;background:var(--cable-blue);color:#04101f;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;padding:1.5px 6px;border-radius:3px;white-space:nowrap;letter-spacing:.03em;}
+  .ai-detect-box .ai-box-label{position:absolute;top:-17px;inset-inline-start:-1.5px;background:var(--cable-blue);color:#04101f;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:800;padding:1.5px 6px;border-radius:3px;white-space:nowrap;letter-spacing:.03em;}
+  /* the icon sits INSIDE the frame so the box always shows what it detected, not just an empty outline */
+  .ai-detect-box .ai-box-ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.55;color:var(--cable-blue);}
+  .ai-detect-box .ai-box-ic svg{width:52%;height:52%;filter:drop-shadow(0 0 4px currentColor);}
+  .ai-detect-box.ai-person{border-color:var(--cable-blue);}
+  .ai-detect-box.ai-person .ai-box-label{background:var(--cable-blue);color:#04101f;}
+  .ai-detect-box.ai-person .ai-box-ic{color:var(--cable-blue);}
   .ai-detect-box.ai-car{border-color:var(--cable-orange);}
-  .ai-detect-box.ai-car span{background:var(--cable-orange);color:#0b0620;}
+  .ai-detect-box.ai-car .ai-box-label{background:var(--cable-orange);color:#0b0620;}
+  .ai-detect-box.ai-car .ai-box-ic{color:var(--cable-orange);}
   .ai-detect-box.ai-face{border-color:var(--cta);}
-  .ai-detect-box.ai-face span{background:var(--cta);color:#04202a;}
+  .ai-detect-box.ai-face .ai-box-label{background:var(--cta);color:#04202a;}
+  .ai-detect-box.ai-face .ai-box-ic{color:var(--cta);}
   .ai-detect-box.ai-plate{border-color:var(--ok);}
-  .ai-detect-box.ai-plate span{background:var(--ok);color:#032018;}
+  .ai-detect-box.ai-plate .ai-box-label{background:var(--ok);color:#032018;}
+  .ai-detect-box.ai-plate .ai-box-ic{color:var(--ok);}
   @keyframes aiBoxIn{from{opacity:0;transform:scale(1.15);}to{opacity:1;transform:scale(1);}}
   @keyframes aiBoxOut{from{opacity:1;}to{opacity:0;}}
-  @media(max-width:640px){.ai-detect-box span{font-size:8px;padding:1.5px 5px;top:-15px;}}
+  @media(max-width:640px){.ai-detect-box .ai-box-label{font-size:8px;padding:1.5px 5px;top:-15px;}}
   @media(prefers-reduced-motion:reduce){.ai-detect-box{display:none;}}
 
   /* ================= AI Results Panel — docked to the physical LEFT of the hero animation, below the
@@ -781,6 +800,19 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .sec-head p{color:var(--ink-soft);margin:0;font-size:14.5px;}
 
   .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+
+  /* ================= Quick Category Strip — circular icon row with prev/next arrows ================= */
+  .quick-cat-section{padding:10px 0 26px;}
+  .quick-cat-strip{position:relative;display:flex;align-items:center;gap:8px;}
+  .qcs-track{display:flex;gap:22px;overflow-x:auto;scroll-behavior:smooth;padding:6px 2px 10px;scrollbar-width:none;flex:1;}
+  .qcs-track::-webkit-scrollbar{display:none;}
+  .qc-item{flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;width:104px;text-align:center;}
+  .qc-ic{width:84px;height:84px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:32px;transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s ease,box-shadow .25s ease;}
+  .qc-item:hover .qc-ic{transform:translateY(-4px) scale(1.05);border-color:var(--cable-blue);box-shadow:0 14px 28px -14px color-mix(in srgb, var(--cable-blue) 55%, transparent);}
+  .qc-item b{font-size:12px;font-weight:700;color:var(--ink);white-space:normal;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:2.6em;word-break:break-word;}
+  .qcs-arrow{flex:none;width:34px;height:34px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line);color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+  .qcs-arrow:hover{border-color:var(--cable-blue);color:var(--cable-blue);}
+  @media(max-width:640px){.qc-ic{width:66px;height:66px;font-size:26px;}.qc-item{width:82px;}.qc-item b{font-size:10.5px;}}
   .cat-card{aspect-ratio:16/10;background:linear-gradient(155deg, color-mix(in srgb, var(--cat-accent,var(--cable-blue)) 14%, var(--paper-2)) 0%, var(--paper-2) 78%);border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;overflow:hidden;}
   .cat-card:hover{border-color:color-mix(in srgb, var(--cat-accent,var(--cable-blue)) 60%, var(--line));transform:translateY(-6px);box-shadow:0 24px 55px -22px color-mix(in srgb, var(--cat-accent,var(--cable-blue)) 55%, transparent);}
   .cat-card-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
@@ -851,7 +883,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .brand-wall:hover .brand-strip-track{animation-play-state:paused;}
   .brand-chip{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;padding:6px 4px;}
   .brand-chip .bc-logo{height:34px;display:flex;align-items:center;justify-content:center;filter:brightness(0) invert(1);opacity:.68;transition:opacity .3s ease,filter .3s ease,transform .3s cubic-bezier(.2,.8,.2,1);}
-  .brand-chip .bc-logo img{height:100%;width:auto;max-width:120px;object-fit:contain;}
+  .brand-chip .bc-logo img{height:100%;width:auto;max-width:170px;object-fit:contain;}
   .brand-chip:hover .bc-logo{opacity:1;transform:scale(1.1);filter:brightness(0) invert(1) drop-shadow(0 0 10px color-mix(in srgb, var(--cable-blue) 85%, transparent));}
   .brand-chip .bc-name{display:none;}
   .brand-chip .bc-tip{position:absolute;top:100%;left:50%;transform:translate(-50%,2px);white-space:nowrap;font-size:11px;font-weight:700;color:var(--cable-blue);background:color-mix(in srgb, var(--paper-2) 92%, transparent);border:1px solid color-mix(in srgb, var(--cable-blue) 40%, transparent);border-radius:8px;padding:4px 10px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:3;}
@@ -859,6 +891,13 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   @keyframes brandWallScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @media(prefers-reduced-motion:reduce){.brand-strip-track{animation:none;}}
   @media(max-width:640px){.brand-chip .bc-logo{height:26px;}.brand-strip-track{gap:38px;}}
+
+  /* ================= مشاريعنا (Our Projects) — placeholder template grid ================= */
+  .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
+  .project-card{text-align:center;}
+  .project-thumb{font-size:38px;line-height:1;margin-bottom:10px;}
+  .project-card h4{margin:0 0 6px;font-size:15px;}
+  .project-card p{margin:0;color:var(--ink-soft);font-size:13px;line-height:1.7;}
 
   .prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;perspective:1200px;}
 
@@ -1534,6 +1573,10 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       <kbd class="st-kbd"><span id="cmdkKeyLabel">Ctrl</span> K</kbd>
     </button>
     <div class="header-actions">
+      <a class="header-phone" id="headerPhonePill" onclick="openGeneralWhatsApp()" title="تواصل معنا على واتساب">
+        <span class="hp-ic">📞</span>
+        <span class="hp-num" id="headerPhoneNum" dir="ltr"></span>
+      </a>
       <button class="theme-toggle" id="themeToggleBtn" role="switch" aria-checked="true" title="الوضع الليلي/النهاري">
         <span class="tt-track">
           <span class="tt-ic tt-sun">☀️</span>
@@ -1625,6 +1668,21 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       </div>
 
       <div class="mega-trigger">
+        <a class="nav-drop-label">كمبيوتر ▾</a>
+        <div class="mega-panel">
+          <div class="nav-drop-list">
+            <a onclick="executeSearch('كمبيوتر')"><span class="mega-ic">🖥️</span> كمبيوتر مكتبي وشخصي</a>
+            <a onclick="executeSearch('لابتوب')"><span class="mega-ic">💻</span> لاب توب</a>
+            <a onclick="executeSearch('شاشة')"><span class="mega-ic">🖵</span> شاشات كمبيوتر</a>
+            <a onclick="selectCategoryFilter('طابعات')"><span class="mega-ic">🖨️</span> طابعات وماسحات ضوئية</a>
+            <a onclick="selectCategoryFilter('UPS وحلول الطاقة')"><span class="mega-ic">🔋</span> مصدر تيار غير منقطع (UPS)</a>
+            <a onclick="executeSearch('اكسسوار')"><span class="mega-ic">🧰</span> إكسسوارات ومحولات الكمبيوتر</a>
+            <div class="nav-drop-foot"><a onclick="selectCategoryFilter('كمبيوتر ولابتوبات')"><span class="mega-ic">🗂️</span> كل قسم الكمبيوتر واللاب توب</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mega-trigger">
         <a data-page="tools" onclick="navigateTo('tools')">الأدوات الذكية ▾</a>
         <div class="mega-panel">
           <div class="nav-drop-list">
@@ -1660,6 +1718,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
         <div class="mega-panel">
           <div class="nav-drop-list">
             <a data-page="about" onclick="navigateTo('about')"><span class="mega-ic">🏢</span> من نحن</a>
+            <a data-page="projects" onclick="navigateTo('projects')"><span class="mega-ic">📸</span> مشاريعنا</a>
             <a data-page="track" onclick="navigateTo('track')"><span class="mega-ic">📦</span> تتبع الطلب</a>
             <a data-page="downloads" onclick="navigateTo('downloads')"><span class="mega-ic">⬇️</span> التنزيلات</a>
             <a data-page="contact" onclick="navigateTo('contact')"><span class="mega-ic">📅</span> اطلب معاينة مجانية</a>
@@ -1727,6 +1786,12 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
           <div class="hcb-text">
             <div class="hcb-title"><i class="hcb-label-dot"></i>مراقبة بالـ AI</div>
             <div class="hcb-sub">LIVE &amp; SECURE</div>
+            <div class="hcb-feats">
+              <span title="كشف الأشخاص">🧍 أشخاص</span>
+              <span title="كشف السيارات">🚗 سيارات</span>
+              <span title="قراءة اللوحات">🔠 لوحات</span>
+            </div>
+            <div class="hcb-counter">كشف اليوم <b id="hcbDetCount">0</b></div>
           </div>
         </div>
       </div>
@@ -1824,6 +1889,14 @@ Plan → Build → Secure → Support</h1>
             <a class="arp-link" onclick="navigateTo('finder')">تحليل NVR ⬅ اعرف نظامك المناسب</a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="wrap quick-cat-section">
+      <div class="quick-cat-strip">
+        <button class="qcs-arrow qcs-prev" onclick="scrollQuickCats(-1)" aria-label="السابق">‹</button>
+        <div class="qcs-track" id="quickCatTrack"></div>
+        <button class="qcs-arrow qcs-next" onclick="scrollQuickCats(1)" aria-label="التالي">›</button>
       </div>
     </section>
 
@@ -2270,6 +2343,36 @@ Plan → Build → Secure → Support</h1>
     </section>
   </div>
 
+  <!-- PROJECTS -->
+  <div class="page-view" id="page-projects">
+    <section class="wrap">
+      <div class="sec-head reveal">
+        <div><h2>مشاريعنا</h2><p>نماذج من التركيبات اللي نفذناها لعملائنا — استبدل الصور والتفاصيل دي بمشاريعك الحقيقية من لوحة التحكم.</p></div>
+      </div>
+      <div class="projects-grid">
+        <div class="info-card project-card">
+          <div class="project-thumb">🏢</div>
+          <h4>مقر شركة — القاهرة</h4>
+          <p>تركيب شبكة كاميرات مراقبة متكاملة + شبكة داخلية للمكاتب.</p>
+        </div>
+        <div class="info-card project-card">
+          <div class="project-thumb">🏭</div>
+          <h4>مستودع لوجستي — العاشر من رمضان</h4>
+          <p>تغطية كاملة بكاميرات صناعية IP66 + نظام NVR مركزي.</p>
+        </div>
+        <div class="info-card project-card">
+          <div class="project-thumb">🏠</div>
+          <h4>مجمع سكني — الشيخ زايد</h4>
+          <p>نظام مراقبة وتحكم دخول للبوابات ونقاط الوصول المشتركة.</p>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top:20px;text-align:center;">
+        <p style="margin:0 0 12px;color:var(--ink-soft);">عايز تشوف مشروعك هنا؟</p>
+        <button class="btn btn-primary" onclick="navigateTo('contact')">📅 اطلب معاينة مجانية</button>
+      </div>
+    </section>
+  </div>
+
   <!-- TRACK ORDER -->
   <div class="page-view" id="page-track">
     <section class="wrap">
@@ -2677,6 +2780,25 @@ function renderCatGrid(){
     </div>`;
   }).join('') || '<div class="empty-state">لا توجد أقسام بعد - أضفها من لوحة التحكم</div>';
   renderMegaMenu();
+  renderQuickCats();
+}
+
+function renderQuickCats(){
+  const track = document.getElementById('quickCatTrack');
+  if(!track) return;
+  track.innerHTML = categories.map(c => {
+    const icon = c.icon || CAT_ICONS[c.name] || '📦';
+    return `<div class="qc-item" onclick="selectCategoryFilter('${c.name.replace(/'/g,"\\'")}')">
+      <div class="qc-ic">${icon}</div>
+      <b>${c.name}</b>
+    </div>`;
+  }).join('');
+}
+function scrollQuickCats(dir){
+  const track = document.getElementById('quickCatTrack');
+  if(!track) return;
+  // page is dir="rtl": scrolling toward "next" content moves scrollLeft negative in RTL flex rows
+  track.scrollBy({ left: dir * -260, behavior: 'smooth' });
 }
 
 function renderMegaMenu(){
@@ -3123,11 +3245,15 @@ function brandMonogramURI(name, index){
   // The logo wall forces every image to a flat white silhouette (CSS filter), so this placeholder
   // just needs a clean, solid wordmark shape — no background box, no color, matching the
   // "white logos only, no boxes" look requested for the brand wall.
-  const initials = brandInitials(name);
-  // build a properly-sized viewBox around the text so it doesn't get clipped/stretched
-  const w = Math.max(64, initials.length * 34);
+  // NOTE: this is only ever shown until a real logo file exists at /assets/brands/{slug}.png —
+  // it renders the full brand name (not 2-letter initials, which read as broken/garbled text
+  // when a dozen brand chips sit side by side).
+  const label = String(name).trim().toUpperCase();
+  const len = label.length;
+  const fontSize = len > 16 ? 15 : len > 11 ? 18 : len > 7 ? 21 : 25;
+  const w = Math.max(80, Math.round(len * fontSize * 0.62) + 24);
   const svg2 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} 56'>
-    <text x='${w/2}' y='40' font-family='Arial, Helvetica, sans-serif' font-size='34' font-weight='800' fill='#111' text-anchor='middle' style='letter-spacing:.5px'>${initials}</text>
+    <text x='${w/2}' y='36' font-family='Arial, Helvetica, sans-serif' font-size='${fontSize}' font-weight='800' fill='#111' text-anchor='middle' style='letter-spacing:.6px'>${label}</text>
   </svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg2);
 }
@@ -3146,12 +3272,20 @@ const BRAND_CATEGORY = {
 function brandCategory(name){
   return BRAND_CATEGORY[String(name).toLowerCase().trim()] || 'منتجات وحلول تقنية معتمدة';
 }
-/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated monogram.
-   Drop actual logo files into /assets/brands/{slug}.png (or .svg) to override the monogram
-   automatically — no code changes needed, same pattern as /assets/ai-samples. */
+/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated wordmark.
+   IMPORTANT: browsers log every failed <img> load to the console (the "Failed to load resource"
+   errors you'll see in devtools) even though the onerror handler recovers gracefully — so instead
+   of blindly trying a file for every brand and letting most of them 404, we only ever *request* a
+   file for a brand slug listed in BRAND_LOGO_FILES below. Everything else skips straight to the
+   clean wordmark placeholder — no failed request, no console noise.
+   To add a real logo: drop the file in /assets/brands/{slug}.png (or .svg) AND add that slug to
+   BRAND_LOGO_FILES — then it replaces the wordmark automatically everywhere the brand appears. */
+const BRAND_LOGO_FILES = new Set([
+  // 'hikvision', 'dahua', 'tp-link', ...
+]);
 window.__brandLogoFallback = function(img){
   const stage = img.dataset.stage || '0';
-  if(stage === '0'){
+  if(stage === '0' && BRAND_LOGO_FILES.has(img.dataset.slug + '-svg')){
     img.dataset.stage = '1';
     img.src = `assets/brands/${img.dataset.slug}.svg`;
   } else {
@@ -3170,8 +3304,12 @@ function renderBrandStrip(){
   const chip = (b, idx) => {
     const safe = b.replace(/'/g,"\\'");
     const slug = brandSlug(b);
-    return `<div class="brand-chip" onclick="navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();">
-      <div class="bc-logo"><img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)"></div>
+    const hasPng = BRAND_LOGO_FILES.has(slug);
+    const logoImg = hasPng
+      ? `<img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)">`
+      : `<img src="${brandMonogramURI(b, idx)}" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy">`;
+    return `<div class="brand-chip${hasPng?'':' bc-mono'}" onclick="navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();">
+      <div class="bc-logo">${logoImg}</div>
       <span class="bc-tip">${brandCategory(b)}</span>
     </div>`;
   };
@@ -4455,6 +4593,10 @@ themeToggleBtn.addEventListener('click', ()=>{
 document.addEventListener('DOMContentLoaded', ()=>{
   loadData();
   updateCartUI();
+  const headerPhoneNum = document.getElementById('headerPhoneNum');
+  if(headerPhoneNum && typeof WHATSAPP_NUMBER !== 'undefined'){
+    headerPhoneNum.textContent = WHATSAPP_NUMBER.replace(/^20/, '0');
+  }
   const drawer = document.getElementById('cartDrawer');
   const overlay = document.getElementById('cartOverlay');
   document.getElementById('cartTriggerBtn').addEventListener('click', ()=>{ drawer.classList.add('open'); overlay.classList.add('open'); });
@@ -4857,7 +4999,7 @@ function initCountUp(){
   // (e.g. person-01.jpg, person-02.jpg, car-01.jpg …) and they'll be picked up automatically.
   // Until then, a designed icon frame is shown instead — nothing ever looks broken.
   const TYPES = [
-    { key:'person', cls:'',         accClass:'',          label:'Person', samples:2, icon:'<path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>' },
+    { key:'person', cls:'ai-person', accClass:'',          label:'Person', samples:2, icon:'<path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>' },
     { key:'car',    cls:'ai-car',   accClass:'ac-car',    label:'Car',    samples:2, icon:'<path d="M4 16.5 5.6 11a2 2 0 0 1 1.9-1.4h9a2 2 0 0 1 1.9 1.4L20 16.5"/><rect x="3" y="16.5" width="18" height="4" rx="1.4"/><circle cx="7.5" cy="20.2" r="1.3"/><circle cx="16.5" cy="20.2" r="1.3"/>' },
     { key:'face',   cls:'ai-face',  accClass:'ac-face',   label:'Face',   samples:1, icon:'<circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="15" cy="10.5" r=".9" fill="currentColor" stroke="none"/><path d="M9 15c.9.8 1.9 1.2 3 1.2s2.1-.4 3-1.2"/>' },
     { key:'plate',  cls:'ai-plate', accClass:'ac-plate',  label:'Plate',  samples:5, icon:'<rect x="3" y="7" width="18" height="10" rx="1.6"/><path d="M6.5 12.5h3M11.5 12.5h6"/>' }
@@ -4877,6 +5019,23 @@ function initCountUp(){
     return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
   }
   const MAX_PANEL_ITEMS = 2;
+  // Live "detections today" counter shown on the AI camera badge — persisted per calendar day
+  // so it feels like a real running tally instead of resetting every page load.
+  const hcbCountEl = document.getElementById('hcbDetCount');
+  function todayKey(){ const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+  let detCount = 0;
+  try {
+    const saved = JSON.parse(localStorage.getItem('delta_ai_det_count') || 'null');
+    if(saved && saved.day === todayKey()) detCount = saved.n;
+    else detCount = 812 + Math.floor(Math.random()*40); // fresh-day baseline so it never starts at 0
+  } catch(e){ detCount = 812; }
+  function renderCount(){ if(hcbCountEl) hcbCountEl.textContent = detCount.toLocaleString('en-US'); }
+  function bumpCount(n){
+    detCount += n;
+    renderCount();
+    try { localStorage.setItem('delta_ai_det_count', JSON.stringify({ day: todayKey(), n: detCount })); } catch(e){}
+  }
+  renderCount();
   function pushToPanel(t){
     if(!arpList) return;
     const card = document.createElement('div');
@@ -4923,6 +5082,15 @@ function initCountUp(){
     setTimeout(()=> badge.classList.remove('hcb-scan-pulse'), 700);
   }
   let ambientTimer = null;
+  // start high so the very FIRST scan (fires ~3.5s after page load) always includes 'person' —
+  // a quick page view/reload should never have to wait through several silent cycles to see it
+  let cyclesSincePerson = 99;
+  // two non-overlapping slots inside the lower-right zone so two simultaneous boxes never stack on each other
+  const SLOTS = [
+    { left:[60,74],  top:[34,48] },
+    { left:[76,88],  top:[52,64] }
+  ];
+  function pick(range){ return range[0] + Math.random()*(range[1]-range[0]); }
   function spawnBoxes(){
     if(ambientTimer){ clearTimeout(ambientTimer); ambientTimer = null; }
     if(document.hidden || window.innerWidth < 340){ scheduleNext(); return; }
@@ -4932,25 +5100,35 @@ function initCountUp(){
     layer.innerHTML = '';
     const detected = [];
     const count = 1 + Math.floor(Math.random()*2);
+    // pity timer: "person" never sits out more than one cycle in a row, so the badge doesn't
+    // go long stretches only flashing car/face/plate (and a quick page view still sees it)
+    const forcePerson = cyclesSincePerson >= 1;
+    cyclesSincePerson++;
     for(let i=0;i<count;i++){
-      const t = TYPES[Math.floor(Math.random()*TYPES.length)];
+      let t;
+      if(i===0 && forcePerson){ t = TYPES[0]; }
+      else { t = TYPES[Math.floor(Math.random()*TYPES.length)]; }
+      if(t.key === 'person') cyclesSincePerson = 0;
       detected.push(t);
+      const slot = SLOTS[i % SLOTS.length];
       const box = document.createElement('div');
       box.className = 'ai-detect-box ' + t.cls;
       const w = 46 + Math.random()*40, h = 44 + Math.random()*32;
       box.style.width = w+'px'; box.style.height = h+'px';
       // Keep boxes in the empty lower-right zone: below the LIVE NETWORK card (top ~4-30%,
       // right ~4-33%), clear of the centred node column (left 50%) and the left-docked
-      // results panel/camera badge — so they never sit on top of the diagram icons.
-      box.style.left = (60 + Math.random()*28)+'%';
-      box.style.top = (34 + Math.random()*30)+'%';
-      box.innerHTML = `<span>${t.label}</span>`;
+      // results panel/camera badge — each of the (max 2) simultaneous boxes gets its own slot
+      // so they never sit on top of each other or the diagram icons.
+      box.style.left = pick(slot.left)+'%';
+      box.style.top = pick(slot.top)+'%';
+      box.innerHTML = `<span class="ai-box-ic">${FALLBACK_ICON(t)}</span><span class="ai-box-label">${t.label}</span>`;
       layer.appendChild(box);
     }
     // Hop 2 — a beat later, the NVR finishes "analyzing" and pushes the results out to the panel
     setTimeout(()=>{
       drawFlowLine(NVR_PT, PANEL_PT, 1400);
       detected.forEach(t => pushToPanel(t));
+      bumpCount(detected.length);
     }, 650);
     setTimeout(()=>{ layer.innerHTML = ''; }, 2450);
     scheduleNext();

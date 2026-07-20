@@ -373,8 +373,8 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;}
   .btn:hover{transform:translateY(-2px);}
   .btn-primary{background:var(--grad-brand);color:#fff;box-shadow:0 8px 24px -8px #6D5EF766;}
-  .btn-cta{background:var(--cta);color:#fff;box-shadow:0 8px 26px -8px #FF7A00aa;}
-  .btn-cta:hover{box-shadow:0 14px 34px -8px #FF7A00cc;}
+  .btn-cta{background:var(--grad-brand);color:#fff;box-shadow:0 8px 26px -8px color-mix(in srgb, var(--cable-blue) 65%, transparent);}
+  .btn-cta:hover{box-shadow:0 14px 34px -8px color-mix(in srgb, var(--cable-blue) 80%, transparent);filter:brightness(1.08);}
   .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
   .btn-outline:hover{border-color:var(--cable-orange);background:var(--navy-800);}
   .hero-stats{display:flex;gap:32px;flex-wrap:wrap;}
@@ -844,21 +844,22 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .brand-stats .bs-item{display:flex;flex-direction:column;gap:2px;}
   .brand-stats .bs-item b{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--cable-blue);}
   .brand-stats .bs-item span{font-size:12px;color:var(--ink-soft);font-weight:700;}
-  /* ===== Infinite white logo wall — no boxes, no color, just clean wordmarks that drift
-     right-to-left and pause/lift/glow on hover, with a small category tooltip underneath ===== */
-  .brand-wall{position:relative;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);padding:14px 0 34px;}
-  .brand-strip-track{display:flex;align-items:center;gap:56px;width:max-content;direction:ltr;animation:brandWallScroll 42s linear infinite;}
-  .brand-wall:hover .brand-strip-track{animation-play-state:paused;}
-  .brand-chip{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;padding:6px 4px;}
-  .brand-chip .bc-logo{height:34px;display:flex;align-items:center;justify-content:center;filter:brightness(0) invert(1);opacity:.68;transition:opacity .3s ease,filter .3s ease,transform .3s cubic-bezier(.2,.8,.2,1);}
-  .brand-chip .bc-logo img{height:100%;width:auto;max-width:120px;object-fit:contain;}
-  .brand-chip:hover .bc-logo{opacity:1;transform:scale(1.1);filter:brightness(0) invert(1) drop-shadow(0 0 10px color-mix(in srgb, var(--cable-blue) 85%, transparent));}
-  .brand-chip .bc-name{display:none;}
-  .brand-chip .bc-tip{position:absolute;top:100%;left:50%;transform:translate(-50%,2px);white-space:nowrap;font-size:11px;font-weight:700;color:var(--cable-blue);background:color-mix(in srgb, var(--paper-2) 92%, transparent);border:1px solid color-mix(in srgb, var(--cable-blue) 40%, transparent);border-radius:8px;padding:4px 10px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:3;}
-  .brand-chip:hover .bc-tip{opacity:1;transform:translate(-50%,8px);}
-  @keyframes brandWallScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-  @media(prefers-reduced-motion:reduce){.brand-strip-track{animation:none;}}
-  @media(max-width:640px){.brand-chip .bc-logo{height:26px;}.brand-strip-track{gap:38px;}}
+  /* ===== Static brand wall: a clean, fixed grid of logo-badge cards (no auto-scroll marquee).
+     Each badge has a light tile so both real uploaded logos and the generated monogram
+     fallback read clearly against the dark theme, with the brand name shown underneath. ===== */
+  .brand-wall{padding:6px 0 4px;}
+  .brand-strip-track{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:18px;}
+  .brand-chip{position:relative;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:16px 14px 13px;width:128px;transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s ease,box-shadow .25s ease;}
+  .brand-chip:hover{transform:translateY(-4px);border-color:color-mix(in srgb, var(--cable-blue) 55%, var(--line));box-shadow:0 14px 28px -14px #000a,0 0 0 1px color-mix(in srgb, var(--cable-blue) 25%, transparent);}
+  .brand-chip .bc-logo{height:44px;width:100%;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;padding:6px 10px;}
+  .brand-chip .bc-logo img{height:100%;width:auto;max-width:100%;object-fit:contain;}
+  /* the generated monogram fallback gets a colored tile instead of the plain white one,
+     so it reads as a proper badge rather than bare floating text */
+  .brand-chip.bc-mono .bc-logo{background:var(--bc-mono-bg, linear-gradient(135deg,#2F7BFF,#8A5CFF));}
+  .brand-chip .bc-name{display:block;font-size:12.5px;font-weight:800;color:var(--ink);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .brand-chip .bc-tip{display:block;font-size:10.5px;color:var(--ink-soft);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  @media(max-width:640px){.brand-chip{width:104px;padding:12px 10px 10px;}.brand-chip .bc-logo{height:36px;}.brand-strip-track{gap:12px;}}
+  @media(prefers-reduced-motion:reduce){.brand-chip{transition:none;}}
 
   .prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;perspective:1200px;}
 
@@ -912,6 +913,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .prod-badge-left.bestseller{background:#c9860c;}
   .prod-badge-left.new{background:var(--cable-blue);}
   .prod-badge-left.digital{background:#7a3ff2;}
+  .prod-badge-left.launch{background:linear-gradient(120deg,#ff5470,#ff8a3d);}
   .digital-note{background:var(--cable-orange-dim);border:1px solid var(--cable-orange);color:var(--ink);font-size:12.5px;padding:10px 12px;border-radius:8px;margin:10px 0;line-height:1.8;}
   .wish-btn{position:absolute;bottom:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(8,21,37,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);z-index:2;line-height:1;}
   .wish-btn:hover{transform:scale(1.12);}
@@ -1034,6 +1036,20 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .pd-stock.in{color:var(--ok);}
   .pd-stock.out{color:var(--danger);}
   .pd-qty-row{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .pd-notify-box{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+  .pd-notify-box input{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);}
+  .pd-reviews-section{margin-top:34px;padding-top:26px;border-top:1px solid var(--line);display:grid;grid-template-columns:1.4fr 1fr;gap:28px;}
+  @media(max-width:760px){.pd-reviews-section{grid-template-columns:1fr;}}
+  .pd-review-summary{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .pd-review-avg-stars,.pd-review-item-stars{color:#f5a623;letter-spacing:2px;}
+  .pd-review-item{padding:12px 0;border-bottom:1px solid var(--line);}
+  .pd-review-item:last-child{border-bottom:none;}
+  .pd-review-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;}
+  .pd-review-item p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.7;}
+  .pd-review-form{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;align-self:start;}
+  .pd-review-form h4{margin:0 0 10px;}
+  .pd-star-input{font-size:24px;color:#f5a623;letter-spacing:4px;margin-bottom:10px;cursor:pointer;}
+  .pd-review-form input,.pd-review-form textarea{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);margin-bottom:10px;font-family:inherit;}
   .pd-qty-row .qty-btn{width:34px;height:34px;font-size:16px;}
 
   /* Bank transfer modal */
@@ -1545,6 +1561,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   <nav class="catnav">
     <div class="wrap" id="catNavMenu">
       <a class="active" data-page="home" onclick="navigateTo('home')">الرئيسية</a>
+      <a onclick="showOffersOnly()" style="color:var(--cable-orange);font-weight:800;">🔥 عروضنا</a>
 
       <div class="mega-trigger">
         <a class="nav-drop-label">الحلول ▾</a>
@@ -1601,7 +1618,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       </div>
 
       <div class="mega-trigger">
-        <a data-page="products" onclick="navigateTo('products')">المنتجات ▾</a>
+        <a data-page="products" onclick="currentOffersOnly=false; navigateTo('products')">المنتجات ▾</a>
         <div class="mega-panel mega-panel-wide">
           <div class="mega-panel-inner">
             <div class="mega-col-list" id="megaMenuList"></div>
@@ -1654,6 +1671,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
       </div>
 
       <a data-page="track" onclick="navigateTo('track')" class="nav-pill-cta nav-pill-ghost" style="margin-inline-start:auto;">📦 تتبع الطلب</a>
+      <a onclick="openGeneralWhatsApp()" class="nav-pill-cta nav-pill-ghost" title="تواصل مباشر على واتساب" style="padding:8px 12px !important;">💬</a>
       <a data-page="contact" onclick="navigateTo('contact')" class="nav-pill-cta glow-pulse">📅 اطلب معاينة مجانية</a>
     </div>
   </nav>
@@ -1682,24 +1700,27 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
             <div class="hcb-ring"></div>
             <div class="hcb-core">
               <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <!-- ceiling mount: fixed, does not rotate -->
-                <path d="M12.5 26.4h7" stroke-width="1.6" opacity=".55"/>
-                <path d="M16 26.4v-4.3" stroke-width="1.6" opacity=".7"/>
-                <!-- rotating PTZ turret head -->
+                <!-- wall/pole mount arm: fixed, does not rotate -->
+                <path d="M4 15.2h3.4" stroke-width="1.6" opacity=".55"/>
+                <path d="M6.2 12.6v5.2" stroke-width="1.6" opacity=".7"/>
+                <!-- bullet body: pans slightly to "aim" at the scene, doesn't spin like a dome -->
                 <g class="hcb-head">
-                  <circle cx="16" cy="14.4" r="9.1" opacity=".9"/>
-                  <circle cx="16" cy="14.4" r="9.1" fill="url(#hcbHeadFill)" stroke="none" opacity=".5"/>
-                  <!-- front-facing notch so the pan is unmistakable -->
-                  <path d="M16 5.5 17.3 7.7h-2.6z" fill="currentColor" stroke="none"/>
-                  <!-- lens -->
-                  <circle cx="16" cy="14.4" r="4.6" stroke-width="1.4"/>
-                  <circle cx="16" cy="14.4" r="2.5" fill="currentColor" stroke="none" opacity=".92"/>
-                  <circle class="hcb-glint" cx="14.3" cy="12.6" r=".9" fill="#fff" stroke="none"/>
+                  <!-- cylindrical bullet housing -->
+                  <rect x="7.2" y="11.4" width="16.4" height="7.6" rx="3.8" opacity=".9"/>
+                  <rect x="7.2" y="11.4" width="16.4" height="7.6" rx="3.8" fill="url(#hcbHeadFill)" stroke="none" opacity=".5"/>
+                  <!-- sun-shield hood on top, front-facing so the aim direction is unmistakable -->
+                  <path d="M18.5 11.6c1.6-1.1 4-1.3 5.7-.3" stroke-width="1.4" opacity=".85"/>
+                  <!-- lens ring + glass -->
+                  <circle cx="21.6" cy="15.2" r="4.15" stroke-width="1.4"/>
+                  <circle cx="21.6" cy="15.2" r="2.3" fill="currentColor" stroke="none" opacity=".92"/>
+                  <circle class="hcb-glint" cx="20.3" cy="13.9" r=".8" fill="#fff" stroke="none"/>
+                  <!-- IR array on the housing, typical of an ANPR bullet camera -->
+                  <circle cx="10.3" cy="15.2" r=".85" fill="currentColor" stroke="none" opacity=".7"/>
                   <!-- status / recording LED -->
-                  <circle class="hcb-led" cx="22.3" cy="9.1" r="1.15" fill="var(--ok)" stroke="none"/>
+                  <circle class="hcb-led" cx="24.6" cy="10.6" r="1.15" fill="var(--ok)" stroke="none"/>
                 </g>
                 <defs>
-                  <radialGradient id="hcbHeadFill" cx="50%" cy="38%" r="65%">
+                  <radialGradient id="hcbHeadFill" cx="60%" cy="35%" r="70%">
                     <stop offset="0%" stop-color="currentColor" stop-opacity=".28"/>
                     <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
                   </radialGradient>
@@ -1930,16 +1951,6 @@ Plan → Build → Secure → Support</h1>
         <a class="btn btn-outline" onclick="navigateTo('products')">عرض الكل</a>
       </div>
       <div class="prod-grid" id="featuredGrid"></div>
-    </section>
-
-    <section class="brands">
-      <div class="wrap">
-        <span class="brand-name" style="color:var(--ink-soft);">الشركاء والتوكيلات:</span>
-        <span class="brand-name">TechNet Enterprise</span>
-        <span class="brand-name">ProLink Networks</span>
-        <span class="brand-name">SecureView AI</span>
-        <span class="brand-name">NetCore Labs</span>
-      </div>
     </section>
 
     <section class="wrap">
@@ -2342,6 +2353,7 @@ Plan → Build → Secure → Support</h1>
           <div>
             <h3>طلب معاينة</h3>
             <div class="form-group"><label>اسم المنشأة / العميل</label><input type="text" id="contactName" placeholder="مثال: شركة النور للتطوير"></div>
+            <div style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true"><label>اتركه فارغًا</label><input type="text" id="contactHoneypot" tabindex="-1" autocomplete="off"></div>
             <div class="form-group"><label>رقم الهاتف (اختياري)</label><input type="tel" id="contactPhone" placeholder="01xxxxxxxxx"></div>
             <div class="form-group"><label>تفاصيل الطلب</label><textarea id="contactDetails" rows="4" placeholder="اذكر عدد الكاميرات أو نقاط الشبكة أو نوع الأجهزة المطلوبة..."></textarea></div>
             <button class="btn btn-outline" onclick="sendStructuredForm()">إرسال الطلب</button>
@@ -2466,6 +2478,7 @@ let wishlist = JSON.parse(localStorage.getItem('it_pro_wishlist') || '[]');
 let currentCategoryFilter = 'الكل';
 let currentBrandFilter = 'الكل';
 let currentSearchQuery = '';
+let currentOffersOnly = false;
 let priceMinFilter = null;
 let priceMaxFilter = null;
 let appliedCoupon = null;
@@ -2724,6 +2737,17 @@ function isProductNew(p){
   const ageMs = Date.now() - new Date(p.created_at).getTime();
   return ageMs < (1000*60*60*24*14); // 14 يوم
 }
+/* "أول 48 ساعة": لو المنتج مضاف حديثًا (أقل من 48 ساعة) وله سعر مخفّض (old_price) مضبوط
+   من الأدمن وقت الإضافة، بنبرزه كعرض إطلاق محدود المدة بعدّاد تنازلي - بيشجع زيارة الموقع
+   بانتظام. مفيش تلاعب في السعر نفسه هنا، بس إبراز بصري لخصم حقيقي أدمن حطّه فعلاً. */
+function launchWindowHoursLeft(p){
+  if(!p.created_at) return 0;
+  const deadline = new Date(p.created_at).getTime() + (1000*60*60*48);
+  return Math.max(0, Math.ceil((deadline - Date.now()) / (1000*60*60)));
+}
+function isInLaunchWindow(p){
+  return !!(p.old_price && p.old_price > p.price) && launchWindowHoursLeft(p) > 0;
+}
 
 function categoryAccentKey(p){
   const text = ((p.category||'') + ' ' + (p.name||'')).toLowerCase();
@@ -2738,10 +2762,12 @@ function categoryAccentKey(p){
 function productCardHTML(p){
   const discount = p.old_price && p.old_price > p.price;
   const cover = (p.images && p.images.length) ? p.images[0] : (p.image_url || 'https://placehold.co/400x400/10294f/9fb0d1?text=No+Image');
+  const launch = isInLaunchWindow(p);
   const badge = discount ? `<div class="prod-badge">خصم ${Math.round(100-(p.price/p.old_price*100))}%</div>` : (p.stock>0 ? `<div class="prod-badge stock">متوفر</div>` : `<div class="prod-badge" style="background:var(--danger);">غير متوفر</div>`);
   const isDigital = p.product_type === 'digital';
   let secondaryBadge = '';
-  if(isDigital) secondaryBadge = `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
+  if(launch) secondaryBadge = `<div class="prod-badge-left launch">⏰ عرض إطلاق - ينتهي خلال ${launchWindowHoursLeft(p)} س</div>`;
+  else if(isDigital) secondaryBadge = `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
   else if(p.is_bestseller) secondaryBadge = `<div class="prod-badge-left bestseller">🔥 الأكثر مبيعًا</div>`;
   else if(isProductNew(p)) secondaryBadge = `<div class="prod-badge-left new">✨ جديد</div>`;
   const wished = isInWishlist(p.id);
@@ -2849,6 +2875,16 @@ function renderProductDetail(id){
       </div>
       ${p.product_type==='digital' ? '<div class="digital-note">💾 منتج رقمي: هيتبعتلك رابط تحميل آمن على واتساب بعد تأكيد الدفع مباشرة، ومتاح لك تتابع حالة طلبك من صفحة "تتبع الطلب".</div>' : `<div class="pd-stock ${p.stock>0?'in':'out'}">${p.stock>0 ? '✓ متوفر بالمخزون' : '✕ غير متوفر حاليًا'}</div>`}
       <p class="pd-desc">${p.description || 'لا يوجد وصف تفصيلي لهذا المنتج حاليًا. تواصل معنا لمزيد من التفاصيل.'}</p>
+      ${(p.product_type!=='digital' && p.stock<=0) ? `
+        <div class="pd-notify-box">
+          <b>📩 نبهني لما يتوفر</b>
+          <p style="margin:4px 0 10px;font-size:13px;color:var(--ink-soft);">سجّل رقمك وهنبعتلك واتساب أول ما يتوفر تاني.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="tel" id="pdNotifyPhone" placeholder="رقم الموبايل" style="flex:1;min-width:160px;">
+            <button class="btn btn-outline" onclick="submitStockNotify('${p.id}', '${p.name.replace(/'/g,"\\'")}')">سجّل التنبيه</button>
+          </div>
+          <div id="pdNotifyMsg" style="font-size:12.5px;margin-top:6px;"></div>
+        </div>` : ''}
       <div class="pd-qty-row">
         <button class="qty-btn" onclick="pdChangeQty(-1)">-</button>
         <span id="pdQtyVal">1</span>
@@ -2858,6 +2894,17 @@ function renderProductDetail(id){
         <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="pdAddToCart('${p.id}')">${p.product_type==='digital'?'⬇️ اطلب الآن':'🛒 أضف للسلة'}</button>
         <button class="wish-btn inline ${isInWishlist(p.id)?'active':''}" data-id="${p.id}" title="أضف للمفضلة" onclick="toggleWishlist('${p.id}')">${isInWishlist(p.id)?'♥':'♡'}</button>
       </div>
+    </div>
+    <div class="pd-reviews-section" style="grid-column:1 / -1;">
+      <div id="pdReviewsList"><p style="color:var(--ink-soft);font-size:13.5px;">جاري تحميل التقييمات...</p></div>
+      <div class="pd-review-form">
+        <h4>✍️ اكتب تقييمك</h4>
+        <div class="pd-star-input" id="pdStarInput">${[1,2,3,4,5].map(n=>`<span data-v="${n}" onclick="setReviewStars(${n})">☆</span>`).join('')}</div>
+        <input type="text" id="pdReviewName" placeholder="اسمك">
+        <textarea id="pdReviewComment" rows="3" placeholder="رأيك في المنتج (اختياري)"></textarea>
+        <button class="btn btn-outline" onclick="submitProductReview('${p.id}')">إرسال التقييم</button>
+        <div id="pdReviewMsg" style="font-size:12.5px;margin-top:6px;"></div>
+      </div>
     </div>`;
   window._pdImages = images; window._pdQty = 1;
   document.title = `${p.name} | Delta IT Solutions`;
@@ -2865,6 +2912,81 @@ function renderProductDetail(id){
   document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('active-page'));
   document.getElementById('page-product-detail').classList.add('active-page');
   window.scrollTo({top:0, behavior:'smooth'});
+  window._pdReviewStars = 0;
+  loadProductReviews(p.id);
+}
+
+let _pdReviewStars = 0;
+function setReviewStars(n){
+  _pdReviewStars = n;
+  document.querySelectorAll('#pdStarInput span').forEach(s => {
+    s.textContent = Number(s.dataset.v) <= n ? '★' : '☆';
+    s.classList.toggle('filled', Number(s.dataset.v) <= n);
+  });
+}
+
+async function loadProductReviews(productId){
+  const box = document.getElementById('pdReviewsList');
+  if(!box) return;
+  try{
+    const { data, error } = await sb.from('product_reviews').select('*').eq('product_id', productId).eq('approved', true).order('created_at', { ascending:false });
+    if(error) throw error;
+    const reviews = data || [];
+    if(!reviews.length){
+      box.innerHTML = '<p style="color:var(--ink-soft);font-size:13.5px;">لسه مفيش تقييمات لهذا المنتج - كن أول من يقيّمه!</p>';
+      return;
+    }
+    const avg = reviews.reduce((s,r)=>s+r.rating,0) / reviews.length;
+    const stars = n => '★'.repeat(Math.round(n)) + '☆'.repeat(5-Math.round(n));
+    box.innerHTML = `
+      <div class="pd-review-summary"><span class="pd-review-avg-stars">${stars(avg)}</span><b>${avg.toFixed(1)}</b><span style="color:var(--ink-soft);font-size:13px;">(${reviews.length} تقييم)</span></div>
+      ${reviews.map(r => `
+        <div class="pd-review-item">
+          <div class="pd-review-item-head"><b>${(r.customer_name||'عميل').replace(/</g,'&lt;')}</b><span class="pd-review-item-stars">${stars(r.rating)}</span></div>
+          ${r.comment ? `<p>${r.comment.replace(/</g,'&lt;')}</p>` : ''}
+        </div>`).join('')}`;
+  }catch(e){
+    console.error('loadProductReviews failed', e);
+    box.innerHTML = '<p style="color:var(--ink-soft);font-size:13.5px;">تعذر تحميل التقييمات حاليًا.</p>';
+  }
+}
+
+async function submitProductReview(productId){
+  const msg = document.getElementById('pdReviewMsg');
+  const name = document.getElementById('pdReviewName').value.trim();
+  const comment = document.getElementById('pdReviewComment').value.trim();
+  if(!_pdReviewStars){ msg.style.color='var(--danger,#e5484d)'; msg.innerText = 'برجاء اختيار عدد النجوم أولاً.'; return; }
+  if(!name){ msg.style.color='var(--danger,#e5484d)'; msg.innerText = 'برجاء كتابة اسمك.'; return; }
+  if(!checkRateLimit('product_review', 5, 15*60*1000)){ msg.style.color='var(--danger,#e5484d)'; msg.innerText = 'محاولات كتير في وقت قصير - حاول تاني بعد كام دقيقة.'; return; }
+  try{
+    const { error } = await sb.from('product_reviews').insert({ product_id: productId, customer_name: name, rating: _pdReviewStars, comment: comment || null, approved: false });
+    if(error) throw error;
+    msg.style.color = 'var(--ok,#2ecc71)';
+    msg.innerText = '✓ شكرًا لتقييمك! هيظهر للعملاء بعد مراجعة سريعة من فريقنا.';
+    document.getElementById('pdReviewName').value = '';
+    document.getElementById('pdReviewComment').value = '';
+    setReviewStars(0);
+  }catch(e){
+    console.error('submitProductReview failed', e);
+    msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء إرسال التقييم، حاول مرة أخرى.';
+  }
+}
+
+async function submitStockNotify(productId, productName){
+  const msg = document.getElementById('pdNotifyMsg');
+  const phone = document.getElementById('pdNotifyPhone').value.trim();
+  if(!phone){ msg.style.color='var(--danger,#e5484d)'; msg.innerText = 'برجاء إدخال رقم الموبايل.'; return; }
+  if(!checkRateLimit('stock_notify', 5, 15*60*1000)){ msg.style.color='var(--danger,#e5484d)'; msg.innerText = 'محاولات كتير في وقت قصير - حاول تاني بعد كام دقيقة.'; return; }
+  try{
+    const { error } = await sb.from('stock_notify_requests').insert({ product_id: productId, product_name: productName, phone });
+    if(error) throw error;
+    msg.style.color = 'var(--ok,#2ecc71)';
+    msg.innerText = '✓ تم التسجيل، هنبعتلك واتساب فور توفر المنتج.';
+    document.getElementById('pdNotifyPhone').value = '';
+  }catch(e){
+    console.error('submitStockNotify failed', e);
+    msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ، حاول مرة أخرى.';
+  }
 }
 
 function pdSelectImage(i){
@@ -2927,16 +3049,34 @@ function renderFeatured(){
 function renderProducts(){
   const el = document.getElementById('allProductsGrid');
   let list = products;
+  if(currentOffersOnly) list = list.filter(p => p.old_price && Number(p.old_price) > Number(p.price));
   if(currentCategoryFilter && currentCategoryFilter !== 'الكل') list = list.filter(p => p.category === currentCategoryFilter);
   if(currentBrandFilter && currentBrandFilter !== 'الكل') list = list.filter(p => (p.brand||'') === currentBrandFilter);
   if(currentSearchQuery) list = list.filter(p => p.name.toLowerCase().includes(currentSearchQuery.toLowerCase()));
   if(priceMinFilter !== null && !isNaN(priceMinFilter)) list = list.filter(p => Number(p.price) >= priceMinFilter);
   if(priceMaxFilter !== null && !isNaN(priceMaxFilter)) list = list.filter(p => Number(p.price) <= priceMaxFilter);
-  document.getElementById('productsCountLabel').innerText = `${list.length} منتج متاح`;
-  el.innerHTML = list.map(productCardHTML).join('') || '<div class="empty-state">لا توجد منتجات مطابقة</div>';
+  const offersNote = currentOffersOnly ? ' <button class="clear-btn" style="margin-right:8px;" onclick="clearOffersFilter()">✕ مسح فلتر العروض</button>' : '';
+  document.getElementById('productsCountLabel').innerHTML = `${list.length} منتج متاح${currentOffersOnly ? ' · 🔥 عروض فقط' : ''}${offersNote}`;
+  el.innerHTML = list.map(productCardHTML).join('') || (currentOffersOnly ? '<div class="empty-state">مفيش عروض مفعّلة دلوقتي - تابعنا قريب!</div>' : '<div class="empty-state">لا توجد منتجات مطابقة</div>');
+}
+
+function showOffersOnly(){
+  navigateTo('products');
+  currentOffersOnly = true;
+  currentCategoryFilter = 'الكل';
+  currentBrandFilter = 'الكل';
+  currentSearchQuery = '';
+  renderFilters();
+  renderBrandFilters();
+  renderProducts();
+}
+function clearOffersFilter(){
+  currentOffersOnly = false;
+  renderProducts();
 }
 
 function filterByCat(cat, btnEl){
+  currentOffersOnly = false;
   currentCategoryFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   if(btnEl) btnEl.classList.add('active');
@@ -2945,6 +3085,7 @@ function filterByCat(cat, btnEl){
 
 function selectCategoryFilter(cat){
   navigateTo('products');
+  currentOffersOnly = false;
   currentCategoryFilter = cat;
   renderFilters();
   renderProducts();
@@ -2967,6 +3108,7 @@ function renderBrandFilters(){
 }
 
 function filterByBrand(brand, btnEl){
+  currentOffersOnly = false;
   currentBrandFilter = brand;
   document.querySelectorAll('.brand-btn').forEach(b=>b.classList.remove('active'));
   if(btnEl) btnEl.classList.add('active');
@@ -3015,17 +3157,21 @@ function brandInitials(name){
   const w = words[0] || '?';
   return w.length >= 2 ? w.slice(0,2).toUpperCase() : w.toUpperCase();
 }
-function brandMonogramURI(name, index){
-  // The logo wall forces every image to a flat white silhouette (CSS filter), so this placeholder
-  // just needs a clean, solid wordmark shape — no background box, no color, matching the
-  // "white logos only, no boxes" look requested for the brand wall.
+function brandMonogramURI(name){
+  // Generated placeholder for brands without a real uploaded logo file. Sits on its own
+  // colored tile (set separately via brandTileGradient), so the text itself is plain white.
   const initials = brandInitials(name);
-  // build a properly-sized viewBox around the text so it doesn't get clipped/stretched
   const w = Math.max(64, initials.length * 34);
   const svg2 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} 56'>
-    <text x='${w/2}' y='40' font-family='Arial, Helvetica, sans-serif' font-size='34' font-weight='800' fill='#111' text-anchor='middle' style='letter-spacing:.5px'>${initials}</text>
+    <text x='${w/2}' y='40' font-family='Arial, Helvetica, sans-serif' font-size='34' font-weight='800' fill='#fff' text-anchor='middle' style='letter-spacing:.5px'>${initials}</text>
   </svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg2);
+}
+/* A distinct, pleasant gradient tile per brand (derived from its index) so the monogram
+   badges don't all look identical — same idea as GitHub/Slack's generated avatar colors. */
+function brandTileGradient(index){
+  const h1 = brandHue(index), h2 = (h1 + 42) % 360;
+  return `linear-gradient(135deg, hsl(${h1} 70% 52%), hsl(${h2} 70% 40%))`;
 }
 /* Best-effort category/product line shown under a brand on hover. Falls back to a generic line
    for brands not in the list — this is presentational copy only, not exhaustive/authoritative. */
@@ -3042,9 +3188,9 @@ const BRAND_CATEGORY = {
 function brandCategory(name){
   return BRAND_CATEGORY[String(name).toLowerCase().trim()] || 'منتجات وحلول تقنية معتمدة';
 }
-/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated monogram.
-   Drop actual logo files into /assets/brands/{slug}.png (or .svg) to override the monogram
-   automatically — no code changes needed, same pattern as /assets/ai-samples. */
+/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated monogram
+   on a colored tile. Drop actual logo files into /assets/brands/{slug}.png (or .svg) to
+   override the monogram automatically — no code changes needed. */
 window.__brandLogoFallback = function(img){
   const stage = img.dataset.stage || '0';
   if(stage === '0'){
@@ -3052,8 +3198,11 @@ window.__brandLogoFallback = function(img){
     img.src = `assets/brands/${img.dataset.slug}.svg`;
   } else {
     img.onerror = null;
-    img.src = brandMonogramURI(img.dataset.brandName, parseInt(img.dataset.idx || '0', 10));
-    if(img.parentElement) img.parentElement.classList.add('bc-mono');
+    img.src = brandMonogramURI(img.dataset.brandName);
+    if(img.parentElement){
+      img.parentElement.classList.add('bc-mono');
+      img.parentElement.style.setProperty('--bc-mono-bg', brandTileGradient(parseInt(img.dataset.idx || '0', 10)));
+    }
   }
 };
 function renderBrandStrip(){
@@ -3068,13 +3217,11 @@ function renderBrandStrip(){
     const slug = brandSlug(b);
     return `<div class="brand-chip" onclick="navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();">
       <div class="bc-logo"><img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)"></div>
+      <span class="bc-name">${b}</span>
       <span class="bc-tip">${brandCategory(b)}</span>
     </div>`;
   };
-  // render the list twice back-to-back so the CSS animation can scroll exactly -50%
-  // and loop seamlessly (right-to-left) with no visible seam or reset-jump
-  const once = brands.map(chip).join('');
-  strip.innerHTML = once + once;
+  strip.innerHTML = brands.map(chip).join('');
 }
 
 function navigateTo(page){
@@ -4239,11 +4386,31 @@ async function confirmBankOrder(){
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
+/* Lightweight client-side throttle for public forms (quote request / order tracking).
+   This is NOT a substitute for real server-side rate limiting (a bot can always bypass
+   client JS) - it just raises the bar against casual spam/scripted abuse from the browser.
+   For hard protection, add a Supabase Edge Function or database trigger that checks
+   submission counts per IP/phone server-side. */
+function checkRateLimit(key, maxAttempts, windowMs){
+  const now = Date.now();
+  let hits = [];
+  try{ hits = JSON.parse(localStorage.getItem('rl_'+key) || '[]'); }catch(e){ hits = []; }
+  hits = hits.filter(t => now - t < windowMs);
+  if(hits.length >= maxAttempts) return false;
+  hits.push(now);
+  localStorage.setItem('rl_'+key, JSON.stringify(hits));
+  return true;
+}
+
 async function lookupOrder(){
   const box = document.getElementById('trackResultBox');
   const btn = document.getElementById('trackBtn');
   const ref = document.getElementById('trackRefInput').value.trim();
   if(!ref){ box.innerHTML = '<div class="track-err">برجاء إدخال رقم مرجع الطلب.</div>'; return; }
+  if(!checkRateLimit('track_order', 10, 5*60*1000)){
+    box.innerHTML = '<div class="track-err">محاولات كتير في وقت قصير - برجاء الانتظار كام دقيقة وإعادة المحاولة.</div>';
+    return;
+  }
   btn.disabled = true; btn.innerText = 'جاري البحث...';
   box.innerHTML = '';
   try{
@@ -4291,6 +4458,13 @@ async function sendStructuredForm(){
   const phone = document.getElementById('contactPhone').value.trim();
   const details = document.getElementById('contactDetails').value.trim();
   if(!name || !details) return alert('برجاء ملء البيانات لتجهيز المقايسة.');
+  // honeypot: real users never see/fill this field (hidden via CSS); bots that auto-fill every
+  // input on the page will trip it
+  const hp = document.getElementById('contactHoneypot');
+  if(hp && hp.value.trim()){ return; }
+  if(!checkRateLimit('quote_request', 5, 10*60*1000)){
+    return alert('محاولات كتير في وقت قصير - برجاء الانتظار كام دقيقة وإعادة المحاولة.');
+  }
 
   // نسجّل الطلب في قاعدة البيانات عشان يبقى عندك سجل يقدر الأدمن يتابعه
   // حتى لو العميل قفل واتساب من غير ما يبعت الرسالة فعليًا

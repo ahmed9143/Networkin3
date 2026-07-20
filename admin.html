@@ -54,6 +54,7 @@
   main.content{padding:30px 34px;overflow-x:auto;}
   .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
   .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
+  .review-row{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
   .promo-offer-row{display:grid;grid-template-columns:1fr 2fr 2fr auto;gap:10px;align-items:center;margin-bottom:10px;}
   .promo-offer-row input{width:100%;}
   .finder-step-block{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
@@ -227,6 +228,7 @@
     <div class="nav-item" data-tab="quotes" onclick="switchTab('quotes')">📋 طلبات المقايسة</div>
     <div class="nav-item" data-tab="downloads" onclick="switchTab('downloads')">📁 التنزيلات</div>
     <div class="nav-item" data-tab="sitesettings" onclick="switchTab('sitesettings')">🎛️ إعدادات الموقع</div>
+    <div class="nav-item" data-tab="reviews" onclick="switchTab('reviews')">⭐ التقييمات والتنبيهات</div>
     <div class="nav-item logout" onclick="doLogout()">🚪 تسجيل الخروج</div>
   </aside>
 
@@ -445,6 +447,27 @@
           <button class="btn" onclick="resetFinderCopyForm()">↺ استرجاع النصوص الافتراضية</button>
           <span id="finderCopySaveMsg" style="font-size:13px;"></span>
         </div>
+      </div>
+    </div>
+
+    <div class="tab-view" id="tab-reviews">
+      <div class="topline">
+        <div><h2>التقييمات وطلبات التنبيه</h2><p>وافق على تقييمات العملاء قبل ما تظهر في الموقع، وتابع مين طلب يتنبه لما منتج يتوفر تاني.</p></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="margin:0 0 12px;">⏳ تقييمات في انتظار المراجعة</h3>
+        <div id="pendingReviewsList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="margin:0 0 12px;">✅ تقييمات منشورة</h3>
+        <div id="approvedReviewsList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 12px;">📩 طلبات "نبهني لما يتوفر"</h3>
+        <div id="stockNotifyList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
       </div>
     </div>
   </main>
@@ -753,6 +776,7 @@ const CMDK_ACTIONS = [
   {ic:'📋', label:'طلبات المقايسة', meta:'صفحة', run:()=>switchTab('quotes')},
   {ic:'📁', label:'التنزيلات', meta:'صفحة', run:()=>switchTab('downloads')},
   {ic:'🎛️', label:'إعدادات الموقع', meta:'صفحة', run:()=>switchTab('sitesettings')},
+  {ic:'⭐', label:'التقييمات والتنبيهات', meta:'صفحة', run:()=>switchTab('reviews')},
   {ic:'🚪', label:'تسجيل الخروج', meta:'أمر', run:()=>doLogout()},
 ];
 let cmdkActiveIndex = 0;
@@ -855,6 +879,8 @@ let orders = [];
 let quotes = [];
 let downloadsAdmin = [];
 let siteSettings = {};
+let productReviews = [];
+let stockNotifyRequests = [];
 
 async function loadAll(){
   const { data: catData } = await sb.from('categories').select('*').order('sort_order',{ascending:true});
@@ -864,6 +890,8 @@ async function loadAll(){
   const { data: quoteData, error: quoteErr } = await sb.from('quote_requests').select('*').order('created_at',{ascending:false});
   const { data: dlData, error: dlErr } = await sb.from('downloads').select('*').order('sort_order',{ascending:true});
   const { data: settingsData, error: settingsErr } = await sb.from('site_settings').select('*');
+  const { data: reviewsData, error: reviewsErr } = await sb.from('product_reviews').select('*, products(name)').order('created_at',{ascending:false});
+  const { data: notifyData, error: notifyErr } = await sb.from('stock_notify_requests').select('*').order('created_at',{ascending:false});
   categories = catData || [];
   products = prodData || [];
   coupons = couponData || [];
@@ -872,9 +900,13 @@ async function loadAll(){
   downloadsAdmin = dlData || [];
   siteSettings = {};
   (settingsData || []).forEach(row => { siteSettings[row.key] = row.value; });
+  productReviews = reviewsData || [];
+  stockNotifyRequests = notifyData || [];
   if(quoteErr) console.error('quote_requests: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', quoteErr);
   if(dlErr) console.error('downloads: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', dlErr);
   if(settingsErr) console.error('site_settings: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', settingsErr);
+  if(reviewsErr) console.error('product_reviews: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', reviewsErr);
+  if(notifyErr) console.error('stock_notify_requests: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', notifyErr);
   renderCategoriesTable();
   renderProductsTable();
   populateCategorySelect();
@@ -885,6 +917,8 @@ async function loadAll(){
   renderDashboard();
   renderPromoOffersForm();
   renderFinderCopyForm();
+  renderReviewsAdmin();
+  renderStockNotifyAdmin();
 }
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -2256,6 +2290,74 @@ async function saveFinderCopy(){
   msg.style.color = 'var(--ok,#2ecc71)';
   msg.innerText = '✓ اتحفظ بنجاح - التعديل هيظهر للعملاء فورًا';
   setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
+}
+
+/* ================= تقييمات المنتجات وطلبات "نبهني لما يتوفر" ================= */
+
+function renderReviewsAdmin(){
+  const pendingBox = document.getElementById('pendingReviewsList');
+  const approvedBox = document.getElementById('approvedReviewsList');
+  if(!pendingBox || !approvedBox) return;
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+  const pending = productReviews.filter(r => !r.approved);
+  const approved = productReviews.filter(r => r.approved);
+
+  pendingBox.innerHTML = pending.length ? pending.map(r => `
+    <div class="review-row">
+      <div><b>${(r.products && r.products.name) || 'منتج محذوف'}</b> — ${r.customer_name} <span style="color:#f5a623;">${stars(r.rating)}</span></div>
+      ${r.comment ? `<p style="margin:6px 0;font-size:13px;color:#8994a8;">${r.comment.replace(/</g,'&lt;')}</p>` : ''}
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button class="btn btn-primary" onclick="approveReview('${r.id}')">✓ موافقة ونشر</button>
+        <button class="btn" onclick="deleteReview('${r.id}')">🗑️ حذف</button>
+      </div>
+    </div>`).join('') : '<p style="color:#8994a8;font-size:13px;">مفيش تقييمات في انتظار المراجعة دلوقتي.</p>';
+
+  approvedBox.innerHTML = approved.length ? approved.map(r => `
+    <div class="review-row">
+      <div><b>${(r.products && r.products.name) || 'منتج محذوف'}</b> — ${r.customer_name} <span style="color:#f5a623;">${stars(r.rating)}</span></div>
+      ${r.comment ? `<p style="margin:6px 0;font-size:13px;color:#8994a8;">${r.comment.replace(/</g,'&lt;')}</p>` : ''}
+      <button class="btn" onclick="deleteReview('${r.id}')">🗑️ حذف</button>
+    </div>`).join('') : '<p style="color:#8994a8;font-size:13px;">لسه مفيش تقييمات منشورة.</p>';
+}
+
+async function approveReview(id){
+  const { error } = await sb.from('product_reviews').update({ approved:true }).eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
+}
+
+async function deleteReview(id){
+  if(!confirm('حذف هذا التقييم نهائيًا؟')) return;
+  const { error } = await sb.from('product_reviews').delete().eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
+}
+
+function renderStockNotifyAdmin(){
+  const box = document.getElementById('stockNotifyList');
+  if(!box) return;
+  if(!stockNotifyRequests.length){ box.innerHTML = '<p style="color:#8994a8;font-size:13px;">مفيش طلبات تنبيه حاليًا.</p>'; return; }
+  box.innerHTML = stockNotifyRequests.map(r => `
+    <div class="review-row" style="${r.notified?'opacity:.55;':''}">
+      <div><b>${r.product_name}</b> — <span dir="ltr">${r.phone}</span> ${r.notified ? '✓ تم التنبيه' : ''}</div>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <a class="btn btn-outline" target="_blank" href="https://wa.me/${r.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent('الخبر السعيد: '+r.product_name+' اتوفر تاني عندنا 🎉')}">واتساب</a>
+        ${!r.notified ? `<button class="btn btn-primary" onclick="markNotified('${r.id}')">✓ اتبعتله</button>` : ''}
+        <button class="btn" onclick="deleteStockNotify('${r.id}')">🗑️ حذف</button>
+      </div>
+    </div>`).join('');
+}
+
+async function markNotified(id){
+  const { error } = await sb.from('stock_notify_requests').update({ notified:true }).eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
+}
+
+async function deleteStockNotify(id){
+  const { error } = await sb.from('stock_notify_requests').delete().eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
 }
 
 checkSession();

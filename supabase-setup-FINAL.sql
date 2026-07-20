@@ -272,6 +272,56 @@ create policy "Auth manage site_settings" on public.site_settings for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 -- ============================================================
+-- 7ج) تقييمات المنتجات (Product Reviews)
+--     أي زائر يقدر يكتب تقييم (بدون تسجيل دخول)، لكنه ميظهرش للعامة
+--     غير بعد ما الأدمن يوافق عليه (approved=true) - عشان نمنع السبام.
+-- ============================================================
+create table if not exists public.product_reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  customer_name text not null,
+  rating smallint not null check (rating between 1 and 5),
+  comment text,
+  approved boolean not null default false,
+  created_at timestamptz default now()
+);
+alter table public.product_reviews enable row level security;
+drop policy if exists "Public read approved reviews" on public.product_reviews;
+drop policy if exists "Public submit reviews" on public.product_reviews;
+drop policy if exists "Auth manage reviews" on public.product_reviews;
+
+create policy "Public read approved reviews" on public.product_reviews for select using (approved = true);
+-- أي حد يقدر يبعت تقييم جديد، لكن لازم يتبعت بـ approved=false إجباريًا (مش هو اللي بيحدد يظهر ولا لأ)
+create policy "Public submit reviews" on public.product_reviews for insert with check (approved = false);
+-- الأدمن بس (بعد تسجيل الدخول) يقدر يشوف كل التقييمات (حتى الغير موافق عليها) ويوافق/يحذف
+create policy "Auth manage reviews" on public.product_reviews for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+create index if not exists idx_reviews_product on public.product_reviews (product_id);
+
+-- ============================================================
+-- 7د) طلبات "نبهني لما يتوفر" (Back-in-stock notifications)
+-- ============================================================
+create table if not exists public.stock_notify_requests (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  product_name text not null,
+  phone text not null,
+  notified boolean not null default false,
+  created_at timestamptz default now()
+);
+alter table public.stock_notify_requests enable row level security;
+drop policy if exists "Public submit stock notify" on public.stock_notify_requests;
+drop policy if exists "Auth manage stock notify" on public.stock_notify_requests;
+
+-- أي زائر يقدر يسجّل طلب تنبيه، لكن محدش يقدر يقرا القايمة غير الأدمن (بيانات هاتف عملاء)
+create policy "Public submit stock notify" on public.stock_notify_requests for insert with check (true);
+create policy "Auth manage stock notify" on public.stock_notify_requests for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+create index if not exists idx_stock_notify_product on public.stock_notify_requests (product_id);
+
+-- ============================================================
 -- 8) Storage Buckets
 -- ============================================================
 insert into storage.buckets (id, name, public) values ('products','products', true)

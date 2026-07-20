@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصفحة غير موجودة (404) | Delta IT Solutions</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy-950:#050d18;--navy-900:#0b1e3d;--navy-800:#10294f;--cable-blue:#2f6fed;--cable-orange:#ff7a2f;--paper:#081525;--paper-2:#0b1e3d;--ink:#f4f6f9;--ink-soft:#9fb0d1;--line:#173a6b;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+  a{color:var(--cable-orange);}
+  header{background:var(--navy-900);border-bottom:3px solid var(--cable-orange);padding:18px 0;}
+  header .wrap{max-width:820px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:10px;}
+  header .logo-mark{width:34px;height:34px;}
+  header b{font-size:16px;}
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 24px;}
+  .card{max-width:520px;text-align:center;background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:48px 32px;}
+  .radar{position:relative;width:96px;height:96px;margin:0 auto 22px;}
+  .radar .ring{position:absolute;inset:0;border-radius:50%;border:2px solid color-mix(in srgb, var(--cable-blue) 45%, transparent);animation:radarPing 2.4s ease-out infinite;}
+  .radar .ring2{animation-delay:.8s;}
+  .radar .ring3{animation-delay:1.6s;}
+  .radar .dot{position:absolute;top:50%;left:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--cable-orange);box-shadow:0 0 18px 2px color-mix(in srgb, var(--cable-orange) 70%, transparent);}
+  @keyframes radarPing{0%{transform:scale(.3);opacity:.9;}100%{transform:scale(1.6);opacity:0;}}
+  @media(prefers-reduced-motion:reduce){.radar .ring{animation:none;opacity:.35;}}
+  .code{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.08em;color:var(--cable-blue);font-weight:700;margin-bottom:10px;}
+  h1{font-size:24px;margin:0 0 10px;}
+  p{color:var(--ink-soft);font-size:14.5px;line-height:1.9;margin:0 0 28px;}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .btn{display:inline-block;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;border:1px solid transparent;}
+  .btn-primary{background:var(--cable-blue);color:#fff;}
+  .btn-outline{background:transparent;color:var(--ink);border-color:var(--line);}
+  footer{text-align:center;padding:20px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <svg class="logo-mark" viewBox="0 0 100 100"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#lg)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/></svg>
+    <b>Delta IT Solutions</b>
+  </div>
+</header>
+<main>
+  <div class="card">
+    <div class="radar">
+      <div class="ring ring1"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="code">ERROR 404 · NO SIGNAL</div>
+    <h1>الصفحة اللي بتدور عليها مش موجودة</h1>
+    <p>يمكن الرابط قديم أو اتنقل أو اتكتب غلط. جرب ترجع للصفحة الرئيسية أو تصفح منتجاتنا، أو كلّمنا مباشرة لو محتاج مساعدة.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="index.html">🏠 الرئيسية</a>
+      <a class="btn btn-outline" href="index.html#open-products">تصفح المنتجات</a>
+      <a class="btn btn-outline" href="https://wa.me/201032641038" target="_blank" rel="noopener">تواصل واتساب</a>
+    </div>
+  </div>
+</main>
+<footer>© 2026 Delta IT Solutions. جميع الحقوق محفوظة.</footer>
+</body>
+</html>

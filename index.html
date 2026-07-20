@@ -45,6 +45,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="shortcut icon" href="favicon.ico">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#081525">
 
 <!-- Open Graph / مشاركة على واتساب وفيسبوك -->
@@ -66,7 +67,7 @@
   "@type":"LocalBusiness",
   "name":"Delta IT Solutions",
   "url":"https://delta-it-solutions.vercel.app/",
-  "logo":"https://delta-it-solutions.vercel.app/logo.png",
+  "logo":"https://delta-it-solutions.vercel.app/favicon-512.png",
   "image":"https://delta-it-solutions.vercel.app/og-image.png",
   "description":"Professional CCTV, Networking, Access Control, Attendance Systems and IT Infrastructure Solutions.",
   "telephone":"+20XXXXXXXXXX",
@@ -87,7 +88,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Delta IT Solutions",
-  "url": "https://your-domain.com/"
+  "url": "https://delta-it-solutions.vercel.app/"
 }
 </script>
 
@@ -982,26 +983,33 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .feat-list li:nth-child(4){transition-delay:.38s;}
   .feat-list li::before{transition:transform .4s var(--transition) .4s;}
   .reveal.in-view .feat-list li::before{animation:nnDotPulse .5s ease .45s;}
-  /* Animated orbit graphic replacing the old static 3-circle SVG on the "من نحن" page:
-     a floating core (brand mark) with two rotating rings and four orbiting satellite badges,
-     one per checklist item on the left, so the visual actually reflects the page content
-     instead of being decoration with no connection to it. */
+  /* Animated orbit graphic on the "من نحن" page: a solid gradient hub with two rotating
+     "arms" (rotate-only, no separate glow-circle collision like the first version) —
+     each arm carries a thin connecting spoke plus a satellite badge that counter-rotates
+     to stay upright, so it reads as one connected radar/network system tied to the
+     checklist items instead of four disconnected floating circles. */
   .about-orbit{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-  .about-orbit .ao-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px dashed color-mix(in srgb, var(--line) 85%, transparent);}
-  .about-orbit .ao-ring1{width:170px;height:170px;margin:-85px 0 0 -85px;animation:hcbSpin 22s linear infinite;}
-  .about-orbit .ao-ring2{width:250px;height:250px;margin:-125px 0 0 -125px;border-style:solid;border-color:color-mix(in srgb, var(--cable-blue) 28%, transparent);animation:hcbSpin 32s linear infinite reverse;}
-  .about-orbit .ao-ring3{width:320px;height:320px;margin:-160px 0 0 -160px;opacity:.55;animation:hcbSpin 50s linear infinite;}
-  .about-orbit .ao-core{position:absolute;top:50%;left:50%;width:78px;height:78px;margin:-39px 0 0 -39px;border-radius:50%;background:color-mix(in srgb, var(--paper-2) 80%, transparent);backdrop-filter:blur(10px);border:1px solid color-mix(in srgb, var(--cable-blue) 55%, transparent);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px -6px color-mix(in srgb, var(--cable-blue) 65%, transparent);animation:hcbFloat 5s ease-in-out infinite;}
-  .about-orbit .ao-core svg{width:38px;height:38px;}
-  .about-orbit .ao-sat{position:absolute;top:50%;left:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:color-mix(in srgb, var(--paper-2) 85%, transparent);backdrop-filter:blur(8px);border:1px solid color-mix(in srgb, var(--cable-orange) 55%, transparent);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 20px -8px #000a;cursor:default;transition:transform .25s var(--transition);}
+  .about-orbit .ao-ring{position:absolute;top:50%;left:50%;border-radius:50%;}
+  .about-orbit .ao-ring1{width:172px;height:172px;margin:-86px 0 0 -86px;border:1px dashed color-mix(in srgb, var(--cable-blue) 38%, var(--line));animation:hcbSpin 26s linear infinite;}
+  .about-orbit .ao-ring2{width:254px;height:254px;margin:-127px 0 0 -127px;border:1px solid color-mix(in srgb, var(--cable-orange) 24%, var(--line));animation:hcbSpin 38s linear infinite reverse;}
+  .about-orbit .ao-core{position:absolute;top:50%;left:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2f6fed,#ff7a2f);box-shadow:0 12px 30px -8px rgba(47,111,237,.5);animation:hcbFloat 5s ease-in-out infinite;z-index:2;}
+  .about-orbit .ao-core::after{content:'';position:absolute;inset:-16px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb, var(--cable-blue) 22%, transparent), transparent 72%);z-index:-1;animation:nnDotPulse 3.2s ease-in-out infinite;}
+  .about-orbit .ao-core svg{width:36px;height:36px;position:relative;}
+  .about-orbit .ao-arm{position:absolute;top:50%;left:50%;width:1px;height:1px;}
+  .about-orbit .ao-arm-r1{animation:hcbSpin 26s linear infinite;}
+  .about-orbit .ao-arm-r1.ao-arm-b{animation-delay:-13s;}
+  .about-orbit .ao-arm-r1.ao-arm-b .ao-sat{animation-delay:-13s;}
+  .about-orbit .ao-arm-r2{animation:hcbSpin 38s linear infinite reverse;}
+  .about-orbit .ao-arm-r2.ao-arm-b{animation-delay:-19s;}
+  .about-orbit .ao-arm-r2.ao-arm-b .ao-sat{animation-delay:-19s;}
+  .about-orbit .ao-spoke{position:absolute;top:0;left:0;height:1px;transform-origin:0 0;background:linear-gradient(90deg, transparent, color-mix(in srgb, var(--cable-blue) 45%, transparent));}
+  .about-orbit .ao-arm-r1 .ao-spoke{width:86px;}
+  .about-orbit .ao-arm-r2 .ao-spoke{width:127px;}
+  .about-orbit .ao-sat{position:absolute;top:0;width:50px;height:50px;margin-top:-25px;border-radius:50%;background:var(--paper-2);border:1px solid color-mix(in srgb, var(--cable-orange) 45%, transparent);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 20px -8px #000a;transition:transform .25s var(--transition);}
+  .about-orbit .ao-arm-r1 .ao-sat{left:86px;margin-left:-25px;animation:hcbSpin 26s linear infinite reverse;}
+  .about-orbit .ao-arm-r2 .ao-sat{left:127px;margin-left:-25px;animation:hcbSpin 38s linear infinite;}
   .about-orbit .ao-sat:hover{transform:scale(1.15);}
-  .about-orbit .ao-sat1{animation:aoOrbitA 22s linear infinite;}
-  .about-orbit .ao-sat2{animation:aoOrbitA 22s linear infinite;animation-delay:-11s;}
-  .about-orbit .ao-sat3{animation:aoOrbitB 32s linear infinite reverse;}
-  .about-orbit .ao-sat4{animation:aoOrbitB 32s linear infinite reverse;animation-delay:-16s;}
-  @keyframes aoOrbitA{from{transform:rotate(0deg) translateX(85px) rotate(0deg);}to{transform:rotate(360deg) translateX(85px) rotate(-360deg);}}
-  @keyframes aoOrbitB{from{transform:rotate(0deg) translateX(125px) rotate(0deg);}to{transform:rotate(360deg) translateX(125px) rotate(-360deg);}}
-  @media(prefers-reduced-motion:reduce){.about-orbit .ao-ring,.about-orbit .ao-core,.about-orbit .ao-sat{animation:none !important;}}
+  @media(prefers-reduced-motion:reduce){.about-orbit .ao-ring,.about-orbit .ao-core,.about-orbit .ao-arm,.about-orbit .ao-sat{animation:none !important;}}
   .feat-list{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px;}
   .feat-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);}
   .feat-list li::before{content:'✓';background:var(--ok);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px;}
@@ -2353,15 +2361,26 @@ Plan → Build → Secure → Support</h1>
           </div>
           <div class="hero-visual" style="height:320px;">
             <div class="about-orbit" aria-hidden="true">
-              <div class="ao-ring ao-ring3"></div>
               <div class="ao-ring ao-ring2"></div>
               <div class="ao-ring ao-ring1"></div>
-              <div class="ao-sat ao-sat1" title="فريق هندسي متخصص">👷</div>
-              <div class="ao-sat ao-sat2" title="توكيلات رسمية">🏅</div>
-              <div class="ao-sat ao-sat3" title="ضمان حقيقي">🛡️</div>
-              <div class="ao-sat ao-sat4" title="أسعار تنافسية">💰</div>
+              <div class="ao-arm ao-arm-r1">
+                <div class="ao-spoke"></div>
+                <div class="ao-sat" title="فريق هندسي متخصص">👷</div>
+              </div>
+              <div class="ao-arm ao-arm-r1 ao-arm-b">
+                <div class="ao-spoke"></div>
+                <div class="ao-sat" title="ضمان حقيقي وخدمة ما بعد البيع">🛡️</div>
+              </div>
+              <div class="ao-arm ao-arm-r2">
+                <div class="ao-spoke"></div>
+                <div class="ao-sat" title="توكيلات رسمية">🏅</div>
+              </div>
+              <div class="ao-arm ao-arm-r2 ao-arm-b">
+                <div class="ao-spoke"></div>
+                <div class="ao-sat" title="أسعار تنافسية">💰</div>
+              </div>
               <div class="ao-core">
-                <svg viewBox="0 0 100 100"><defs><linearGradient id="aboutLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#aboutLogoGrad)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" fill="#fff" stroke="none"/><circle cx="12" cy="12" r="7.2"/><circle cx="12" cy="12" r="10.4" opacity=".55"/></svg>
               </div>
             </div>
           </div>
@@ -2499,6 +2518,21 @@ Plan → Build → Secure → Support</h1>
             <div class="form-group"><label>تفاصيل الطلب</label><textarea id="contactDetails" rows="4" placeholder="اذكر عدد الكاميرات أو نقاط الشبكة أو نوع الأجهزة المطلوبة..."></textarea></div>
             <button class="btn btn-outline" onclick="sendStructuredForm()">إرسال الطلب</button>
           </div>
+        </div>
+      </div>
+    </section>
+  <!-- NOT FOUND (in-app 404 fallback — shown by navigateTo() when a page id doesn't exist,
+       e.g. an old/broken link or a bad #open- hash, instead of the app crashing or going blank) -->
+  <div class="page-view" id="page-notfound">
+    <section class="wrap">
+      <div class="info-card" style="text-align:center;padding:60px 24px;">
+        <div style="font-size:64px;line-height:1;margin-bottom:8px;">📡</div>
+        <h2 style="margin:0 0 8px;font-size:28px;">مفيش إشارة... الصفحة دي مش موجودة</h2>
+        <p style="color:var(--ink-soft);font-size:15px;max-width:440px;margin:0 auto 26px;">يمكن الرابط قديم أو اتغيّر. جرب ترجع للرئيسية أو تتصفح المنتجات، أو كلّمنا لو محتاج مساعدة.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="navigateTo('home')">🏠 الرئيسية</button>
+          <button class="btn btn-outline" onclick="navigateTo('products')">تصفح المنتجات</button>
+          <button class="btn btn-outline" onclick="openGeneralWhatsApp()">تواصل واتساب</button>
         </div>
       </div>
     </section>
@@ -3363,7 +3397,8 @@ function navigateTo(page){
   removeProductJsonLd();
   document.title = DEFAULT_TITLE;
   document.querySelectorAll('.page-view').forEach(p=>p.classList.remove('active-page'));
-  const targetPage = document.getElementById('page-'+page);
+  let targetPage = document.getElementById('page-'+page);
+  if(!targetPage){ targetPage = document.getElementById('page-notfound'); page = 'notfound'; } /* unknown page id (bad/old link) -> friendly 404 instead of a crash */
   targetPage.classList.add('page-enter');
   targetPage.classList.add('active-page');
   void targetPage.offsetWidth; /* force reflow so the browser registers the hidden state before we transition out of it */

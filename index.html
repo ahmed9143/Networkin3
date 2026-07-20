@@ -971,6 +971,37 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
   .about-grid h3{font-size:26px;margin:0 0 14px;}
   .about-grid p{color:var(--ink-soft);line-height:1.9;font-size:15px;}
+  /* Staggered reveal for the About page checklist — each item rises in slightly after the
+     one before it once the parent .reveal section crosses into view, instead of the flat
+     all-at-once fade the rest of the page already had. */
+  .feat-list li{opacity:0;transform:translateY(10px);transition:opacity .5s var(--transition),transform .5s var(--transition);}
+  .reveal.in-view .feat-list li{opacity:1;transform:translateY(0);}
+  .feat-list li:nth-child(1){transition-delay:.05s;}
+  .feat-list li:nth-child(2){transition-delay:.16s;}
+  .feat-list li:nth-child(3){transition-delay:.27s;}
+  .feat-list li:nth-child(4){transition-delay:.38s;}
+  .feat-list li::before{transition:transform .4s var(--transition) .4s;}
+  .reveal.in-view .feat-list li::before{animation:nnDotPulse .5s ease .45s;}
+  /* Animated orbit graphic replacing the old static 3-circle SVG on the "من نحن" page:
+     a floating core (brand mark) with two rotating rings and four orbiting satellite badges,
+     one per checklist item on the left, so the visual actually reflects the page content
+     instead of being decoration with no connection to it. */
+  .about-orbit{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+  .about-orbit .ao-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px dashed color-mix(in srgb, var(--line) 85%, transparent);}
+  .about-orbit .ao-ring1{width:170px;height:170px;margin:-85px 0 0 -85px;animation:hcbSpin 22s linear infinite;}
+  .about-orbit .ao-ring2{width:250px;height:250px;margin:-125px 0 0 -125px;border-style:solid;border-color:color-mix(in srgb, var(--cable-blue) 28%, transparent);animation:hcbSpin 32s linear infinite reverse;}
+  .about-orbit .ao-ring3{width:320px;height:320px;margin:-160px 0 0 -160px;opacity:.55;animation:hcbSpin 50s linear infinite;}
+  .about-orbit .ao-core{position:absolute;top:50%;left:50%;width:78px;height:78px;margin:-39px 0 0 -39px;border-radius:50%;background:color-mix(in srgb, var(--paper-2) 80%, transparent);backdrop-filter:blur(10px);border:1px solid color-mix(in srgb, var(--cable-blue) 55%, transparent);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px -6px color-mix(in srgb, var(--cable-blue) 65%, transparent);animation:hcbFloat 5s ease-in-out infinite;}
+  .about-orbit .ao-core svg{width:38px;height:38px;}
+  .about-orbit .ao-sat{position:absolute;top:50%;left:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:color-mix(in srgb, var(--paper-2) 85%, transparent);backdrop-filter:blur(8px);border:1px solid color-mix(in srgb, var(--cable-orange) 55%, transparent);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 20px -8px #000a;cursor:default;transition:transform .25s var(--transition);}
+  .about-orbit .ao-sat:hover{transform:scale(1.15);}
+  .about-orbit .ao-sat1{animation:aoOrbitA 22s linear infinite;}
+  .about-orbit .ao-sat2{animation:aoOrbitA 22s linear infinite;animation-delay:-11s;}
+  .about-orbit .ao-sat3{animation:aoOrbitB 32s linear infinite reverse;}
+  .about-orbit .ao-sat4{animation:aoOrbitB 32s linear infinite reverse;animation-delay:-16s;}
+  @keyframes aoOrbitA{from{transform:rotate(0deg) translateX(85px) rotate(0deg);}to{transform:rotate(360deg) translateX(85px) rotate(-360deg);}}
+  @keyframes aoOrbitB{from{transform:rotate(0deg) translateX(125px) rotate(0deg);}to{transform:rotate(360deg) translateX(125px) rotate(-360deg);}}
+  @media(prefers-reduced-motion:reduce){.about-orbit .ao-ring,.about-orbit .ao-core,.about-orbit .ao-sat{animation:none !important;}}
   .feat-list{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px;}
   .feat-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);}
   .feat-list li::before{content:'✓';background:var(--ok);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px;}
@@ -2307,7 +2338,7 @@ Plan → Build → Secure → Support</h1>
 
   <!-- ABOUT -->
   <div class="page-view" id="page-about">
-    <section class="wrap">
+    <section class="wrap reveal">
       <div class="info-card">
         <div class="about-grid">
           <div>
@@ -2321,7 +2352,18 @@ Plan → Build → Secure → Support</h1>
             </ul>
           </div>
           <div class="hero-visual" style="height:320px;">
-            <svg viewBox="0 0 420 380"><g><circle cx="210" cy="190" r="140" fill="none" stroke="var(--line)" stroke-width="1"/><circle cx="210" cy="190" r="90" fill="none" stroke="var(--cable-blue)" stroke-width="1.5"/><circle cx="210" cy="190" r="40" fill="var(--cable-orange)" opacity=".15"/></g></svg>
+            <div class="about-orbit" aria-hidden="true">
+              <div class="ao-ring ao-ring3"></div>
+              <div class="ao-ring ao-ring2"></div>
+              <div class="ao-ring ao-ring1"></div>
+              <div class="ao-sat ao-sat1" title="فريق هندسي متخصص">👷</div>
+              <div class="ao-sat ao-sat2" title="توكيلات رسمية">🏅</div>
+              <div class="ao-sat ao-sat3" title="ضمان حقيقي">🛡️</div>
+              <div class="ao-sat ao-sat4" title="أسعار تنافسية">💰</div>
+              <div class="ao-core">
+                <svg viewBox="0 0 100 100"><defs><linearGradient id="aboutLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#aboutLogoGrad)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/></svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3272,27 +3314,24 @@ const BRAND_CATEGORY = {
 function brandCategory(name){
   return BRAND_CATEGORY[String(name).toLowerCase().trim()] || 'منتجات وحلول تقنية معتمدة';
 }
-/* onerror fallback chain for brand logo <img>: real .png -> real .svg -> generated wordmark.
+/* onerror fallback chain for brand logo <img>: real .png -> generated wordmark (single stage only).
    IMPORTANT: browsers log every failed <img> load to the console (the "Failed to load resource"
    errors you'll see in devtools) even though the onerror handler recovers gracefully — so instead
    of blindly trying a file for every brand and letting most of them 404, we only ever *request* a
    file for a brand slug listed in BRAND_LOGO_FILES below. Everything else skips straight to the
-   clean wordmark placeholder — no failed request, no console noise.
-   To add a real logo: drop the file in /assets/brands/{slug}.png (or .svg) AND add that slug to
+   clean wordmark placeholder — no failed request, no console noise. And even for a brand that IS
+   listed, if the .png is missing/renamed the fallback below goes straight to the wordmark in ONE
+   step (no second svg attempt) so a bad entry here can never produce more than a single failed
+   request — this used to be a two-stage png->svg->wordmark chain, collapsed to remove that risk.
+   To add a real logo: drop the file in /assets/brands/{slug}.png AND add that slug to
    BRAND_LOGO_FILES — then it replaces the wordmark automatically everywhere the brand appears. */
 const BRAND_LOGO_FILES = new Set([
   // 'hikvision', 'dahua', 'tp-link', ...
 ]);
 window.__brandLogoFallback = function(img){
-  const stage = img.dataset.stage || '0';
-  if(stage === '0' && BRAND_LOGO_FILES.has(img.dataset.slug + '-svg')){
-    img.dataset.stage = '1';
-    img.src = `assets/brands/${img.dataset.slug}.svg`;
-  } else {
-    img.onerror = null;
-    img.src = brandMonogramURI(img.dataset.brandName, parseInt(img.dataset.idx || '0', 10));
-    if(img.parentElement) img.parentElement.classList.add('bc-mono');
-  }
+  img.onerror = null;
+  img.src = brandMonogramURI(img.dataset.brandName, parseInt(img.dataset.idx || '0', 10));
+  if(img.parentElement) img.parentElement.classList.add('bc-mono');
 };
 function renderBrandStrip(){
   const strip = document.getElementById('brandStripTrack');

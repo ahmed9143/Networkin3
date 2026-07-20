@@ -61,6 +61,13 @@
   .finder-step-block h4{margin:0 0 10px;font-size:14px;}
   .finder-opt-row{display:grid;grid-template-columns:70px 1fr;gap:10px;margin-bottom:8px;align-items:center;}
   @media(max-width:760px){.promo-offer-row{grid-template-columns:1fr;}}
+  .sol-row{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px;display:grid;gap:10px;}
+  .sol-row-top{display:grid;grid-template-columns:60px 2fr 1fr auto;gap:10px;align-items:center;}
+  .sol-row-top input{width:100%;}
+  .sol-row .sr-desc{width:100%;}
+  .sol-row .sr-action{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .sol-row .sr-action select, .sol-row .sr-action input{width:100%;}
+  @media(max-width:760px){.sol-row-top{grid-template-columns:1fr;}.sol-row .sr-action{grid-template-columns:1fr;}}
   .topline h2{margin:0;font-size:22px;}
   .topline p{margin:4px 0 0;color:var(--ink-soft);font-size:13.5px;}
 
@@ -422,7 +429,20 @@
 
     <div class="tab-view" id="tab-sitesettings">
       <div class="topline">
-        <div><h2>إعدادات الموقع</h2><p>تحكم في نصوص الشريط العلوي (العروض) ونصوص "مساعد اختيار الكاميرا" في الموقع من هنا مباشرة - من غير ما تحتاج تعدّل في الكود.</p></div>
+        <div><h2>إعدادات الموقع</h2><p>تحكم في قائمة "الحلول" بالهيدر، نصوص الشريط العلوي (العروض)، ونصوص "مساعد اختيار الكاميرا" في الموقع من هنا مباشرة - من غير ما تحتاج تعدّل في الكود.</p></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🧩 قائمة "الحلول" (الميجا مينيو في الهيدر)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">تحكم كامل في عناصر قائمة "الحلول": الأيقونة، العنوان، الوصف، الوسوم (Tags)، نص الزرار، وإلى أين يوديك. الترتيب هنا هو نفس ترتيب الظهور في الموقع.</p></div>
+          <button class="btn btn-primary" onclick="addSolutionRow()">+ إضافة حل جديد</button>
+        </div>
+        <div id="solutionsMenuList"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveSolutionsMenu()">💾 حفظ قائمة الحلول</button>
+          <button class="btn" onclick="resetSolutionsMenuForm()">↺ استرجاع الوضع الافتراضي</button>
+          <span id="solutionsMenuSaveMsg" style="font-size:13px;"></span>
+        </div>
       </div>
 
       <div class="card" style="margin-bottom:20px;">
@@ -915,6 +935,7 @@ async function loadAll(){
   renderQuotesTable();
   renderDownloadsTable();
   renderDashboard();
+  renderSolutionsMenuForm();
   renderPromoOffersForm();
   renderFinderCopyForm();
   renderReviewsAdmin();
@@ -2132,6 +2153,90 @@ async function deleteDownload(id){
   if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
   if(d && d.file_path){ await sb.storage.from('public-downloads').remove([d.file_path]); }
   await loadAll();
+}
+
+/* ================= إعدادات الموقع: قائمة "الحلول" (الميجا مينيو) =================
+   نفس بنية DEFAULT_SOLUTIONS الموجودة فعليًا في index.html - القيم دي هي اللي بتظهر
+   لو الأدمن لسه ما عدّلش حاجة. القيمة متخزنة في site_settings تحت المفتاح 'solutions_menu'. */
+
+const DEFAULT_SOLUTIONS = [
+  { id:'home', icon:'🏠', title:'حلول المنازل', desc:'نظام مراقبة متكامل لحماية بيتك وعيلتك، تقدر تتابعه من موبايلك في أي وقت ومن أي مكان.', tags:['مراقبة داخلية وخارجية','تنبيهات فورية','تخزين سحابي/محلي','دعم فني سريع'], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:home' },
+  { id:'company', icon:'🏢', title:'حلول الشركات والمكاتب', desc:'حماية أصول شركتك، وتتبيع الحضور والانصراف، وشبكة داخلية مستقرة، كل ده في نظام واحد متكامل.', tags:['مراقبة المكاتب','تحكم في الدخول','شبكات داخلية','تقارير أداء'], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:company' },
+  { id:'factory', icon:'🏭', title:'حلول المصانع والمستودعات', desc:'تغطية واسعة لمساحات كبيرة بكاميرات صناعية تتحمل الظروف القاسية وتراقب خطوط الإنتاج بدقة.', tags:['مقاومة للعوامل الجوية','تخزين طويل المدى','تكامل مع الإنذار','مراقبة الإنتاج'], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:factory' },
+  { id:'hospital', icon:'🏥', title:'حلول المستشفيات والعيادات', desc:'أمان وخصوصية للمرضى، مع مراقبة دقيقة للممرات وغرف الانتظار وتحكم في دخول الغرف الحساسة.', tags:['كاميرات هادئة','تحكم دخول الغرف','تسجيل مستمر','خصوصية المرضى'], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:hospital' },
+  { id:'parking', icon:'🅿️', title:'حلول الجراجات والمواقف', desc:'تتبع دخول وخروج السيارات، وتأمين المواقف على مدار الساعة حتى في الإضاءة المنخفضة.', tags:['قراءة لوحات السيارات','إضاءة IR بعيدة المدى','تكامل مع البوابات','مقاومة للعوامل الجوية'], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:parking' },
+  { id:'access', icon:'🖐️', title:'الحضور والتحكم بالدخول', desc:'إدارة دخول وخروج الموظفين بالبصمة أو الوجه بدقة، وربطها مباشرة بتقارير الحضور والرواتب.', tags:['بصمة إصبع','تمييز الوجه','بطاقات RFID','تكامل مع الرواتب'], cta_label:'🚀 استكشف الأجهزة', action:'page:biometric' }
+];
+
+function renderSolutionsMenuForm(useDefaults){
+  const list = document.getElementById('solutionsMenuList');
+  if(!list) return;
+  const items = useDefaults ? DEFAULT_SOLUTIONS
+    : (siteSettings.solutions_menu && Array.isArray(siteSettings.solutions_menu) && siteSettings.solutions_menu.length ? siteSettings.solutions_menu : DEFAULT_SOLUTIONS);
+  list.innerHTML = '';
+  items.forEach(it => addSolutionRow(it));
+}
+
+function addSolutionRow(item){
+  const it = item || { id:'', icon:'🔧', title:'', desc:'', tags:[], cta_label:'🚀 ابدأ تصميم الحل', action:'finder:home' };
+  const list = document.getElementById('solutionsMenuList');
+  const [actType, actVal] = String(it.action||'finder:home').split(':');
+  const row = document.createElement('div');
+  row.className = 'sol-row';
+  row.innerHTML = `
+    <div class="sol-row-top">
+      <input type="text" class="sr-icon" placeholder="🔧" maxlength="4" value="${(it.icon||'').replace(/"/g,'&quot;')}" title="أيقونة/إيموجي">
+      <input type="text" class="sr-title" placeholder="عنوان الحل (مثال: حلول المنازل)" value="${(it.title||'').replace(/"/g,'&quot;')}">
+      <input type="text" class="sr-id" placeholder="معرف فريد (id) بالإنجليزي - مثال: home" value="${(it.id||'').replace(/"/g,'&quot;')}" title="معرف فريد بدون مسافات، يستخدم داخليًا فقط">
+      <button class="btn" onclick="this.closest('.sol-row').remove()" title="حذف هذا الحل">🗑️</button>
+    </div>
+    <textarea class="sr-desc" rows="2" placeholder="وصف مختصر للحل">${(it.desc||'')}</textarea>
+    <input type="text" class="sr-tags" placeholder="الوسوم (Tags) مفصولة بفاصلة، مثال: مراقبة داخلية, تنبيهات فورية" value="${(it.tags||[]).join(', ').replace(/"/g,'&quot;')}">
+    <div class="sr-action">
+      <input type="text" class="sr-cta" placeholder="نص الزرار (مثال: 🚀 ابدأ تصميم الحل)" value="${(it.cta_label||'').replace(/"/g,'&quot;')}">
+      <div style="display:flex;gap:8px;">
+        <select class="sr-acttype" style="flex:none;width:auto;">
+          <option value="finder" ${actType==='finder'?'selected':''}>يفتح مساعد اختيار الكاميرا لقطاع</option>
+          <option value="page" ${actType==='page'?'selected':''}>يودّي لصفحة معيّنة في الموقع</option>
+        </select>
+        <input type="text" class="sr-actval" placeholder="مثال: home أو biometric" value="${(actVal||'').replace(/"/g,'&quot;')}" style="flex:1;">
+      </div>
+    </div>`;
+  list.appendChild(row);
+}
+
+function resetSolutionsMenuForm(){
+  if(!confirm('هيرجع قائمة "الحلول" للوضع الافتراضي (لسه محتاج تدوس "حفظ" عشان يتفعّل فعليًا). متأكد؟')) return;
+  renderSolutionsMenuForm(true);
+}
+
+async function saveSolutionsMenu(){
+  const msg = document.getElementById('solutionsMenuSaveMsg');
+  const rows = document.querySelectorAll('#solutionsMenuList .sol-row');
+  const items = [];
+  const seenIds = new Set();
+  for(const r of rows){
+    const title = r.querySelector('.sr-title').value.trim();
+    let id = r.querySelector('.sr-id').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+    if(!title) continue;
+    if(!id) id = title.replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase() || ('sol-'+items.length);
+    while(seenIds.has(id)) id = id + '-2';
+    seenIds.add(id);
+    const icon = r.querySelector('.sr-icon').value.trim() || '🔧';
+    const desc = r.querySelector('.sr-desc').value.trim();
+    const tags = r.querySelector('.sr-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+    const cta_label = r.querySelector('.sr-cta').value.trim() || '🚀 ابدأ تصميم الحل';
+    const actType = r.querySelector('.sr-acttype').value;
+    const actVal = r.querySelector('.sr-actval').value.trim();
+    items.push({ id, icon, title, desc, tags, cta_label, action: `${actType}:${actVal}` });
+  }
+  if(!items.length){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'لازم يكون في حل واحد على الأقل بعنوان.'; return; }
+  const { error } = await sb.from('site_settings').upsert({ key:'solutions_menu', value: items, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.solutions_menu = items;
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - التعديل هيظهر للعملاء فورًا';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
 }
 
 /* ================= إعدادات الموقع: عروض الشريط العلوي + نصوص مساعد اختيار الكاميرا =================

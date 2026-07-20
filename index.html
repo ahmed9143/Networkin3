@@ -70,7 +70,7 @@
   "logo":"https://delta-it-solutions.vercel.app/favicon-512.png",
   "image":"https://delta-it-solutions.vercel.app/og-image.png",
   "description":"Professional CCTV, Networking, Access Control, Attendance Systems and IT Infrastructure Solutions.",
-  "telephone":"+20XXXXXXXXXX",
+  "telephone":"+201032641038",
   "address":{
       "@type":"PostalAddress",
       "addressCountry":"EG"
@@ -92,20 +92,9 @@
 }
 </script>
 
-<!-- Google Analytics 4 (اختياري) -->
-<!-- عدّل GA_MEASUREMENT_ID بمعرف حسابك من analytics.google.com ثم أزل التعليق عن السطرين دول -->
-<!--
-<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GA_MEASUREMENT_ID');</script>
--->
-<!-- Meta Pixel (اختياري) -->
-<!-- عدّل YOUR_PIXEL_ID بمعرف البيكسل بتاعك من Meta Business Suite ثم أزل التعليق -->
-<!--
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
-</script>
--->
+<!-- Google Analytics 4 + Meta Pixel (اختياري) -->
+<!-- بيتفعّلوا تلقائيًا من غير ما تلمس الكود: حط المعرفات في config.js
+     (GA_MEASUREMENT_ID و META_PIXEL_ID) وهما بيتحمّلوا بعد ما config.js يتحمّل. -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -166,7 +155,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
     /* ---- Delta IT Solutions — Mission Control palette (reduced to 6 tones) ---- */
     --navy-950:#050816;--navy-900:#060a1c;--navy-800:#0c1330;--navy-700:#141d33;
     --cable-blue:#2F7BFF;--cable-orange:#8A5CFF;--cable-orange-dim:#8A5CFF26;
-    --cta:#00E5FF;--cta-dim:#00E5FF26;
+    --cta:#FF7A2F;--cta-2:#FFA24D;--cta-dim:#FF7A2F26;
     --paper:#050816;--paper-2:#0c1330;--ink:#F4F7FB;--ink-soft:#8E9AAF;--line:rgba(255,255,255,.08);
     --ok:#1DFF9B;--danger:#FF4D5A;--radius:16px;--maxw:1280px;--transition:cubic-bezier(.4,0,.2,1) .3s;
     --grad-brand:linear-gradient(120deg,#2F7BFF 0%,#8A5CFF 100%);
@@ -182,7 +171,7 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   :root[data-theme="light"]{
     --navy-950:#eef1f7;--navy-900:#ffffff;--navy-800:#f5f7fb;--navy-700:#e7ebf3;
     --cable-blue:#0098c2;--cable-orange:#6a4bf0;--cable-orange-dim:#6a4bf01f;
-    --cta:#c98a12;--cta-dim:#c98a121f;
+    --cta:#E06A1F;--cta-2:#F2903D;--cta-dim:#E06A1F1f;
     --paper:#f9fafc;--paper-2:#ffffff;--ink:#0b1220;--ink-soft:#5c6579;--line:#e3e7ef;
     --ok:#0a9e6a;--danger:#e5405f;--radius:16px;--maxw:1280px;--transition:cubic-bezier(.4,0,.2,1) .3s;
     --grad-brand:linear-gradient(120deg,#0098c2 0%,#6a4bf0 100%);
@@ -379,8 +368,8 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;}
   .btn:hover{transform:translateY(-2px);}
   .btn-primary{background:var(--grad-brand);color:#fff;box-shadow:0 8px 24px -8px #6D5EF766;}
-  .btn-cta{background:var(--cta);color:#fff;box-shadow:0 8px 26px -8px #FF7A00aa;}
-  .btn-cta:hover{box-shadow:0 14px 34px -8px #FF7A00cc;}
+  .btn-cta{background:linear-gradient(120deg,var(--cta) 0%,var(--cta-2) 100%);color:#fff;box-shadow:0 8px 26px -8px var(--cta-dim,#FF7A00aa);}
+  .btn-cta:hover{box-shadow:0 14px 34px -10px color-mix(in srgb, var(--cta) 70%, transparent);transform:translateY(-1px);}
   .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
   .btn-outline:hover{border-color:var(--cable-orange);background:var(--navy-800);}
   .hero-stats{display:flex;gap:32px;flex-wrap:wrap;}
@@ -1087,6 +1076,10 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .checkout-fields input,.checkout-fields textarea{width:100%;background:var(--navy-800);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:'Cairo',sans-serif;font-size:13.5px;outline:none;resize:vertical;}
   .checkout-fields input:focus,.checkout-fields textarea:focus{border-color:var(--cable-orange);}
   .checkout-err{color:var(--danger);font-size:12.5px;min-height:16px;}
+  .checkout-order-err{display:none;align-items:flex-start;gap:8px;background:color-mix(in srgb, var(--danger) 12%, transparent);border:1px solid color-mix(in srgb, var(--danger) 35%, transparent);color:var(--danger);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.7;margin:4px 0 10px;}
+  .checkout-order-err.show{display:flex;}
+  .checkout-order-err b{display:block;color:var(--ink);margin-bottom:2px;font-size:13px;}
+  .checkout-order-err .coe-retry{margin-inline-start:auto;flex:none;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;}
   .pay-methods{display:grid;gap:8px;margin-bottom:14px;}
   .pay-option{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer;font-size:13px;}
   .pay-option.selected{border-color:var(--cable-orange);background:var(--cable-orange-dim);}
@@ -1100,6 +1093,11 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
   .pd-thumb{width:70px;height:70px;border-radius:8px;overflow:hidden;border:2px solid var(--line);cursor:pointer;flex-shrink:0;}
   .pd-thumb.active{border-color:var(--cable-orange);}
   .pd-thumb img{width:100%;height:100%;object-fit:cover;}
+  .pd-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft);margin:14px 0 6px;}
+  .pd-breadcrumb a{color:var(--ink-soft);cursor:pointer;transition:color .15s;}
+  .pd-breadcrumb a:hover{color:var(--cable-blue);text-decoration:underline;}
+  .pd-breadcrumb span.sep{opacity:.5;}
+  .pd-breadcrumb span.current{color:var(--ink);font-weight:600;}
   .pd-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);font-size:13.5px;margin-bottom:20px;cursor:pointer;}
   .pd-back:hover{color:var(--cable-orange);}
   .pd-cat{color:var(--cable-blue);font-weight:700;font-size:12.5px;margin-bottom:8px;}
@@ -1646,50 +1644,50 @@ fbq('init','YOUR_PIXEL_ID'); fbq('track','PageView');
         <a class="nav-drop-label">الحلول ▾</a>
         <div class="mega-panel mega-panel-wide">
           <div class="mega-panel-inner">
-            <div class="mega-col-list">
-              <div class="mega-list-item sol-item active" data-sol="home" onmouseenter="showSolutionPreview('home')" onclick="goToSolution('home')"><span class="mega-ic">🏠</span><span>حلول المنازل</span></div>
-              <div class="mega-list-item sol-item" data-sol="company" onmouseenter="showSolutionPreview('company')" onclick="goToSolution('company')"><span class="mega-ic">🏢</span><span>حلول الشركات والمكاتب</span></div>
-              <div class="mega-list-item sol-item" data-sol="factory" onmouseenter="showSolutionPreview('factory')" onclick="goToSolution('factory')"><span class="mega-ic">🏭</span><span>حلول المصانع والمستودعات</span></div>
-              <div class="mega-list-item sol-item" data-sol="hospital" onmouseenter="showSolutionPreview('hospital')" onclick="goToSolution('hospital')"><span class="mega-ic">🏥</span><span>حلول المستشفيات والعيادات</span></div>
-              <div class="mega-list-item sol-item" data-sol="parking" onmouseenter="showSolutionPreview('parking')" onclick="goToSolution('parking')"><span class="mega-ic">🅿️</span><span>حلول الجراجات والمواقف</span></div>
-              <div class="mega-list-item sol-item" data-sol="access" onmouseenter="showSolutionPreview('access')" onclick="navigateTo('biometric')"><span class="mega-ic">🖐️</span><span>الحضور والتحكم بالدخول</span></div>
+            <div class="mega-col-list" id="megaSolList">
+              <div class="mega-list-item sol-item active" data-sol="home" onmouseenter="showSolutionPreview('home')" onclick="solutionAction('finder:home')"><span class="mega-ic">🏠</span><span>حلول المنازل</span></div>
+              <div class="mega-list-item sol-item" data-sol="company" onmouseenter="showSolutionPreview('company')" onclick="solutionAction('finder:company')"><span class="mega-ic">🏢</span><span>حلول الشركات والمكاتب</span></div>
+              <div class="mega-list-item sol-item" data-sol="factory" onmouseenter="showSolutionPreview('factory')" onclick="solutionAction('finder:factory')"><span class="mega-ic">🏭</span><span>حلول المصانع والمستودعات</span></div>
+              <div class="mega-list-item sol-item" data-sol="hospital" onmouseenter="showSolutionPreview('hospital')" onclick="solutionAction('finder:hospital')"><span class="mega-ic">🏥</span><span>حلول المستشفيات والعيادات</span></div>
+              <div class="mega-list-item sol-item" data-sol="parking" onmouseenter="showSolutionPreview('parking')" onclick="solutionAction('finder:parking')"><span class="mega-ic">🅿️</span><span>حلول الجراجات والمواقف</span></div>
+              <div class="mega-list-item sol-item" data-sol="access" onmouseenter="showSolutionPreview('access')" onclick="solutionAction('page:biometric')"><span class="mega-ic">🖐️</span><span>الحضور والتحكم بالدخول</span></div>
             </div>
-            <div class="mega-col-showcase sol-showcase">
+            <div class="mega-col-showcase sol-showcase" id="megaSolShowcase">
               <div class="sol-preview active" data-sol="home">
                 <h5>🏠 حلول المنازل</h5>
                 <p>نظام مراقبة متكامل لحماية بيتك وعيلتك، تقدر تتابعه من موبايلك في أي وقت ومن أي مكان.</p>
                 <div class="sol-tags"><span>مراقبة داخلية وخارجية</span><span>تنبيهات فورية</span><span>تخزين سحابي/محلي</span><span>دعم فني سريع</span></div>
-                <button class="btn btn-primary sol-cta" onclick="goToSolution('home')">🚀 ابدأ تصميم الحل</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('finder:home')">🚀 ابدأ تصميم الحل</button>
               </div>
               <div class="sol-preview" data-sol="company">
                 <h5>🏢 حلول الشركات والمكاتب</h5>
                 <p>حماية أصول شركتك، وتتبيع الحضور والانصراف، وشبكة داخلية مستقرة، كل ده في نظام واحد متكامل.</p>
                 <div class="sol-tags"><span>مراقبة المكاتب</span><span>تحكم في الدخول</span><span>شبكات داخلية</span><span>تقارير أداء</span></div>
-                <button class="btn btn-primary sol-cta" onclick="goToSolution('company')">🚀 ابدأ تصميم الحل</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('finder:company')">🚀 ابدأ تصميم الحل</button>
               </div>
               <div class="sol-preview" data-sol="factory">
                 <h5>🏭 حلول المصانع والمستودعات</h5>
                 <p>تغطية واسعة لمساحات كبيرة بكاميرات صناعية تتحمل الظروف القاسية وتراقب خطوط الإنتاج بدقة.</p>
                 <div class="sol-tags"><span>مقاومة للعوامل الجوية</span><span>تخزين طويل المدى</span><span>تكامل مع الإنذار</span><span>مراقبة الإنتاج</span></div>
-                <button class="btn btn-primary sol-cta" onclick="goToSolution('factory')">🚀 ابدأ تصميم الحل</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('finder:factory')">🚀 ابدأ تصميم الحل</button>
               </div>
               <div class="sol-preview" data-sol="hospital">
                 <h5>🏥 حلول المستشفيات والعيادات</h5>
                 <p>أمان وخصوصية للمرضى، مع مراقبة دقيقة للممرات وغرف الانتظار وتحكم في دخول الغرف الحساسة.</p>
                 <div class="sol-tags"><span>كاميرات هادئة</span><span>تحكم دخول الغرف</span><span>تسجيل مستمر</span><span>خصوصية المرضى</span></div>
-                <button class="btn btn-primary sol-cta" onclick="goToSolution('hospital')">🚀 ابدأ تصميم الحل</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('finder:hospital')">🚀 ابدأ تصميم الحل</button>
               </div>
               <div class="sol-preview" data-sol="parking">
                 <h5>🅿️ حلول الجراجات والمواقف</h5>
                 <p>تتبع دخول وخروج السيارات، وتأمين المواقف على مدار الساعة حتى في الإضاءة المنخفضة.</p>
                 <div class="sol-tags"><span>قراءة لوحات السيارات</span><span>إضاءة IR بعيدة المدى</span><span>تكامل مع البوابات</span><span>مقاومة للعوامل الجوية</span></div>
-                <button class="btn btn-primary sol-cta" onclick="goToSolution('parking')">🚀 ابدأ تصميم الحل</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('finder:parking')">🚀 ابدأ تصميم الحل</button>
               </div>
               <div class="sol-preview" data-sol="access">
                 <h5>🖐️ الحضور والانصراف والتحكم بالدخول</h5>
                 <p>إدارة دخول وخروج الموظفين بالبصمة أو الوجه بدقة، وربطها مباشرة بتقارير الحضور والرواتب.</p>
                 <div class="sol-tags"><span>بصمة إصبع</span><span>تمييز الوجه</span><span>بطاقات RFID</span><span>تكامل مع الرواتب</span></div>
-                <button class="btn btn-primary sol-cta" onclick="navigateTo('biometric')">🚀 استكشف الأجهزة</button>
+                <button class="btn btn-primary sol-cta" onclick="solutionAction('page:biometric')">🚀 استكشف الأجهزة</button>
               </div>
             </div>
           </div>
@@ -2092,6 +2090,7 @@ Plan → Build → Secure → Support</h1>
   <!-- PRODUCT DETAIL -->
   <div class="page-view" id="page-product-detail">
     <section class="wrap">
+      <nav class="pd-breadcrumb" id="pdBreadcrumb" aria-label="Breadcrumb"></nav>
       <div class="pd-back" onclick="navigateTo('products')">→ رجوع لكل المنتجات</div>
       <div class="pd-grid" id="pdContainer"></div>
     </section>
@@ -2616,6 +2615,11 @@ Plan → Build → Secure → Support</h1>
         🏦 تحويل بنكي / إنستاباي
       </label>
     </div>
+    <div class="checkout-order-err" id="checkoutOrderErr">
+      <span>⚠️</span>
+      <div><b>تعذر إتمام الطلب</b><span id="checkoutOrderErrMsg"></span></div>
+      <button class="coe-retry" onclick="retryCheckout()">إعادة المحاولة</button>
+    </div>
     <button class="btn btn-cta" style="width:100%;justify-content:center;" id="checkoutWhatsappBtn">إتمام الطلب</button>
   </div>
 </div>
@@ -2645,6 +2649,24 @@ Plan → Build → Secure → Support</h1>
 </div>
 
 <script src="config.js"></script>
+<script>
+/* تحميل GA4 و Meta Pixel تلقائيًا بس لو المعرف متحطوط في config.js - من غير كده مفيش أي طلبات إضافية */
+(function(){
+  if(typeof GA_MEASUREMENT_ID !== 'undefined' && GA_MEASUREMENT_ID){
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID);
+  }
+  if(typeof META_PIXEL_ID !== 'undefined' && META_PIXEL_ID){
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', META_PIXEL_ID); fbq('track', 'PageView');
+  }
+})();
+</script>
 <script>
 let products = [];
 let categories = [];
@@ -2905,13 +2927,13 @@ function renderMegaShowcase(idx){
   const coverImg = cover ? ((cover.images&&cover.images[0])||cover.image_url) : 'https://placehold.co/360x360/0E1628/8E9AAF?text=Delta+IT';
   const top = inCat.slice().sort((a,b)=>(b.is_bestseller?1:0)-(a.is_bestseller?1:0)).slice(0,3);
   showHost.innerHTML = `
-    <div class="mega-showcase-img"><img src="${coverImg}" alt="${c.name}" loading="lazy"></div>
+    <div class="mega-showcase-img"><img src="${coverImg}" alt="${c.name}" loading="lazy" width="180" height="220"></div>
     <div class="mega-showcase-info">
       <h5>${c.icon || CAT_ICONS[c.name] || '📦'} ${c.name}</h5>
       <p>${inCat.length} منتج متاح في هذا القسم</p>
       ${top.map(p=>`
         <div class="mega-mini-prod" onclick="navigateTo('products'); openProductDetail('${p.id}')">
-          <img class="mega-mini-thumb" src="${(p.images&&p.images[0])||p.image_url||'https://placehold.co/80/0E1628/8E9AAF?text=%20'}" alt="">
+          <img class="mega-mini-thumb" src="${(p.images&&p.images[0])||p.image_url||'https://placehold.co/80/0E1628/8E9AAF?text=%20'}" alt="" loading="lazy" width="36" height="36">
           <span class="mega-mini-name">${p.name}</span>
           <span class="mega-mini-price">${Number(p.price||0).toLocaleString('ar-EG')} ج.م</span>
         </div>`).join('') || '<div style="font-size:12px;color:var(--ink-soft);padding:10px 0;">لا توجد منتجات بعد</div>'}
@@ -2955,7 +2977,7 @@ function productCardHTML(p){
   return `
     <div class="prod-card" data-cat="${categoryAccentKey(p)}" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">
       <div class="prod-thumb">
-        <img src="${cover}" alt="${p.name}" loading="lazy">
+        <img src="${cover}" alt="${p.name}" loading="lazy" width="300" height="300">
         ${isDigital ? '' : badge}
         ${secondaryBadge}
         <button class="wish-btn ${wished?'active':''}" data-id="${p.id}" title="أضف للمفضلة" onclick="event.stopPropagation(); toggleWishlist('${p.id}')">${wished?'♥':'♡'}</button>
@@ -3014,7 +3036,7 @@ function openQuickView(id){
   box.innerHTML = `
     <button class="qv-close" onclick="closeQuickView()">×</button>
     <div class="qv-grid">
-      <div class="qv-img"><img src="${images[0]}" alt="${p.name}"></div>
+      <div class="qv-img"><img src="${images[0]}" alt="${p.name}" width="600" height="600"></div>
       <div class="qv-body">
         <div class="qv-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
         <h2 class="qv-name">${p.name}</h2>
@@ -3040,6 +3062,28 @@ function renderProductDetail(id){
   if(!p){ navigateTo('products'); return; }
   const images = (p.images && p.images.length) ? p.images : (p.image_url ? [p.image_url] : ['https://placehold.co/600x600/10294f/9fb0d1?text=No+Image']);
   const discount = p.old_price && p.old_price > p.price;
+
+  // Breadcrumb trail (Home > Category > Product) - real navigable links + BreadcrumbList schema for SEO
+  const bcEsc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const bcEl = document.getElementById('pdBreadcrumb');
+  if(bcEl){
+    const crumbs = [{name:'الرئيسية', onclick:"navigateTo('home')"}];
+    if(p.category) crumbs.push({name:p.category, onclick:"navigateTo('products')"});
+    crumbs.push({name:p.name, current:true});
+    bcEl.innerHTML = crumbs.map((c,i) => {
+      const isLast = i === crumbs.length - 1;
+      const item = c.current ? `<span class="current">${bcEsc(c.name)}</span>` : `<a onclick="${c.onclick}">${bcEsc(c.name)}</a>`;
+      return item + (isLast ? '' : ' <span class="sep">/</span> ');
+    }).join('');
+    // Structured data: helps Google show breadcrumb trails in search results
+    let bcSchema = document.getElementById('pdBreadcrumbSchema');
+    if(!bcSchema){ bcSchema = document.createElement('script'); bcSchema.type = 'application/ld+json'; bcSchema.id = 'pdBreadcrumbSchema'; document.head.appendChild(bcSchema); }
+    bcSchema.textContent = JSON.stringify({
+      '@context':'https://schema.org', '@type':'BreadcrumbList',
+      itemListElement: crumbs.map((c,i) => ({ '@type':'ListItem', position:i+1, name:c.name }))
+    });
+  }
+
   const el = document.getElementById('pdContainer');
   el.innerHTML = `
     <div>
@@ -3526,6 +3570,16 @@ function goToSolution(sector){
 function showSolutionPreview(key){
   document.querySelectorAll('.sol-item').forEach(el=>el.classList.toggle('active', el.dataset.sol===key));
   document.querySelectorAll('.sol-preview').forEach(el=>el.classList.toggle('active', el.dataset.sol===key));
+}
+
+// Generalized handler for solution CTAs - action is either "finder:<sector>" (opens the
+// camera-picking assistant pre-filled with that sector) or "page:<pageName>" (direct navigation).
+// Used by both the built-in defaults and any admin-edited solutions (site_settings.solutions_menu).
+function solutionAction(action){
+  if(!action) return;
+  const [type, value] = String(action).split(':');
+  if(type === 'finder') goToSolution(value);
+  else if(type === 'page') navigateTo(value);
 }
 
 function renderFinderProgress(){
@@ -4471,7 +4525,24 @@ function clearCartAfterOrder(){
   document.getElementById('cartOverlay').classList.remove('open');
 }
 
+function showCheckoutOrderErr(msg){
+  const box = document.getElementById('checkoutOrderErr');
+  const msgEl = document.getElementById('checkoutOrderErrMsg');
+  if(!box || !msgEl) return;
+  msgEl.textContent = msg;
+  box.classList.add('show');
+}
+function hideCheckoutOrderErr(){
+  const box = document.getElementById('checkoutOrderErr');
+  if(box) box.classList.remove('show');
+}
+function retryCheckout(){
+  hideCheckoutOrderErr();
+  startCheckout();
+}
+
 function startCheckout(){
+  hideCheckoutOrderErr();
   const keys = Object.keys(cart);
   if(keys.length===0) return alert('برجاء إضافة منتجات للسلة أولاً!');
   const custInfo = validateCheckoutFields();
@@ -4491,7 +4562,7 @@ async function completeWhatsappOrder(custInfo){
   try{
     result = await createOrderRecord('whatsapp_cod', custInfo);
   }catch(e){
-    alert(e.message || 'حدث خطأ غير متوقع أثناء تسجيل الطلب. برجاء المحاولة مرة أخرى.');
+    showCheckoutOrderErr(e.message || 'حدث خطأ غير متوقع أثناء تسجيل الطلب. برجاء المحاولة مرة أخرى، ولو استمرت المشكلة تواصل معنا مباشرة.');
     btn.disabled = false; btn.innerText = originalLabel;
     return;
   }
@@ -4534,7 +4605,8 @@ async function confirmBankOrder(){
   try{
     result = await createOrderRecord('bank_transfer', custInfo);
   }catch(e){
-    alert(e.message || 'حدث خطأ غير متوقع أثناء تسجيل الطلب. برجاء المحاولة مرة أخرى.');
+    closeBankModal();
+    showCheckoutOrderErr(e.message || 'حدث خطأ غير متوقع أثناء تسجيل الطلب. برجاء المحاولة مرة أخرى، ولو استمرت المشكلة تواصل معنا مباشرة.');
     return;
   }
   let msg = "🏦 *طلب جديد (تحويل بنكي) - Delta IT Solutions*\n-------------------------\n\n";
@@ -5693,19 +5765,35 @@ function initCountUp(){
 
   // Magnetic buttons: primary CTAs pull slightly toward the cursor
   var strength = 14;
-  document.addEventListener('mousemove', function(e){
-    document.querySelectorAll('.magnetic').forEach(function(el){
+  var reduceMotionMag = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotionMag) return;
+
+  var magEls = Array.prototype.slice.call(document.querySelectorAll('.magnetic'));
+  var lastX = -9999, lastY = -9999, ticking = false;
+
+  function updateMagnets(){
+    ticking = false;
+    magEls.forEach(function(el){
       var r = el.getBoundingClientRect();
+      if(!r.width || !r.height) return; // hidden/zero-size elements: skip, avoids NaN transforms
       var cx = r.left + r.width/2, cy = r.top + r.height/2;
-      var dx = e.clientX - cx, dy = e.clientY - cy;
+      var dx = lastX - cx, dy = lastY - cy;
       var dist = Math.hypot(dx,dy);
       if(dist < r.width * 1.4){
-        el.style.transform = 'translate('+(dx/r.width*strength)+'px,'+(dy/r.height*strength)+'px)';
-      } else {
+        var clampedX = Math.max(-strength, Math.min(strength, dx/r.width*strength));
+        var clampedY = Math.max(-strength, Math.min(strength, dy/r.height*strength));
+        el.style.transform = 'translate('+clampedX+'px,'+clampedY+'px)';
+      } else if(el.style.transform){
         el.style.transform = '';
       }
     });
-  });
+  }
+  document.addEventListener('mousemove', function(e){
+    lastX = e.clientX; lastY = e.clientY;
+    if(!ticking){ ticking = true; requestAnimationFrame(updateMagnets); }
+  }, {passive:true});
+  // re-scan on resize in case CTA buttons are added/removed dynamically (e.g. page navigation)
+  window.addEventListener('resize', function(){ magEls = Array.prototype.slice.call(document.querySelectorAll('.magnetic')); }, {passive:true});
 })();
 </script>
 <script>
@@ -5782,6 +5870,34 @@ function initCountUp(){
   let pcBlink = 0;
   let activeCalls = 2;
 
+  /* ---- ambient depth: soft twinkling starfield behind the topology (purely decorative, cheap to draw) ---- */
+  let stars = [];
+  function itOpsSeedStars(){
+    stars = Array.from({length:46},()=>({x:Math.random(), y:Math.random(), r:Math.random()*1.3+0.3, phase:Math.random()*Math.PI*2, speed:Math.random()*0.02+0.01}));
+  }
+  function drawStarfield(t){
+    stars.forEach(s=>{
+      const tw = (Math.sin(t*s.speed*60 + s.phase)+1)/2;
+      ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(160,200,255,${0.06+tw*0.16})`;
+      ctx.fill();
+    });
+  }
+
+  /* ---- arrival "impact" flash: a brief glow ring on whichever node a packet just reached ---- */
+  const nodeHit = {};
+  function pingNode(key){ nodeHit[key] = 1; }
+  function drawArrivalFlashes(){
+    Object.keys(nodeHit).forEach(key=>{
+      const v = nodeHit[key];
+      if(v <= 0.02){ delete nodeHit[key]; return; }
+      const n = nodes[key]; if(!n) return;
+      ctx.beginPath(); ctx.arc(n.x, n.y, 8 + (1-v)*16, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(120,200,255,${v*0.5})`; ctx.lineWidth = 1.4; ctx.stroke();
+      nodeHit[key] = v * 0.88;
+    });
+  }
+
   function drawNode(pos, color, r=7){
     ctx.beginPath(); ctx.arc(pos.x,pos.y,r,0,Math.PI*2);
     ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 13; ctx.fill(); ctx.shadowBlur = 0;
@@ -5815,6 +5931,12 @@ function initCountUp(){
   function itOpsDraw(){
     ctx.clearRect(0,0,W,H);
 
+    /* ambient depth: subtle vignette + twinkling starfield behind the topology */
+    const bgGrad = ctx.createRadialGradient(W*0.5,H*0.45,0,W*0.5,H*0.45,Math.max(W,H)*0.75);
+    bgGrad.addColorStop(0,'rgba(47,216,255,0.05)'); bgGrad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
+    drawStarfield(Date.now()*0.001);
+
     drawLine(nodes.firewall, nodes.switchN, 'rgba(47,216,255,0.25)', 1.4);
     drawLine(nodes.switchN, nodes.cloud, 'rgba(47,216,255,0.18)', 1.1);
     drawLine(nodes.switchN, nodes.camera, 'rgba(47,216,255,0.16)', 1);
@@ -5846,6 +5968,11 @@ function initCountUp(){
 
     /* switch + port LEDs */
     switchLit = Math.max(0, switchLit-0.02);
+    const haloR = 26 + Math.sin(Date.now()*0.0016)*4;
+    const haloGrad = ctx.createRadialGradient(nodes.switchN.x,nodes.switchN.y,0,nodes.switchN.x,nodes.switchN.y,haloR);
+    haloGrad.addColorStop(0, switchLit>0.05 ? 'rgba(62,232,154,0.16)' : 'rgba(47,216,255,0.14)');
+    haloGrad.addColorStop(1,'rgba(47,216,255,0)');
+    ctx.fillStyle = haloGrad; ctx.beginPath(); ctx.arc(nodes.switchN.x,nodes.switchN.y,haloR,0,Math.PI*2); ctx.fill();
     drawNode(nodes.switchN, switchLit>0.05 ? '#3ee89a' : '#2fd8ff', 8+switchLit*3);
     ports.forEach((p,i)=>{
       const px = nodes.switchN.x - 24 + i*5.2, py = nodes.switchN.y + 15;
@@ -5910,7 +6037,7 @@ function initCountUp(){
     callRings = callRings.filter(r=>r.alpha>0);
     drawLabel(nodes.phone, nodes.phone.label);
 
-    /* packets along every spoke */
+    /* packets along every spoke, each with a short fading trail for a livelier "data flow" feel */
     packets.forEach(pk=>{
       pk.t += pk.speed;
       if(pk.path==='fw-sw' && pk.threat && pk.t>0.4 && pk.t<0.6 && !pk.blocked){ pk.blocked = true; pk.blockedAt = pk.t; }
@@ -5920,11 +6047,21 @@ function initCountUp(){
       let dx=0,dy=0;
       const dist = Math.hypot(mouse.x-pt.x, mouse.y-pt.y);
       if(dist<60){ const f=(60-dist)/60*8; const ang=Math.atan2(pt.y-mouse.y,pt.x-mouse.x); dx=Math.cos(ang)*f; dy=Math.sin(ang)*f; }
+      // trail: a few fading echoes just behind the packet along the same path
+      for(let k=3;k>=1;k--){
+        const tt = Math.max(0, pk.t - k*0.035);
+        const tp = pathPoint(pk.path, tt);
+        ctx.beginPath(); ctx.arc(tp.x+dx, tp.y+dy+pk.yOff*0.3, 2*(1-k*0.22), 0, Math.PI*2);
+        ctx.fillStyle = color; ctx.globalAlpha = 0.22*(1-k*0.22); ctx.fill(); ctx.globalAlpha = 1;
+      }
       ctx.beginPath(); ctx.arc(pt.x+dx, pt.y+dy+pk.yOff*0.3, 2, 0, Math.PI*2);
       ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 7; ctx.fill(); ctx.shadowBlur = 0;
       if(pk.path==='fw-sw' && Math.abs(camAngle) < 0.05) switchLit = 1;
+      if(pk.t >= 1 && !pk.arrived){ pk.arrived = true; pingNode(PATHS[pk.path].b); }
     });
     packets = packets.filter(p=>p.t<1);
+
+    drawArrivalFlashes();
   }
 
   /* ---- rAF loop, only while the section is visible (real perf win over the reference demo) ---- */
@@ -5946,6 +6083,7 @@ function initCountUp(){
     spawners.push(setInterval(()=>{ callRings.push({r:0, alpha:0.55}); activeCalls = Math.max(0, activeCalls + (Math.random()<0.5?1:-1)); const el=document.getElementById('itOpsCalls'); if(el) el.textContent = Math.max(1,activeCalls); }, 1400));
   }
 
+  itOpsSeedStars();
   itOpsResize();
   window.addEventListener('resize', itOpsResize);
 
@@ -6027,6 +6165,42 @@ function initCountUp(){
       })
       .catch(()=>{ /* keep defaults on any error */ });
   }
+})();
+
+/* ================= Admin-editable "الحلول" mega-menu =================
+   Managed from admin.html ("🎛️ إعدادات الموقع" tab) without touching any code -
+   stored in Supabase `site_settings` under the key 'solutions_menu'. If nothing is
+   configured yet (or the request fails) the hardcoded defaults already in the HTML
+   stay exactly as they are, so the menu never looks broken. */
+(function(){
+  if(typeof sb === 'undefined' || !sb || !sb.from) return;
+  const listHost = document.getElementById('megaSolList');
+  const showHost = document.getElementById('megaSolShowcase');
+  if(!listHost || !showHost) return;
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function renderSolutions(items){
+    if(!Array.isArray(items) || !items.length) return; // never wipe the working defaults
+    listHost.innerHTML = items.map((it,i) => `
+      <div class="mega-list-item sol-item ${i===0?'active':''}" data-sol="${esc(it.id)}" onmouseenter="showSolutionPreview('${esc(it.id)}')" onclick="solutionAction('${esc(it.action)}')"><span class="mega-ic">${esc(it.icon)}</span><span>${esc(it.title)}</span></div>
+    `).join('');
+    showHost.innerHTML = items.map((it,i) => `
+      <div class="sol-preview ${i===0?'active':''}" data-sol="${esc(it.id)}">
+        <h5>${esc(it.icon)} ${esc(it.title)}</h5>
+        <p>${esc(it.desc)}</p>
+        <div class="sol-tags">${(it.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+        <button class="btn btn-primary sol-cta" onclick="solutionAction('${esc(it.action)}')">${esc(it.cta_label || '🚀 ابدأ تصميم الحل')}</button>
+      </div>
+    `).join('');
+  }
+
+  sb.from('site_settings').select('value').eq('key','solutions_menu').maybeSingle()
+    .then(({ data }) => {
+      const list = data && data.value && Array.isArray(data.value) && data.value.length ? data.value : null;
+      if(list) renderSolutions(list);
+    })
+    .catch(()=>{ /* keep the built-in defaults on any error */ });
 })();
 </script>
 </body>

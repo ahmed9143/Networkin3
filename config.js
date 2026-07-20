@@ -13,6 +13,12 @@ const SUPABASE_ANON_KEY = "sb_publishable_eDn9PSJgWQJp-YF5OP8E4A_R6pG96Xe";
 
 const WHATSAPP_NUMBER = "201032641038";
 
+/* تتبّع الزوار (اختياري) - سيب القيمة فاضية "" لو مش عايز تفعّلها.
+   GA4:  من analytics.google.com > Admin > Data Streams > معرف بيبدأ بـ G-...
+   Meta Pixel: من Meta Events Manager > معرف رقمي (Pixel ID). */
+const GA_MEASUREMENT_ID = "";
+const META_PIXEL_ID = "";
+
 /* بيانات التحويل البنكي / إنستاباي - تظهر للعميل كخيار دفع بديل عن الدفع عند الاستلام */
 const BANK_DETAILS = {
   bankName: "اسم البنك",

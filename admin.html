@@ -18,13 +18,92 @@
     --ink:#f4f6f9;--ink-soft:#9fb0d1;--line:#173a6b;--ok:#1fae6b;--danger:#ff5c5c;--radius:12px;
   }
   *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',sans-serif;}
   button,input,select,textarea{font-family:'Cairo',sans-serif;}
   .hidden{display:none !important;}
 
+  /* ===== Scrollbar ===== */
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:var(--paper);}
+  ::-webkit-scrollbar-thumb{background:var(--navy-700);border-radius:20px;border:2px solid var(--paper);}
+  ::-webkit-scrollbar-thumb:hover{background:var(--cable-blue);}
+
+  /* ===== Global themed form controls (fixes unstyled white inputs) ===== */
+  input, select, textarea{
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13.5px;
+    outline:none;
+    transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  textarea{resize:vertical;line-height:1.6;font-family:'Cairo',sans-serif;}
+  input::placeholder, textarea::placeholder{color:var(--ink-soft);opacity:.75;}
+  input:hover, select:hover, textarea:hover{border-color:var(--cable-blue);}
+  input:focus, select:focus, textarea:focus{
+    border-color:var(--cable-blue);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--cable-blue) 25%, transparent);
+    background:var(--navy-700);
+  }
+  select{cursor:pointer;}
+  input[type="checkbox"]{width:auto;padding:0;accent-color:var(--cable-orange);cursor:pointer;}
+
+  /* ===== Buttons: micro-interactions ===== */
+  .btn{position:relative;overflow:hidden;transform:translateZ(0);}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(0,0,0,.45);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary:hover{box-shadow:0 6px 18px -4px color-mix(in srgb, var(--cable-orange) 55%, transparent);}
+  .icon-btn{transition:.2s;}
+  .icon-btn:hover{transform:translateY(-1px) scale(1.05);}
+
+  /* ===== Nav items ===== */
+  .nav-item{position:relative;}
+  .nav-item.active{box-shadow:0 4px 14px -4px color-mix(in srgb, var(--cable-orange) 60%, transparent);}
+
+  /* ===== Cards ===== */
+  .card, .stat-card, .chart-card, .insight-card, .mission-control-banner{transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease;}
+  .card:hover, .stat-card:hover{border-color:var(--navy-700);box-shadow:0 10px 26px -14px rgba(0,0,0,.6);}
+
+  /* ===== Tab switch animation ===== */
+  .tab-view.active{animation:tabFadeIn .28s ease both;}
+  @keyframes tabFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== Row-level animation for dynamically added rows ===== */
+  .sol-row, .promo-offer-row, .finder-step-block, .review-row{
+    transition:border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+    animation:rowFadeIn .25s ease both;
+  }
+  @keyframes rowFadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .sol-row:hover, .promo-offer-row:hover, .finder-step-block:hover, .review-row:hover{
+    border-color:var(--cable-blue);
+    box-shadow:0 6px 20px -12px rgba(47,111,237,.5);
+  }
+  .finder-opt-row{transition:.2s;border-radius:8px;}
+  .finder-opt-row:hover{background:var(--navy-800);}
+
+  /* ===== Save message pop ===== */
+  #solutionsMenuSaveMsg, #promoOffersSaveMsg, #finderCopySaveMsg{
+    display:inline-block;animation:msgPop .3s ease both;
+  }
+  #solutionsMenuSaveMsg:empty, #promoOffersSaveMsg:empty, #finderCopySaveMsg:empty{animation:none;}
+  @keyframes msgPop{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+
+  /* ===== Loading skeleton shimmer (جاري التحميل...) ===== */
+  @keyframes shimmer{0%{background-position:-200px 0;}100%{background-position:calc(200px + 100%) 0;}}
+
+  /* ===== Delete button on rows: subtle danger hover ===== */
+  .sol-row-top > button.btn, .promo-offer-row > button.btn{transition:.2s;}
+  .sol-row-top > button.btn:hover, .promo-offer-row > button.btn:hover{background:var(--danger);color:#fff;}
+
   /* Login */
   #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .login-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:40px;width:100%;max-width:380px;}
+  .login-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:40px;width:100%;max-width:380px;animation:loginIn .4s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes loginIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .login-card .btn-block{transition:.2s;}
+  .field input:focus, .field select:focus, .field textarea:focus{transform:translateY(-1px);}
   .login-card h1{font-size:20px;margin:0 0 6px;}
   .login-card p{color:var(--ink-soft);font-size:13.5px;margin:0 0 24px;}
   .field{margin-bottom:14px;}
@@ -41,7 +120,10 @@
 
   /* Layout */
   #adminApp{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
-  aside{background:var(--navy-950);border-left:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;}
+  #adminApp:not(.hidden){animation:appIn .35s ease both;}
+  @keyframes appIn{from{opacity:0;}to{opacity:1;}}
+  aside{background:var(--navy-950);border-left:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;animation:asideIn .4s ease both;}
+  @keyframes asideIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:translateX(0);}}
   aside .brand{display:flex;align-items:center;gap:10px;margin-bottom:30px;padding:0 6px;}
   aside .brand .mark{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   aside .brand .mark svg{width:28px;height:28px;}
@@ -100,6 +182,24 @@
   .checkbox-row input{width:auto;}
 
   .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
+  .stat-cards .stat-card{animation:cardStagger .4s ease both;}
+  .stat-cards .stat-card:nth-child(1){animation-delay:.03s;}
+  .stat-cards .stat-card:nth-child(2){animation-delay:.08s;}
+  .stat-cards .stat-card:nth-child(3){animation-delay:.13s;}
+  .stat-cards .stat-card:nth-child(4){animation-delay:.18s;}
+  @keyframes cardStagger{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .insights-grid .insight-card{animation:cardStagger .35s ease both;}
+  .nav-item{animation:navIn .3s ease both;}
+  .nav-item:nth-child(2){animation-delay:.02s;}
+  .nav-item:nth-child(3){animation-delay:.04s;}
+  .nav-item:nth-child(4){animation-delay:.06s;}
+  .nav-item:nth-child(5){animation-delay:.08s;}
+  .nav-item:nth-child(6){animation-delay:.1s;}
+  .nav-item:nth-child(7){animation-delay:.12s;}
+  .nav-item:nth-child(8){animation-delay:.14s;}
+  .nav-item:nth-child(9){animation-delay:.16s;}
+  .nav-item:nth-child(10){animation-delay:.18s;}
+  @keyframes navIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
   .mission-control-banner{background:linear-gradient(120deg,#6D5EF71a,#00E5FF12);border:1px solid #6D5EF755;border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;}
   .mission-control-banner .mc-greeting{font-size:20px;font-weight:800;margin-bottom:6px;}
   .mission-control-banner .mc-summary{font-size:14px;color:var(--ink-soft);line-height:1.8;}
@@ -236,6 +336,7 @@
     <div class="nav-item" data-tab="downloads" onclick="switchTab('downloads')">📁 التنزيلات</div>
     <div class="nav-item" data-tab="sitesettings" onclick="switchTab('sitesettings')">🎛️ إعدادات الموقع</div>
     <div class="nav-item" data-tab="reviews" onclick="switchTab('reviews')">⭐ التقييمات والتنبيهات</div>
+    <div class="nav-item" data-tab="enterprise" onclick="switchTab('enterprise')">🏗️ أدوات المؤسسات</div>
     <div class="nav-item logout" onclick="doLogout()">🚪 تسجيل الخروج</div>
   </aside>
 
@@ -488,6 +589,49 @@
       <div class="card">
         <h3 style="margin:0 0 12px;">📩 طلبات "نبهني لما يتوفر"</h3>
         <div id="stockNotifyList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
+      </div>
+    </div>
+
+    <!-- Enterprise Tools: submissions from Rack Builder / BOQ Generator / Coming-Soon category pages -->
+    <div class="tab-view" id="tab-enterprise">
+      <div class="topline">
+        <div><h2>أدوات المؤسسات</h2><p>كل اللي بيوصل من Rack Builder، BOQ Generator، وطلبات التنبيه من صفحات "قريبًا" في الموقع</p></div>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><span>🗄️ مشاريع Rack محفوظة</span><b id="statRackTotal">0</b></div>
+        <div class="stat-card"><span>📑 مستندات BOQ محفوظة</span><b id="statBoqTotal">0</b></div>
+        <div class="stat-card" style="border-color:#ff7a2f66;"><span>🔔 طلبات تنبيه أقسام</span><b id="statCatNotifyTotal" style="color:var(--cable-orange);">0</b></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <h3 style="margin:0;">🗄️ مشاريع Rack Builder</h3>
+          <select id="rackStatusFilter" onchange="renderRackProjectsTable()">
+            <option value="all">كل الحالات</option>
+            <option value="draft">جديد</option>
+            <option value="reviewed">تمت المراجعة</option>
+            <option value="quoted">تم تسعير</option>
+            <option value="closed">مغلق</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>الكود</th><th>السعة</th><th>الأجهزة</th><th>الطاقة</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
+          <tbody id="rackProjectsTableBody"><tr class="empty-row"><td colspan="7">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="margin:0 0 12px;">📑 مستندات BOQ</h3>
+        <table>
+          <thead><tr><th>العميل</th><th>المشروع</th><th>عدد الأصناف</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
+          <tbody id="boqDocumentsTableBody"><tr class="empty-row"><td colspan="7">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 12px;">🔔 طلبات تنبيه من صفحات "قريبًا"</h3>
+        <div id="categoryNotifyList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
       </div>
     </div>
   </main>
@@ -797,6 +941,7 @@ const CMDK_ACTIONS = [
   {ic:'📁', label:'التنزيلات', meta:'صفحة', run:()=>switchTab('downloads')},
   {ic:'🎛️', label:'إعدادات الموقع', meta:'صفحة', run:()=>switchTab('sitesettings')},
   {ic:'⭐', label:'التقييمات والتنبيهات', meta:'صفحة', run:()=>switchTab('reviews')},
+  {ic:'🏗️', label:'أدوات المؤسسات (Rack/BOQ/تنبيهات الأقسام)', meta:'صفحة', run:()=>switchTab('enterprise')},
   {ic:'🚪', label:'تسجيل الخروج', meta:'أمر', run:()=>doLogout()},
 ];
 let cmdkActiveIndex = 0;
@@ -901,6 +1046,9 @@ let downloadsAdmin = [];
 let siteSettings = {};
 let productReviews = [];
 let stockNotifyRequests = [];
+let rackProjects = [];
+let boqDocuments = [];
+let categoryNotifyRequests = [];
 
 async function loadAll(){
   const { data: catData } = await sb.from('categories').select('*').order('sort_order',{ascending:true});
@@ -912,6 +1060,9 @@ async function loadAll(){
   const { data: settingsData, error: settingsErr } = await sb.from('site_settings').select('*');
   const { data: reviewsData, error: reviewsErr } = await sb.from('product_reviews').select('*, products(name)').order('created_at',{ascending:false});
   const { data: notifyData, error: notifyErr } = await sb.from('stock_notify_requests').select('*').order('created_at',{ascending:false});
+  const { data: rackData, error: rackErr } = await sb.from('rack_projects').select('*').order('created_at',{ascending:false});
+  const { data: boqData, error: boqErr } = await sb.from('boq_documents').select('*').order('created_at',{ascending:false});
+  const { data: catNotifyData, error: catNotifyErr } = await sb.from('category_notify_requests').select('*').order('created_at',{ascending:false});
   categories = catData || [];
   products = prodData || [];
   coupons = couponData || [];
@@ -922,11 +1073,17 @@ async function loadAll(){
   (settingsData || []).forEach(row => { siteSettings[row.key] = row.value; });
   productReviews = reviewsData || [];
   stockNotifyRequests = notifyData || [];
+  rackProjects = rackData || [];
+  boqDocuments = boqData || [];
+  categoryNotifyRequests = catNotifyData || [];
   if(quoteErr) console.error('quote_requests: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', quoteErr);
   if(dlErr) console.error('downloads: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', dlErr);
   if(settingsErr) console.error('site_settings: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', settingsErr);
   if(reviewsErr) console.error('product_reviews: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', reviewsErr);
   if(notifyErr) console.error('stock_notify_requests: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', notifyErr);
+  if(rackErr) console.error('rack_projects: شغّل ملف supabase-migration-002-enterprise-tools.sql لتفعيل هذا الجدول', rackErr);
+  if(boqErr) console.error('boq_documents: شغّل ملف supabase-migration-002-enterprise-tools.sql لتفعيل هذا الجدول', boqErr);
+  if(catNotifyErr) console.error('category_notify_requests: شغّل ملف supabase-migration-002-enterprise-tools.sql لتفعيل هذا الجدول', catNotifyErr);
   renderCategoriesTable();
   renderProductsTable();
   populateCategorySelect();
@@ -940,6 +1097,9 @@ async function loadAll(){
   renderFinderCopyForm();
   renderReviewsAdmin();
   renderStockNotifyAdmin();
+  renderRackProjectsTable();
+  renderBoqDocumentsTable();
+  renderCategoryNotifyAdmin();
 }
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -2461,6 +2621,104 @@ async function markNotified(id){
 
 async function deleteStockNotify(id){
   const { error } = await sb.from('stock_notify_requests').delete().eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
+}
+
+/* ---------------- 🏗️ أدوات المؤسسات: Rack Projects / BOQ Documents / Category Notify ---------------- */
+const RACK_STATUS_LABELS = { draft:'جديد', reviewed:'تمت المراجعة', quoted:'تم تسعير', closed:'مغلق' };
+
+function renderRackProjectsTable(){
+  const statEl = document.getElementById('statRackTotal'); if(statEl) statEl.innerText = rackProjects.length;
+  const body = document.getElementById('rackProjectsTableBody');
+  if(!body) return;
+  const filter = document.getElementById('rackStatusFilter') ? document.getElementById('rackStatusFilter').value : 'all';
+  const list = filter === 'all' ? rackProjects : rackProjects.filter(r => r.status === filter);
+  if(!list.length){ body.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد مشاريع Rack بعد. تأكد من تشغيل ملف supabase-migration-002-enterprise-tools.sql إذا كانت هذه أول مرة.</td></tr>'; return; }
+  body.innerHTML = list.map(r => `
+    <tr>
+      <td><code>RACK-${r.id.slice(0,8).toUpperCase()}</code></td>
+      <td>${r.capacity_u}U (${r.total_u}U مستخدم)</td>
+      <td>${(r.items||[]).length} جهاز</td>
+      <td>${r.power_watts||0} W</td>
+      <td>
+        <select class="status-select" onchange="updateRackStatus('${r.id}', this.value)">
+          ${Object.keys(RACK_STATUS_LABELS).map(s => `<option value="${s}" ${r.status===s?'selected':''}>${RACK_STATUS_LABELS[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td>${new Date(r.created_at).toLocaleDateString('ar-EG')}</td>
+      <td><button class="icon-btn danger" onclick="deleteRackProject('${r.id}')">🗑️</button></td>
+    </tr>`).join('');
+}
+async function updateRackStatus(id, status){
+  const { error } = await sb.from('rack_projects').update({ status }).eq('id', id);
+  if(error){ alert('حدث خطأ أثناء تحديث الحالة'); console.error(error); return; }
+  const r = rackProjects.find(x=>x.id===id); if(r) r.status = status;
+  renderRackProjectsTable();
+}
+async function deleteRackProject(id){
+  if(!confirm('حذف مشروع الـ Rack ده نهائيًا؟')) return;
+  const { error } = await sb.from('rack_projects').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+function renderBoqDocumentsTable(){
+  const statEl = document.getElementById('statBoqTotal'); if(statEl) statEl.innerText = boqDocuments.length;
+  const body = document.getElementById('boqDocumentsTableBody');
+  if(!body) return;
+  if(!boqDocuments.length){ body.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد مستندات BOQ بعد. تأكد من تشغيل ملف supabase-migration-002-enterprise-tools.sql إذا كانت هذه أول مرة.</td></tr>'; return; }
+  const BOQ_STATUS_LABELS = { draft:'جديد', sent:'اتبعت', approved:'تم الاعتماد', rejected:'مرفوض' };
+  body.innerHTML = boqDocuments.map(b => `
+    <tr>
+      <td>${b.customer_name || '-'}${b.customer_phone ? ` — <a href="https://wa.me/${b.customer_phone.replace(/[^0-9]/g,'')}" target="_blank">${b.customer_phone}</a>` : ''}</td>
+      <td>${b.project_name || '-'}</td>
+      <td>${(b.items||[]).length}</td>
+      <td>${Number(b.grand_total||0).toLocaleString('ar-EG')} ج.م</td>
+      <td>
+        <select class="status-select" onchange="updateBoqStatus('${b.id}', this.value)">
+          ${Object.keys(BOQ_STATUS_LABELS).map(s => `<option value="${s}" ${b.status===s?'selected':''}>${BOQ_STATUS_LABELS[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td>${new Date(b.created_at).toLocaleDateString('ar-EG')}</td>
+      <td><button class="icon-btn danger" onclick="deleteBoqDocument('${b.id}')">🗑️</button></td>
+    </tr>`).join('');
+}
+async function updateBoqStatus(id, status){
+  const { error } = await sb.from('boq_documents').update({ status }).eq('id', id);
+  if(error){ alert('حدث خطأ أثناء تحديث الحالة'); console.error(error); return; }
+  const b = boqDocuments.find(x=>x.id===id); if(b) b.status = status;
+  renderBoqDocumentsTable();
+}
+async function deleteBoqDocument(id){
+  if(!confirm('حذف مستند الـ BOQ ده نهائيًا؟')) return;
+  const { error } = await sb.from('boq_documents').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف'); console.error(error); return; }
+  await loadAll();
+}
+
+function renderCategoryNotifyAdmin(){
+  const statEl = document.getElementById('statCatNotifyTotal'); if(statEl) statEl.innerText = categoryNotifyRequests.filter(r=>!r.notified).length;
+  const box = document.getElementById('categoryNotifyList');
+  if(!box) return;
+  if(!categoryNotifyRequests.length){ box.innerHTML = '<p style="color:#8994a8;font-size:13px;">مفيش طلبات تنبيه أقسام حاليًا.</p>'; return; }
+  box.innerHTML = categoryNotifyRequests.map(r => `
+    <div class="review-row" style="${r.notified?'opacity:.55;':''}">
+      <div><b>${r.category_label}</b> — <span dir="ltr">${r.phone}</span> ${r.notified ? '✓ تم التنبيه' : ''}</div>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <a class="btn btn-outline" target="_blank" href="https://wa.me/${r.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent('الخبر السعيد: قسم '+r.category_label+' اتوفر عندنا دلوقتي 🎉')}">واتساب</a>
+        ${!r.notified ? `<button class="btn btn-primary" onclick="markCategoryNotified('${r.id}')">✓ اتبعتله</button>` : ''}
+        <button class="btn" onclick="deleteCategoryNotify('${r.id}')">🗑️ حذف</button>
+      </div>
+    </div>`).join('');
+}
+async function markCategoryNotified(id){
+  const { error } = await sb.from('category_notify_requests').update({ notified:true }).eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadAll();
+}
+async function deleteCategoryNotify(id){
+  const { error } = await sb.from('category_notify_requests').delete().eq('id', id);
   if(error){ alert('حدث خطأ: ' + error.message); return; }
   await loadAll();
 }

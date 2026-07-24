@@ -423,6 +423,7 @@ declare
   v_total numeric := 0;
   v_items_out jsonb := '[]'::jsonb;
   v_coupon record;
+  v_coupon_code_used text := null;   -- plain text capture; avoids "record v_coupon not assigned" when no coupon is used
   v_order_id uuid;
   v_order_ref text;
   v_status text;
@@ -539,6 +540,8 @@ begin
     if v_discount > v_subtotal then v_discount := v_subtotal; end if;
 
     update public.coupons set used_count = used_count + 1 where id = v_coupon.id;
+
+    v_coupon_code_used := v_coupon.code;   -- capture into plain text now, while it's safe
   end if;
 
   v_total := greatest(v_subtotal - v_discount, 0);
@@ -556,7 +559,7 @@ begin
     customer_name, customer_phone, shipping_address
   ) values (
     v_order_ref, v_items_out, v_subtotal, v_discount, v_total,
-    case when p_coupon_code is not null and length(trim(p_coupon_code)) > 0 then v_coupon.code else null end,
+    v_coupon_code_used,
     p_payment_method, v_status,
     trim(p_customer_name), trim(p_customer_phone), nullif(trim(coalesce(p_shipping_address,'')),'')
   ) returning id into v_order_id;

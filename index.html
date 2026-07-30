@@ -3,6 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+/* Dynamic day/night theme — runs before CSS paints to avoid a flash of the wrong theme.
+   Modes stored in localStorage under 'it_theme_mode':
+     'auto'  (default) -> theme follows local device time: 06:00–18:00 = light, otherwise = dark/cyber
+     'light' / 'dark'  -> user forced this theme manually via the toggle button, auto-switching stops
+   The site-wide default when nothing is saved yet is 'auto', not a hardcoded theme. */
+(function(){
+  try{
+    var mode = localStorage.getItem('it_theme_mode') || 'auto';
+    var theme;
+    if(mode === 'auto'){
+      var h = new Date().getHours();
+      theme = (h >= 6 && h < 18) ? 'light' : 'dark';
+    } else {
+      theme = mode;
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme-mode', mode);
+  }catch(e){
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+})();
+</script>
 <link rel="canonical" href="https://delta-it-solutions.vercel.app/">
 <meta property="og:url" content="https://delta-it-solutions.vercel.app/">
 <meta name="robots" content="index, follow">
@@ -1418,6 +1441,7 @@
         <li><a onclick="navigateTo('faq')">الأسئلة الشائعة</a></li>
         <li><a onclick="navigateTo('downloads')">التنزيلات</a></li>
         <li><a onclick="navigateTo('contact')">اطلب معاينة</a></li>
+        <li><a href="rack-scanner.html">🔍 ماسح الـRack (QR)</a></li>
       </ul></div>
       <div><h4>أدلة ومقالات</h4><ul>
         <li><a href="best-cctv-cameras-for-home.html">أفضل كاميرات مراقبة للمنزل</a></li>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+(function(){
+  try{
+    var mode = localStorage.getItem('it_theme_mode') || 'auto';
+    var theme = mode === 'auto' ? ((new Date().getHours()>=6 && new Date().getHours()<18) ? 'light' : 'dark') : mode;
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){}
+})();
+</script>
+<title>جواز السفر الرقمي للمشروع | Delta IT Solutions</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="dark"]{--paper:#050816;--paper-2:#0c1330;--ink:#F4F7FB;--ink-soft:#8E9AAF;--line:rgba(255,255,255,.08);--blue:#2F7BFF;--purple:#8A5CFF;--ok:#1DFF9B;--warn:#FFB020;--danger:#FF4D5A;}
+  :root[data-theme="light"]{--paper:#f9fafc;--paper-2:#ffffff;--ink:#0b1220;--ink-soft:#5c6579;--line:#e3e7ef;--blue:#0098c2;--purple:#6a4bf0;--ok:#0a9e6a;--warn:#c98a12;--danger:#e5405f;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',sans-serif;line-height:1.8;transition:background .3s,color .3s;}
+  a{color:var(--blue);}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 60px;}
+  header{background:var(--paper-2);border-bottom:3px solid var(--purple);padding:16px 0;position:sticky;top:0;z-index:5;}
+  header .in{max-width:760px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  header b{font-size:15px;}
+  .brand{display:flex;align-items:center;gap:8px;}
+  .brand svg{width:28px;height:28px;}
+  .badge-passport{background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;font-size:11px;padding:5px 12px;border-radius:20px;font-weight:700;}
+  main{padding-top:26px;}
+  .state{text-align:center;padding:80px 20px;color:var(--ink-soft);}
+  .state svg{width:64px;height:64px;margin-bottom:14px;opacity:.5;}
+  h1{font-size:22px;margin:6px 0 2px;}
+  .sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:20px;}
+  .cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;border:1px solid var(--line);}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 22px;}
+  .chip{background:var(--paper-2);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;color:var(--ink-soft);}
+  section{margin-top:30px;}
+  section h2{font-size:16px;border-inline-start:4px solid var(--blue);padding-inline-start:10px;margin-bottom:14px;}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+  .gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:pointer;}
+  .device-card{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .device-card .dn{font-weight:700;font-size:14.5px;}
+  .device-card .dt{color:var(--ink-soft);font-size:12px;}
+  .warranty-pill{font-size:11.5px;padding:4px 10px;border-radius:20px;font-weight:700;white-space:nowrap;}
+  .warranty-pill.ok{background:color-mix(in srgb, var(--ok) 18%, transparent);color:var(--ok);}
+  .warranty-pill.soon{background:color-mix(in srgb, var(--warn) 20%, transparent);color:var(--warn);}
+  .warranty-pill.expired{background:color-mix(in srgb, var(--danger) 18%, transparent);color:var(--danger);}
+  .maint-item{border-inline-start:3px solid var(--blue);padding:6px 12px;margin-bottom:10px;}
+  .maint-item .date{font-size:11.5px;color:var(--ink-soft);}
+  .cta{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap;}
+  .btn{flex:1;min-width:160px;text-align:center;padding:13px;border-radius:12px;font-weight:700;font-size:13.5px;text-decoration:none;border:1px solid var(--line);}
+  .btn.primary{background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;border:none;}
+  .btn.ghost{color:var(--ink);background:var(--paper-2);}
+  footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:10px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="in">
+    <div class="brand">
+      <svg viewBox="0 0 100 100"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#lg)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/></svg>
+      <b>Delta IT Solutions</b>
+    </div>
+    <span class="badge-passport">🛂 جواز السفر الرقمي</span>
+  </div>
+</header>
+<main class="wrap" id="content">
+  <div class="state" id="loadingState">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+    <div>جاري تحميل بيانات المشروع...</div>
+  </div>
+</main>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" src=""></div>
+<footer>© Delta IT Solutions — جواز السفر الرقمي بيتحدّث تلقائيًا من نظام إدارة المشاريع.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+function warrantyState(dateStr){
+  if(!dateStr) return null;
+  const d = new Date(dateStr), now = new Date();
+  const daysLeft = Math.round((d-now)/86400000);
+  if(daysLeft < 0) return {cls:'expired', label:'الضمان منتهي'};
+  if(daysLeft <= 60) return {cls:'soon', label:`الضمان قارب على الانتهاء (${daysLeft} يوم)`};
+  return {cls:'ok', label:'الضمان ساري لـ ' + d.toLocaleDateString('ar-EG')};
+}
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function openLightbox(src){ document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('open'); }
+
+async function loadPassport(){
+  const slug = new URLSearchParams(location.search).get('slug');
+  const content = document.getElementById('content');
+  if(!slug){
+    content.innerHTML = `<div class="state"><h1>رابط غير صالح</h1><p>مفيش رمز مشروع في الرابط.</p></div>`;
+    return;
+  }
+  const { data, error } = await sb.rpc('get_project_passport', { p_slug: slug });
+  if(error || !data){
+    content.innerHTML = `<div class="state"><h1>الجواز الرقمي مش متاح</h1><p>ممكن يكون المشروع لسه مش منشور، أو رابط الـQR قديم. تواصل معانا لو محتاج مساعدة.</p><a class="btn primary" style="display:inline-block;margin-top:14px;" href="https://wa.me/${WHATSAPP_NUMBER}" target="_blank">تواصل واتساب</a></div>`;
+    return;
+  }
+  const p = data.project, gallery = data.gallery || [], devices = data.devices || [], log = data.maintenance_log || [];
+
+  let html = `
+    ${p.cover_image_url ? `<img class="cover" src="${esc(p.cover_image_url)}" alt="${esc(p.title)}">` : ''}
+    <h1>${esc(p.title)}</h1>
+    <div class="sub">${esc(p.summary||'')}</div>
+    <div class="meta-row">
+      ${p.customer_name ? `<span class="chip">🏢 ${esc(p.customer_name)}</span>` : ''}
+      ${p.category ? `<span class="chip">🗂️ ${esc(p.category)}</span>` : ''}
+      ${p.location_text ? `<span class="chip">📍 ${esc(p.location_text)}</span>` : ''}
+      ${p.engineer_name ? `<span class="chip">👷 ${esc(p.engineer_name)}</span>` : ''}
+    </div>
+    ${p.description ? `<p>${esc(p.description)}</p>` : ''}
+  `;
+
+  if(gallery.length){
+    html += `<section><h2>📐 الرسومات والصور</h2><div class="gallery">${gallery.map(g=>`<img src="${esc(g.image_url)}" alt="${esc(g.caption||'')}" loading="lazy" onclick="openLightbox('${esc(g.image_url)}')">`).join('')}</div></section>`;
+  }
+
+  if(devices.length){
+    html += `<section><h2>🖥️ الأجهزة المُركّبة</h2>${devices.map(d=>{
+      const w = warrantyState(d.warranty_until);
+      return `<div class="device-card">
+        <div><div class="dn">${esc(d.device_name)} ${d.quantity>1?`× ${d.quantity}`:''}</div>
+        <div class="dt">${d.device_type?esc(d.device_type)+' · ':''}${d.last_maintenance_date?'آخر صيانة: '+new Date(d.last_maintenance_date).toLocaleDateString('ar-EG'):'مفيش سجل صيانة بعد'}</div></div>
+        ${w ? `<span class="warranty-pill ${w.cls}">${w.label}</span>` : ''}
+      </div>`;
+    }).join('')}</section>`;
+  }
+
+  if(log.length){
+    html += `<section><h2>🛠️ سجل الصيانة</h2>${log.map(m=>`<div class="maint-item"><div class="date">${new Date(m.performed_at).toLocaleDateString('ar-EG')} — ${esc(m.device_name)}${m.engineer_name?' · '+esc(m.engineer_name):''}</div><div>${esc(m.summary)}</div></div>`).join('')}</section>`;
+  }
+
+  html += `<div class="cta">
+    ${p.pdf_url ? `<a class="btn ghost" href="${esc(p.pdf_url)}" target="_blank">📄 تحميل ملف المشروع PDF</a>` : ''}
+    <a class="btn primary" href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحبًا، عايز أطلب صيانة/دعم لمشروع: '+p.title)}" target="_blank">🛠️ طلب صيانة عبر واتساب</a>
+  </div>`;
+
+  content.innerHTML = html;
+}
+loadPassport();
+</script>
+</body>
+</html>

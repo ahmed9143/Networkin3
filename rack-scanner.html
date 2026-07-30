@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ماسح الـRack | Delta IT Solutions</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#2F7BFF;--purple:#8A5CFF;--ok:#1DFF9B;--warn:#FFB020;--danger:#FF4D5A;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:#000;color:#F4F7FB;font-family:'Cairo',sans-serif;overflow:hidden;}
+  #camWrap{position:fixed;inset:0;}
+  video{width:100%;height:100%;object-fit:cover;}
+  #overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  header{position:fixed;top:0;inset-inline:0;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;
+    background:linear-gradient(to bottom, rgba(0,0,0,.75), transparent);z-index:5;display:flex;align-items:center;justify-content:space-between;}
+  header .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.12);padding:8px 14px;border-radius:20px;}
+  header b{font-size:14px;}
+  .ai-toggle{position:fixed;bottom:calc(26px + env(safe-area-inset-bottom,0px));inset-inline:0;display:flex;justify-content:center;gap:10px;z-index:5;}
+  .ai-toggle button{background:rgba(10,15,30,.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);color:#fff;padding:11px 18px;border-radius:24px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+  .ai-toggle button.on{background:linear-gradient(120deg,var(--blue),var(--purple));border-color:transparent;}
+  .hint{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:0;text-align:center;color:rgba(255,255,255,.75);font-size:12.5px;z-index:4;pointer-events:none;}
+  .disclaimer{position:fixed;top:calc(88px + env(safe-area-inset-top,0px));inset-inline:16px;text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;z-index:4;pointer-events:none;line-height:1.6;}
+  #card{position:fixed;bottom:0;inset-inline:0;background:#0c1330;border-radius:22px 22px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));
+    transform:translateY(110%);transition:transform .35s cubic-bezier(.2,.9,.3,1.3);z-index:10;max-height:70vh;overflow-y:auto;}
+  #card.open{transform:translateY(0);}
+  #card .handle{width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;margin:0 auto 16px;}
+  #card h2{margin:0 0 4px;font-size:18px;}
+  #card .sub{color:#8E9AAF;font-size:12.5px;margin-bottom:14px;}
+  .pill{display:inline-block;font-size:11.5px;padding:4px 10px;border-radius:20px;font-weight:700;margin-inline-end:6px;}
+  .pill.ok{background:rgba(29,255,155,.15);color:var(--ok);}
+  .pill.soon{background:rgba(255,176,32,.18);color:var(--warn);}
+  .pill.expired{background:rgba(255,77,90,.15);color:var(--danger);}
+  #card .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13.5px;}
+  #card .row span:first-child{color:#8E9AAF;}
+  #card .close{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:15px;}
+  .scan-frame{position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);width:min(70vw,260px);height:min(70vw,260px);
+    border:2.5px solid rgba(47,123,255,.8);border-radius:20px;z-index:3;pointer-events:none;box-shadow:0 0 0 2000px rgba(0,0,0,.35);}
+  .scan-frame::before, .scan-frame::after{content:'';position:absolute;width:26px;height:26px;border-color:var(--purple);}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">← رجوع</a>
+  <b>🔍 ماسح الـRack</b>
+  <span style="width:60px;"></span>
+</header>
+
+<div id="camWrap">
+  <video id="video" playsinline autoplay muted></video>
+  <canvas id="overlay"></canvas>
+</div>
+<div class="scan-frame" id="scanFrame"></div>
+<div class="hint" id="hint">وجّه الكاميرا على QR الملصق على الجهاز</div>
+<div class="disclaimer">التعرّف الدقيق على الجهاز بيتم عن طريق QR الملصق عليه. وضع "AI تجريبي" بيرسم مربعات كشف أشكال عامة تقريبية للتوضيح البصري فقط، ومش بيحدد نوع الجهاز بدقة.</div>
+
+<div class="ai-toggle">
+  <button id="aiBtn" onclick="toggleAI()">✨ AI تجريبي</button>
+</div>
+
+<div id="card">
+  <button class="close" onclick="closeCard()">✕</button>
+  <div class="handle"></div>
+  <div id="cardBody"></div>
+</div>
+
+<canvas id="qrCanvas" style="display:none;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="config.js"></script>
+<script>
+const video = document.getElementById('video');
+const qrCanvas = document.getElementById('qrCanvas');
+const qrCtx = qrCanvas.getContext('2d', { willReadFrequently:true });
+const overlay = document.getElementById('overlay');
+const octx = overlay.getContext('2d');
+const hint = document.getElementById('hint');
+let scanning = true;
+let lastToken = null;
+
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function warrantyPill(dateStr){
+  if(!dateStr) return '';
+  const d = new Date(dateStr), days = Math.round((d-new Date())/86400000);
+  if(days < 0) return `<span class="pill expired">الضمان منتهي</span>`;
+  if(days <= 60) return `<span class="pill soon">الضمان قارب على الانتهاء</span>`;
+  return `<span class="pill ok">الضمان ساري</span>`;
+}
+
+async function startCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = stream;
+    await video.play();
+    resizeCanvases();
+    requestAnimationFrame(scanLoop);
+  }catch(e){
+    hint.textContent = 'محتاج إذن الكاميرا عشان الماسح يشتغل. راجع إعدادات المتصفح.';
+  }
+}
+function resizeCanvases(){
+  [overlay, qrCanvas].forEach(c=>{ c.width = video.videoWidth || window.innerWidth; c.height = video.videoHeight || window.innerHeight; });
+  overlay.style.width = '100%'; overlay.style.height = '100%';
+}
+
+function scanLoop(){
+  if(scanning && video.readyState === video.HAVE_ENOUGH_DATA){
+    qrCtx.drawImage(video, 0, 0, qrCanvas.width, qrCanvas.height);
+    const imgData = qrCtx.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+    const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
+    if(code && code.data){
+      let token = null;
+      try{
+        const u = new URL(code.data, location.href);
+        token = u.searchParams.get('device');
+      }catch(e){ /* not a URL, ignore */ }
+      if(token && token !== lastToken){
+        lastToken = token;
+        onDeviceFound(token);
+      }
+    }
+  }
+  requestAnimationFrame(scanLoop);
+}
+
+async function onDeviceFound(token){
+  hint.textContent = 'تم العثور على الجهاز، جاري تحميل بياناته...';
+  const { data, error } = await sb.rpc('get_device_by_qr', { p_token: token });
+  if(error || !data){
+    hint.textContent = 'الرمز ده مش متعرف عليه أو مش متاح عامة.';
+    setTimeout(()=>{ lastToken = null; hint.textContent = 'وجّه الكاميرا على QR الملصق على الجهاز'; }, 2500);
+    return;
+  }
+  showCard(data);
+}
+
+function showCard(d){
+  document.getElementById('cardBody').innerHTML = `
+    <h2>${esc(d.device_name)}</h2>
+    <div class="sub">${d.device_type?esc(d.device_type)+' · ':''}مشروع: ${esc(d.project_title)}${d.customer_name?' · '+esc(d.customer_name):''}</div>
+    ${warrantyPill(d.warranty_until)}
+    <div class="row"><span>الكمية</span><span>${d.quantity||1}</span></div>
+    ${d.warranty_until?`<div class="row"><span>الضمان لحد</span><span>${new Date(d.warranty_until).toLocaleDateString('ar-EG')}</span></div>`:''}
+    <div class="row"><span>آخر صيانة</span><span>${d.last_maintenance_date? new Date(d.last_maintenance_date).toLocaleDateString('ar-EG') : 'لا يوجد سجل بعد'}</span></div>
+    ${d.notes?`<div class="row" style="border:none;flex-direction:column;align-items:flex-start;gap:4px;"><span>ملاحظات</span><span style="color:#F4F7FB;">${esc(d.notes)}</span></div>`:''}
+    <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('محتاج صيانة/دعم لجهاز: '+d.device_name+' - مشروع '+d.project_title)}" target="_blank"
+       style="display:block;text-align:center;margin-top:16px;padding:13px;border-radius:12px;background:linear-gradient(120deg,#2F7BFF,#8A5CFF);color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;">🛠️ طلب صيانة لهذا الجهاز</a>
+  `;
+  document.getElementById('card').classList.add('open');
+  document.getElementById('scanFrame').style.display = 'none';
+}
+function closeCard(){
+  document.getElementById('card').classList.remove('open');
+  document.getElementById('scanFrame').style.display = 'block';
+  lastToken = null;
+  hint.textContent = 'وجّه الكاميرا على QR الملصق على الجهاز';
+}
+
+/* ---------------- Optional generic AI visual-detection overlay ----------------
+   Uses TensorFlow.js + COCO-SSD (a general-purpose, pre-trained model). It does
+   NOT know what a network switch, patch panel, or UPS looks like specifically —
+   it only recognizes ~80 everyday object classes. We surface it as a visual
+   "scanning" effect and label detections honestly, rather than claiming
+   device-accurate identification (that accuracy comes from the QR scan above). */
+let aiOn = false, aiModel = null, aiLoading = false;
+async function toggleAI(){
+  const btn = document.getElementById('aiBtn');
+  aiOn = !aiOn;
+  btn.classList.toggle('on', aiOn);
+  if(aiOn && !aiModel && !aiLoading){
+    aiLoading = true;
+    btn.textContent = '⏳ تحميل الموديل...';
+    await loadScripts([
+      'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js',
+      'https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js'
+    ]);
+    aiModel = await cocoSsd.load({ base:'lite_mobilenet_v2' });
+    aiLoading = false;
+    btn.textContent = '✨ AI تجريبي';
+    aiDetectLoop();
+  } else if(!aiOn){
+    octx.clearRect(0,0,overlay.width,overlay.height);
+  }
+}
+function loadScripts(urls){
+  return Promise.all(urls.map(u=>new Promise((res,rej)=>{
+    const s = document.createElement('script'); s.src = u; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  })));
+}
+async function aiDetectLoop(){
+  if(!aiOn || !aiModel){ octx.clearRect(0,0,overlay.width,overlay.height); return; }
+  if(video.readyState === video.HAVE_ENOUGH_DATA){
+    const preds = await aiModel.detect(video);
+    octx.clearRect(0,0,overlay.width,overlay.height);
+    preds.forEach(p=>{
+      const [x,y,w,h] = p.bbox;
+      octx.strokeStyle = 'rgba(138,92,255,.9)'; octx.lineWidth = 2.5;
+      octx.strokeRect(x,y,w,h);
+      octx.fillStyle = 'rgba(138,92,255,.9)';
+      const label = `${p.class} ${Math.round(p.score*100)}%`;
+      const tw = octx.measureText(label).width + 12;
+      octx.fillRect(x, y-22, tw, 22);
+      octx.fillStyle = '#fff'; octx.font = '13px Cairo, sans-serif';
+      octx.fillText(label, x+6, y-6);
+    });
+  }
+  setTimeout(aiDetectLoop, 200);
+}
+
+/* If opened directly from a printed QR sticker (phone's own camera app),
+   the link is rack-scanner.html?device=TOKEN — skip live scanning and show
+   the card immediately. */
+const directToken = new URLSearchParams(location.search).get('device');
+window.addEventListener('resize', resizeCanvases);
+startCamera().then(()=>{ if(directToken){ scanning = false; onDeviceFound(directToken); document.getElementById('scanFrame').style.display='none'; } });
+</script>
+</body>
+</html>

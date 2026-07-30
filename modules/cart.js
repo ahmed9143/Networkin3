@@ -46,7 +46,7 @@ function renderWishlistDrawer(){
   container.innerHTML = items.map(p=>{
     const cover = (p.images && p.images.length) ? p.images[0] : (p.image_url || 'https://placehold.co/100x100/10294f/9fb0d1?text=No+Image');
     return `<div class="cart-item">
-      <img class="wishlist-item-thumb" src="${cover}" alt="${p.name}" onclick="closeWishlistDrawer(); openProductDetail('${p.id}');" style="cursor:pointer;">
+      <img class="wishlist-item-thumb" src="${cover}" alt="${p.name}" loading="lazy" width="64" height="64" onclick="closeWishlistDrawer(); openProductDetail('${p.id}');" style="cursor:pointer;">
       <div class="cart-item-details" style="flex:1;">
         <div class="cart-item-title">${p.name}</div>
         <div class="cart-item-price">${Number(p.price).toLocaleString('en-US')} ج.م</div>

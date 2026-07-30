@@ -62,3 +62,53 @@ upgrade, smart filtering, AI engineering tools, projects module, asset
 management, workflow engine, analytics, knowledge center, notifications,
 admin upgrades) is unbuilt. These are large, separable modules — see
 TODO.md for the prioritized backlog.
+
+## 2026-07-31 — Dynamic theme + Digital Passport (QR) + Rack Scanner
+
+- **Bug fixes**: added `loading="lazy"` + explicit width/height to the
+  wishlist thumbnail in `modules/cart.js` (the one image tag in the repo
+  missing it).
+- **Dynamic day/night theme**: the existing manual `data-theme` light/dark
+  toggle is now time-based by default (`it_theme_mode` in localStorage —
+  `auto` follows the device clock, 06:00–18:00 = light / else = dark-cyber;
+  a click still forces a theme, a long-press on the toggle returns to
+  `auto`). Set before first paint via an inline `<head>` script in
+  `index.html` to avoid a flash of the wrong theme; re-checked every 5 min
+  and on tab focus in `modules/notifications.js`. `project-passport.html`
+  and `rack-scanner.html` also read the same saved mode/time on load.
+- **Digital Passport (QR)**: `supabase-migration-004-passport.sql` adds
+  `passport_enabled` to `projects`, warranty/maintenance/`qr_token` columns
+  to `project_devices`, a new `device_maintenance_log` table, two
+  SECURITY DEFINER RPCs for anonymous QR scanners
+  (`get_project_passport(slug)`, `get_device_by_qr(token)` — both exclude
+  serial numbers on purpose), and a public `projects` storage bucket.
+  `project-passport.html` is the public page a customer sees after
+  scanning a project's QR: gallery/diagrams, installed devices with a
+  warranty-status pill (ok/soon/expired), and maintenance history.
+- **Rack Scanner**: `rack-scanner.html` — camera page with two modes:
+  (1) live QR scanning via `jsQR` for the "point the phone at the rack"
+  flow — decodes a device's sticker and shows its info in a bottom sheet,
+  accuracy comes from the QR, not visual AI; (2) an optional "AI تجريبي"
+  toggle that loads TensorFlow.js + COCO-SSD (a generic 80-class
+  pre-trained model, lazy-loaded only if toggled on) to draw bounding
+  boxes as a visual scanning effect — labeled honestly in the UI as
+  approximate/generic, since COCO-SSD has no concept of "switch" vs "UPS"
+  vs "patch panel". If opened directly from a printed sticker
+  (`?device=TOKEN`, e.g. via the phone's stock camera app) it skips
+  straight to the device card without needing in-page scanning.
+- **Admin**: new "🛂 المشاريع والباسبورت الرقمي" tab in `admin.html` —
+  project CRUD (title/slug/customer/category/status/passport toggle),
+  per-project device CRUD (name/type/quantity/serial [admin-only]/warranty
+  date/last maintenance/notes), and QR generation (client-side via
+  `qrcode.js`, downloadable PNG) for both the whole project's passport and
+  each individual device.
+
+### Still needed for this feature set
+- Maintenance log entries currently have to be inserted directly in
+  Supabase (no admin UI yet) — `device_maintenance_log` table exists with
+  RLS but no CRUD screen.
+- Project gallery image upload UI in admin (table/RPC support it; admin
+  currently expects a pasted image URL in the cover field only).
+- No PDF export for the passport yet (mentioned in migration 003's
+  leftover TODO too).
+- Full Lighthouse/mobile pass from TODO.md items 3–4 is still outstanding.

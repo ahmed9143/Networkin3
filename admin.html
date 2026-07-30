@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
   :root{
     --navy-950:#050d18;--navy-900:#0b1e3d;--navy-800:#10294f;--navy-700:#173a6b;
@@ -337,6 +338,7 @@
     <div class="nav-item" data-tab="sitesettings" onclick="switchTab('sitesettings')">🎛️ إعدادات الموقع</div>
     <div class="nav-item" data-tab="reviews" onclick="switchTab('reviews')">⭐ التقييمات والتنبيهات</div>
     <div class="nav-item" data-tab="enterprise" onclick="switchTab('enterprise')">🏗️ أدوات المؤسسات</div>
+    <div class="nav-item" data-tab="projects" onclick="switchTab('projects')">🛂 المشاريع والباسبورت الرقمي</div>
     <div class="nav-item logout" onclick="doLogout()">🚪 تسجيل الخروج</div>
   </aside>
 
@@ -634,7 +636,111 @@
         <div id="categoryNotifyList"><p style="color:#8994a8;font-size:13px;">جاري التحميل...</p></div>
       </div>
     </div>
+
+    <div class="tab-view" id="tab-projects">
+      <div class="topline">
+        <div><h2>المشاريع والباسبورت الرقمي</h2><p>كل مشروع بيتحول لجواز سفر رقمي (QR) العميل يمسحه يشوف الرسومات، الأجهزة، الضمان، وآخر صيانة. كمان لكل جهاز QR مستقل لماسح الـRack.</p></div>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ إضافة مشروع</button>
+      </div>
+      <table>
+        <thead><tr><th>المشروع</th><th>العميل</th><th>الحالة</th><th>الباسبورت</th><th>الأجهزة</th><th>إجراءات</th></tr></thead>
+        <tbody id="projectsTableBody"><tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
   </main>
+</div>
+
+<!-- Project Modal -->
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-box" style="max-width:640px;">
+    <h3 id="projectModalTitle">إضافة مشروع</h3>
+    <input type="hidden" id="projectId">
+    <div class="grid2">
+      <div class="field"><label>عنوان المشروع</label><input type="text" id="projectTitle" placeholder="مثال: تركيب نظام مراقبة - بنك الأهلي فرع المعادي"></div>
+      <div class="field"><label>الرابط الفريد (slug)</label><input type="text" id="projectSlug" placeholder="ahly-maadi-cctv"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>اسم العميل</label><input type="text" id="projectCustomer"></div>
+      <div class="field"><label>القسم</label><input type="text" id="projectCategory" placeholder="CCTV / شبكات / بصمة..."></div>
+    </div>
+    <div class="field"><label>ملخص قصير</label><input type="text" id="projectSummary"></div>
+    <div class="field"><label>الوصف الكامل</label><textarea id="projectDescription" rows="3"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>اسم المهندس المسؤول</label><input type="text" id="projectEngineer"></div>
+      <div class="field"><label>الموقع</label><input type="text" id="projectLocation"></div>
+    </div>
+    <div class="field"><label>صورة الغلاف (رابط)</label><input type="text" id="projectCover" placeholder="ارفع من تبويب المنتجات أو الصق رابط صورة"></div>
+    <div class="grid2">
+      <div class="field"><label>الحالة</label>
+        <select id="projectStatus"><option value="draft">مسودة</option><option value="published">منشور</option></select>
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:8px;padding-top:22px;">
+        <input type="checkbox" id="projectPassportEnabled" style="width:auto;"> <label for="projectPassportEnabled" style="margin:0;">تفعيل الباسبورت الرقمي (QR) لهذا المشروع</label>
+      </div>
+    </div>
+    <p class="error-msg" id="projectModalError"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeProjectModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveProject()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Project Devices Modal -->
+<div class="modal-overlay" id="devicesModalOverlay">
+  <div class="modal-box" style="max-width:760px;">
+    <h3>أجهزة المشروع <span id="devicesModalProjectName" style="color:#8994a8;font-weight:400;font-size:13px;"></span></h3>
+    <input type="hidden" id="devicesModalProjectId">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <button class="btn btn-primary" onclick="openDeviceForm()">+ إضافة جهاز</button>
+    </div>
+    <table>
+      <thead><tr><th>الجهاز</th><th>النوع</th><th>الضمان لحد</th><th>آخر صيانة</th><th>QR</th><th></th></tr></thead>
+      <tbody id="devicesTableBody"><tr class="empty-row"><td colspan="6">لا توجد أجهزة بعد.</td></tr></tbody>
+    </table>
+    <div id="deviceFormBox" style="display:none;background:#0c1330;border:1px solid #ffffff14;border-radius:12px;padding:14px;margin-top:14px;">
+      <input type="hidden" id="deviceId">
+      <div class="grid2">
+        <div class="field"><label>اسم الجهاز</label><input type="text" id="deviceName" placeholder="سويتش 24 بورت - الدور الأول"></div>
+        <div class="field"><label>النوع</label>
+          <select id="deviceType">
+            <option value="switch">سويتش</option><option value="patch_panel">Patch Panel</option>
+            <option value="ups">UPS</option><option value="nvr">NVR/DVR</option><option value="camera">كاميرا</option>
+            <option value="router">راوتر</option><option value="other">أخرى</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>الكمية</label><input type="number" id="deviceQty" value="1" min="1"></div>
+        <div class="field"><label>الرقم التسلسلي (Serial - داخلي فقط، مش بيظهر في الباسبورت العام)</label><input type="text" id="deviceSerial"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>الضمان لحد تاريخ</label><input type="date" id="deviceWarranty"></div>
+        <div class="field"><label>آخر صيانة</label><input type="date" id="deviceLastMaint"></div>
+      </div>
+      <div class="field"><label>ملاحظات (بتظهر للعميل في الباسبورت)</label><textarea id="deviceNotes" rows="2"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeDeviceForm()">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveDevice()">حفظ الجهاز</button>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeDevicesModal()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModalOverlay">
+  <div class="modal-box" style="max-width:360px;text-align:center;">
+    <h3 id="qrModalTitle">QR Code</h3>
+    <div id="qrCanvasHolder" style="background:#fff;padding:16px;border-radius:12px;display:inline-block;margin:10px 0;"></div>
+    <p id="qrModalUrl" style="font-size:11px;color:#8994a8;word-break:break-all;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('qrModalOverlay').classList.remove('open')">إغلاق</button>
+      <button class="btn btn-primary" onclick="downloadQR()">⬇️ تحميل PNG للطباعة</button>
+    </div>
+  </div>
 </div>
 
 <!-- Download File Modal -->
@@ -868,6 +974,8 @@
 <script>
 let categories = [];
 let products = [];
+let projects = [];
+let currentProjectDevices = [];
 
 /* ---------------- Image Compression ---------------- */
 // بتقلل حجم أي صورة قبل رفعها (أبعاد أقصاها 1600px وجودة 80%) لتسريع الموقع وتقليل استهلاك التخزين
@@ -942,6 +1050,7 @@ const CMDK_ACTIONS = [
   {ic:'🎛️', label:'إعدادات الموقع', meta:'صفحة', run:()=>switchTab('sitesettings')},
   {ic:'⭐', label:'التقييمات والتنبيهات', meta:'صفحة', run:()=>switchTab('reviews')},
   {ic:'🏗️', label:'أدوات المؤسسات (Rack/BOQ/تنبيهات الأقسام)', meta:'صفحة', run:()=>switchTab('enterprise')},
+  {ic:'🛂', label:'المشاريع والباسبورت الرقمي', meta:'صفحة', run:()=>switchTab('projects')},
   {ic:'🚪', label:'تسجيل الخروج', meta:'أمر', run:()=>doLogout()},
 ];
 let cmdkActiveIndex = 0;
@@ -1063,6 +1172,7 @@ async function loadAll(){
   const { data: rackData, error: rackErr } = await sb.from('rack_projects').select('*').order('created_at',{ascending:false});
   const { data: boqData, error: boqErr } = await sb.from('boq_documents').select('*').order('created_at',{ascending:false});
   const { data: catNotifyData, error: catNotifyErr } = await sb.from('category_notify_requests').select('*').order('created_at',{ascending:false});
+  const { data: projectData, error: projectErr } = await sb.from('projects').select('*').order('created_at',{ascending:false});
   categories = catData || [];
   products = prodData || [];
   coupons = couponData || [];
@@ -1076,6 +1186,8 @@ async function loadAll(){
   rackProjects = rackData || [];
   boqDocuments = boqData || [];
   categoryNotifyRequests = catNotifyData || [];
+  projects = projectData || [];
+  if(projectErr) console.error('projects: شغّل ملف supabase-migration-003-projects.sql و supabase-migration-004-passport.sql لتفعيل هذا الجدول', projectErr);
   if(quoteErr) console.error('quote_requests: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', quoteErr);
   if(dlErr) console.error('downloads: شغّل ملف supabase-additions.sql لتفعيل هذا الجدول', dlErr);
   if(settingsErr) console.error('site_settings: شغّل ملف supabase-setup-FINAL.sql (محدّث) لتفعيل هذا الجدول', settingsErr);
@@ -1100,6 +1212,7 @@ async function loadAll(){
   renderRackProjectsTable();
   renderBoqDocumentsTable();
   renderCategoryNotifyAdmin();
+  renderProjectsTable();
 }
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -2721,6 +2834,200 @@ async function deleteCategoryNotify(id){
   const { error } = await sb.from('category_notify_requests').delete().eq('id', id);
   if(error){ alert('حدث خطأ: ' + error.message); return; }
   await loadAll();
+}
+
+/* ================= Projects & Digital Passport (QR) ================= */
+function siteBaseUrl(){ return location.origin + location.pathname.replace(/admin\.html.*$/, ''); }
+function passportUrl(slug){ return siteBaseUrl() + 'project-passport.html?slug=' + encodeURIComponent(slug); }
+function deviceUrl(token){ return siteBaseUrl() + 'rack-scanner.html?device=' + encodeURIComponent(token); }
+
+function renderProjectsTable(){
+  const body = document.getElementById('projectsTableBody');
+  if(!body) return;
+  if(!projects.length){ body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد مشاريع بعد. لو الجدول مش موجود، شغّل supabase-migration-003-projects.sql ثم supabase-migration-004-passport.sql في Supabase.</td></tr>'; return; }
+  body.innerHTML = projects.map(p => `
+    <tr>
+      <td><b>${p.title}</b><br><span style="color:#8994a8;font-size:11.5px;">${p.slug}</span></td>
+      <td>${p.customer_name || '-'}</td>
+      <td><span class="badge ${p.status==='published'?'on':'off'}">${p.status==='published'?'منشور':'مسودة'}</span></td>
+      <td>${p.passport_enabled
+          ? `<button class="icon-btn" title="عرض QR" onclick="showProjectQR('${p.id}')">🛂 QR</button>`
+          : '<span style="color:#8994a8;font-size:12px;">غير مفعّل</span>'}</td>
+      <td><button class="icon-btn" onclick="openDevicesModal('${p.id}')">🖥️ إدارة الأجهزة</button></td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick='openProjectModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="icon-btn danger" onclick="deleteProject('${p.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openProjectModal(p){
+  document.getElementById('projectModalError').innerText = '';
+  document.getElementById('projectId').value = p?.id || '';
+  document.getElementById('projectModalTitle').innerText = p?.id ? 'تعديل مشروع' : 'إضافة مشروع';
+  document.getElementById('projectTitle').value = p?.title || '';
+  document.getElementById('projectSlug').value = p?.slug || '';
+  document.getElementById('projectCustomer').value = p?.customer_name || '';
+  document.getElementById('projectCategory').value = p?.category || '';
+  document.getElementById('projectSummary').value = p?.summary || '';
+  document.getElementById('projectDescription').value = p?.description || '';
+  document.getElementById('projectEngineer').value = p?.engineer_name || '';
+  document.getElementById('projectLocation').value = p?.location_text || '';
+  document.getElementById('projectCover').value = p?.cover_image_url || '';
+  document.getElementById('projectStatus').value = p?.status || 'draft';
+  document.getElementById('projectPassportEnabled').checked = !!p?.passport_enabled;
+  document.getElementById('projectModalOverlay').classList.add('open');
+}
+function closeProjectModal(){ document.getElementById('projectModalOverlay').classList.remove('open'); }
+
+function slugify(s){
+  return s.trim().toLowerCase().replace(/[^a-z0-9\u0600-\u06FF\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');
+}
+
+async function saveProject(){
+  const errEl = document.getElementById('projectModalError');
+  errEl.innerText = '';
+  const title = document.getElementById('projectTitle').value.trim();
+  let slug = document.getElementById('projectSlug').value.trim();
+  if(!title){ errEl.innerText = 'برجاء إدخال عنوان المشروع'; return; }
+  if(!slug) slug = slugify(title);
+  else slug = slugify(slug);
+  const payload = {
+    title, slug,
+    customer_name: document.getElementById('projectCustomer').value.trim() || null,
+    category: document.getElementById('projectCategory').value.trim() || null,
+    summary: document.getElementById('projectSummary').value.trim() || null,
+    description: document.getElementById('projectDescription').value.trim() || null,
+    engineer_name: document.getElementById('projectEngineer').value.trim() || null,
+    location_text: document.getElementById('projectLocation').value.trim() || null,
+    cover_image_url: document.getElementById('projectCover').value.trim() || null,
+    status: document.getElementById('projectStatus').value,
+    passport_enabled: document.getElementById('projectPassportEnabled').checked
+  };
+  const id = document.getElementById('projectId').value;
+  let error;
+  if(id){ ({ error } = await sb.from('projects').update(payload).eq('id', id)); }
+  else { ({ error } = await sb.from('projects').insert(payload)); }
+  if(error){ errEl.innerText = 'حدث خطأ: ' + error.message + ' (لو الجدول مش موجود شغّل ملفات الـSQL في README)'; return; }
+  closeProjectModal();
+  await loadAll();
+}
+
+async function deleteProject(id){
+  if(!confirm('متأكد إنك عايز تحذف المشروع ده؟ هيتحذف معاه الأجهزة والصور المرتبطة به.')) return;
+  const { error } = await sb.from('projects').delete().eq('id', id);
+  if(error){ alert('حدث خطأ أثناء الحذف: ' + error.message); return; }
+  await loadAll();
+}
+
+/* ---- Devices (per project) ---- */
+async function openDevicesModal(projectId){
+  const p = projects.find(x=>x.id===projectId);
+  document.getElementById('devicesModalProjectId').value = projectId;
+  document.getElementById('devicesModalProjectName').innerText = p ? '— ' + p.title : '';
+  document.getElementById('deviceFormBox').style.display = 'none';
+  document.getElementById('devicesModalOverlay').classList.add('open');
+  await loadDevices(projectId);
+}
+function closeDevicesModal(){ document.getElementById('devicesModalOverlay').classList.remove('open'); }
+
+async function loadDevices(projectId){
+  const { data, error } = await sb.from('project_devices').select('*').eq('project_id', projectId).order('created_at',{ascending:true});
+  if(error){ document.getElementById('devicesTableBody').innerHTML = `<tr class="empty-row"><td colspan="6">شغّل supabase-migration-004-passport.sql أولاً (${error.message})</td></tr>`; return; }
+  currentProjectDevices = data || [];
+  renderDevicesTable();
+}
+const DEVICE_TYPE_LABELS = { switch:'سويتش', patch_panel:'Patch Panel', ups:'UPS', nvr:'NVR/DVR', camera:'كاميرا', router:'راوتر', other:'أخرى' };
+function renderDevicesTable(){
+  const body = document.getElementById('devicesTableBody');
+  if(!currentProjectDevices.length){ body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد أجهزة بعد.</td></tr>'; return; }
+  body.innerHTML = currentProjectDevices.map(d => `
+    <tr>
+      <td><b>${d.device_name}</b>${d.quantity>1?` ×${d.quantity}`:''}</td>
+      <td>${DEVICE_TYPE_LABELS[d.device_type] || d.device_type || '-'}</td>
+      <td>${d.warranty_until ? new Date(d.warranty_until).toLocaleDateString('ar-EG') : '-'}</td>
+      <td>${d.last_maintenance_date ? new Date(d.last_maintenance_date).toLocaleDateString('ar-EG') : '-'}</td>
+      <td><button class="icon-btn" onclick="showDeviceQR('${d.qr_token}','${(d.device_name||'').replace(/'/g,"&#39;")}')">🔖 QR</button></td>
+      <td class="row-actions">
+        <button class="icon-btn edit" onclick='openDeviceForm(${JSON.stringify(d).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="icon-btn danger" onclick="deleteDevice('${d.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openDeviceForm(d){
+  document.getElementById('deviceId').value = d?.id || '';
+  document.getElementById('deviceName').value = d?.device_name || '';
+  document.getElementById('deviceType').value = d?.device_type || 'switch';
+  document.getElementById('deviceQty').value = d?.quantity || 1;
+  document.getElementById('deviceSerial').value = d?.serial_number || '';
+  document.getElementById('deviceWarranty').value = d?.warranty_until || '';
+  document.getElementById('deviceLastMaint').value = d?.last_maintenance_date || '';
+  document.getElementById('deviceNotes').value = d?.maintenance_notes || '';
+  document.getElementById('deviceFormBox').style.display = 'block';
+}
+function closeDeviceForm(){ document.getElementById('deviceFormBox').style.display = 'none'; }
+
+async function saveDevice(){
+  const projectId = document.getElementById('devicesModalProjectId').value;
+  const name = document.getElementById('deviceName').value.trim();
+  if(!name){ alert('برجاء إدخال اسم الجهاز'); return; }
+  const payload = {
+    project_id: projectId,
+    device_name: name,
+    device_type: document.getElementById('deviceType').value,
+    quantity: parseInt(document.getElementById('deviceQty').value) || 1,
+    serial_number: document.getElementById('deviceSerial').value.trim() || null,
+    warranty_until: document.getElementById('deviceWarranty').value || null,
+    last_maintenance_date: document.getElementById('deviceLastMaint').value || null,
+    maintenance_notes: document.getElementById('deviceNotes').value.trim() || null
+  };
+  const id = document.getElementById('deviceId').value;
+  let error;
+  if(id){ ({ error } = await sb.from('project_devices').update(payload).eq('id', id)); }
+  else { ({ error } = await sb.from('project_devices').insert(payload)); }
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  closeDeviceForm();
+  await loadDevices(projectId);
+}
+
+async function deleteDevice(id){
+  if(!confirm('متأكد إنك عايز تحذف الجهاز ده؟')) return;
+  const projectId = document.getElementById('devicesModalProjectId').value;
+  const { error } = await sb.from('project_devices').delete().eq('id', id);
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  await loadDevices(projectId);
+}
+
+/* ---- QR generation (client-side, via qrcode.js) ---- */
+let currentQrUrl = '';
+function renderQR(url, title){
+  document.getElementById('qrModalTitle').innerText = title;
+  document.getElementById('qrModalUrl').innerText = url;
+  currentQrUrl = url;
+  const holder = document.getElementById('qrCanvasHolder');
+  holder.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  holder.appendChild(canvas);
+  QRCode.toCanvas(canvas, url, { width: 260, margin: 1, color:{ dark:'#0b1220', light:'#ffffff' } });
+  document.getElementById('qrModalOverlay').classList.add('open');
+}
+function showProjectQR(projectId){
+  const p = projects.find(x=>x.id===projectId);
+  if(!p) return;
+  if(!p.passport_enabled){ alert('فعّل الباسبورت الرقمي لهذا المشروع الأول من نافذة التعديل.'); return; }
+  renderQR(passportUrl(p.slug), '🛂 QR الباسبورت الرقمي — ' + p.title);
+}
+function showDeviceQR(token, deviceName){
+  renderQR(deviceUrl(token), '🔖 QR الجهاز — ' + deviceName);
+}
+function downloadQR(){
+  const canvas = document.querySelector('#qrCanvasHolder canvas');
+  if(!canvas) return;
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'qr-code.png';
+  a.click();
 }
 
 checkSession();

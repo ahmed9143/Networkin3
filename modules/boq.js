@@ -3,7 +3,7 @@
 function initBoqBuilder(){
   const picker = document.getElementById('boqProductPicker');
   if(picker && picker.dataset.filled !== '1'){
-    picker.innerHTML = '<option value="">➕ اختر منتج من الكتالوج لإضافته...</option>' + products.map((p,i)=>`<option value="${i}">${p.name} — ${p.price?Number(p.price).toLocaleString('ar-EG')+' ج.م':''}</option>`).join('');
+    picker.innerHTML = '<option value="">➕ اختر منتج من الكتالوج لإضافته...</option>' + products.map((p,i)=>`<option value="${i}">${p.name} — ${p.price?Number(p.price).toLocaleString('en-US')+' ج.م':''}</option>`).join('');
     picker.onchange = function(){
       if(this.value==='') return;
       const p = products[parseInt(this.value)];
@@ -48,14 +48,14 @@ function renderBoqTable(){
       <td><input type="text" value="${(i.name||'').replace(/"/g,'&quot;')}" placeholder="اسم الصنف" oninput="boqUpdate(${i.id},'name',this.value)"></td>
       <td><input type="number" min="1" value="${i.qty}" style="max-width:70px;" oninput="boqUpdate(${i.id},'qty',this.value)"></td>
       <td><input type="number" min="0" value="${i.price}" style="max-width:100px;" oninput="boqUpdate(${i.id},'price',this.value)"></td>
-      <td>${(i.qty*i.price).toLocaleString('ar-EG')} ج.م</td>
+      <td>${(i.qty*i.price).toLocaleString('en-US')} ج.م</td>
       <td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px;" onclick="boqRemoveRow(${i.id})">✕</button></td>
     </tr>`).join('');
   const t = boqTotals();
-  document.getElementById('boqSubtotal').innerText = `${t.subtotal.toLocaleString('ar-EG')} ج.م`;
-  document.getElementById('boqDiscountVal').innerText = `- ${t.discountVal.toLocaleString('ar-EG')} ج.م`;
-  document.getElementById('boqVatVal').innerText = `+ ${t.vatVal.toLocaleString('ar-EG')} ج.م`;
-  document.getElementById('boqGrandTotal').innerText = `${t.grandTotal.toLocaleString('ar-EG')} ج.م`;
+  document.getElementById('boqSubtotal').innerText = `${t.subtotal.toLocaleString('en-US')} ج.م`;
+  document.getElementById('boqDiscountVal').innerText = `- ${t.discountVal.toLocaleString('en-US')} ج.م`;
+  document.getElementById('boqVatVal').innerText = `+ ${t.vatVal.toLocaleString('en-US')} ج.م`;
+  document.getElementById('boqGrandTotal').innerText = `${t.grandTotal.toLocaleString('en-US')} ج.م`;
 }
 function boqValidRows(){ return boqItems.filter(i=>i.name && i.name.trim()!==''); }
 
@@ -141,15 +141,15 @@ function boqSendWhatsapp(){
   if(!rows.length){ alert('ضيف صنف واحد على الأقل قبل الإرسال'); return; }
   const t = boqTotals();
   const lines = ['📑 BOQ من موقع Delta IT Solutions:', ''];
-  rows.forEach(i=>lines.push(`- ${i.name} × ${i.qty} = ${(i.qty*i.price).toLocaleString('ar-EG')} ج.م`));
-  lines.push('', `الإجمالي بعد الخصم والضريبة: ${t.grandTotal.toLocaleString('ar-EG')} ج.م`);
+  rows.forEach(i=>lines.push(`- ${i.name} × ${i.qty} = ${(i.qty*i.price).toLocaleString('en-US')} ج.م`));
+  lines.push('', `الإجمالي بعد الخصم والضريبة: ${t.grandTotal.toLocaleString('en-US')} ج.م`);
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
 }
 
 function initQuoteBuilder(){
   const picker = document.getElementById('qbProductPicker');
   if(picker.dataset.filled !== '1'){
-    picker.innerHTML = '<option value="">➕ اختر منتج من الكتالوج لإضافته...</option>' + products.map((p,i)=>`<option value="${i}">${p.name} — ${p.price?Number(p.price).toLocaleString('ar-EG')+' ج.م':''}</option>`).join('');
+    picker.innerHTML = '<option value="">➕ اختر منتج من الكتالوج لإضافته...</option>' + products.map((p,i)=>`<option value="${i}">${p.name} — ${p.price?Number(p.price).toLocaleString('en-US')+' ج.م':''}</option>`).join('');
     picker.onchange = function(){
       if(this.value===''){ return; }
       const p = products[parseInt(this.value)];
@@ -183,18 +183,18 @@ function renderQuoteTable(){
       <td><input type="text" value="${i.name.replace(/"/g,'&quot;')}" placeholder="اسم الصنف" oninput="qbUpdate(${i.id},'name',this.value)"></td>
       <td><input type="number" min="1" value="${i.qty}" style="max-width:70px;" oninput="qbUpdate(${i.id},'qty',this.value)"></td>
       <td><input type="number" min="0" value="${i.price}" style="max-width:100px;" oninput="qbUpdate(${i.id},'price',this.value)"></td>
-      <td>${(i.qty*i.price).toLocaleString('ar-EG')} ج.م</td>
+      <td>${(i.qty*i.price).toLocaleString('en-US')} ج.م</td>
       <td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px;" onclick="qbRemoveRow(${i.id})">✕</button></td>
     </tr>`).join('');
   const total = qbItems.reduce((s,i)=>s+(i.qty*i.price),0);
-  document.getElementById('qbGrandTotal').innerText = `${total.toLocaleString('ar-EG')} ج.م`;
+  document.getElementById('qbGrandTotal').innerText = `${total.toLocaleString('en-US')} ج.م`;
 }
 function qbSendWhatsapp(){
   if(!qbItems.length || qbItems.every(i=>!i.name)){ alert('ضيف صنف واحد على الأقل قبل الإرسال'); return; }
   const total = qbItems.reduce((s,i)=>s+(i.qty*i.price),0);
   const lines = ['🧾 طلب عرض سعر من الموقع:', ''];
-  qbItems.filter(i=>i.name).forEach(i=>lines.push(`- ${i.name} × ${i.qty} = ${(i.qty*i.price).toLocaleString('ar-EG')} ج.م`));
-  lines.push('', `الإجمالي التقريبي: ${total.toLocaleString('ar-EG')} ج.م`);
+  qbItems.filter(i=>i.name).forEach(i=>lines.push(`- ${i.name} × ${i.qty} = ${(i.qty*i.price).toLocaleString('en-US')} ج.م`));
+  lines.push('', `الإجمالي التقريبي: ${total.toLocaleString('en-US')} ج.م`);
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
 }
 
@@ -217,8 +217,8 @@ function qbPrintDocument(){
     <tr>
       <td>${(i.name||'').replace(/</g,'&lt;')}</td>
       <td style="text-align:center;">${i.qty}</td>
-      <td style="text-align:center;">${Number(i.price).toLocaleString('ar-EG')} ج.م</td>
-      <td style="text-align:center;font-weight:700;">${(i.qty*i.price).toLocaleString('ar-EG')} ج.م</td>
+      <td style="text-align:center;">${Number(i.price).toLocaleString('en-US')} ج.م</td>
+      <td style="text-align:center;font-weight:700;">${(i.qty*i.price).toLocaleString('en-US')} ج.م</td>
     </tr>`).join('');
 
   document.getElementById('qbPrintDoc').innerHTML = `
@@ -231,7 +231,7 @@ function qbPrintDocument(){
     <table class="qb-doc-table">
       <thead><tr><th>الصنف</th><th style="text-align:center;">الكمية</th><th style="text-align:center;">سعر الوحدة</th><th style="text-align:center;">الإجمالي</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
-      <tfoot><tr class="qb-doc-total-row"><td colspan="3">الإجمالي الكلي</td><td style="text-align:center;">${total.toLocaleString('ar-EG')} ج.م</td></tr></tfoot>
+      <tfoot><tr class="qb-doc-total-row"><td colspan="3">الإجمالي الكلي</td><td style="text-align:center;">${total.toLocaleString('en-US')} ج.م</td></tr></tfoot>
     </table>
     <div class="qb-doc-foot">
       <div class="qb-doc-notes">

@@ -49,7 +49,7 @@ function renderWishlistDrawer(){
       <img class="wishlist-item-thumb" src="${cover}" alt="${p.name}" onclick="closeWishlistDrawer(); openProductDetail('${p.id}');" style="cursor:pointer;">
       <div class="cart-item-details" style="flex:1;">
         <div class="cart-item-title">${p.name}</div>
-        <div class="cart-item-price">${Number(p.price).toLocaleString('ar-EG')} ج.م</div>
+        <div class="cart-item-price">${Number(p.price).toLocaleString('en-US')} ج.م</div>
         <button class="add-btn" style="padding:6px 10px;font-size:12px;margin-top:2px;" onclick="addToCart('${p.id}', this)">🛒 أضف للسلة</button>
       </div>
       <button class="remove-item" onclick="toggleWishlist('${p.id}')">حذف</button>
@@ -86,7 +86,7 @@ async function applyCoupon(){
   if(data.expires_at && new Date(data.expires_at) < new Date()){ msgEl.innerText = 'الكود منتهي الصلاحية'; msgEl.classList.add('err'); return; }
   if(data.usage_limit && data.used_count >= data.usage_limit){ msgEl.innerText = 'تم استخدام الكود بالكامل'; msgEl.classList.add('err'); return; }
   const { subtotal } = calcTotals();
-  if(data.min_order && subtotal < data.min_order){ msgEl.innerText = `الحد الأدنى للطلب ${Number(data.min_order).toLocaleString('ar-EG')} ج.م`; msgEl.classList.add('err'); return; }
+  if(data.min_order && subtotal < data.min_order){ msgEl.innerText = `الحد الأدنى للطلب ${Number(data.min_order).toLocaleString('en-US')} ج.م`; msgEl.classList.add('err'); return; }
   appliedCoupon = data;
   msgEl.innerText = 'تم تفعيل الكود بنجاح!'; msgEl.classList.add('ok');
   codeInput.value = '';
@@ -107,12 +107,12 @@ function updateCartUI(){
   const container = document.getElementById('cartItemsContainer');
 
   document.getElementById('cartCountBadge').innerText = totalCount;
-  document.getElementById('cartTotalHeader').innerText = total.toLocaleString('ar-EG')+' ج.م';
-  document.getElementById('cartDrawerTotal').innerText = total.toLocaleString('ar-EG')+' ج.م';
+  document.getElementById('cartTotalHeader').innerText = total.toLocaleString('en-US')+' ج.م';
+  document.getElementById('cartDrawerTotal').innerText = total.toLocaleString('en-US')+' ج.م';
   document.getElementById('cartSubtotalRow').style.display = discount>0 ? 'flex' : 'none';
-  document.getElementById('cartSubtotalVal').innerText = subtotal.toLocaleString('ar-EG')+' ج.م';
+  document.getElementById('cartSubtotalVal').innerText = subtotal.toLocaleString('en-US')+' ج.م';
   document.getElementById('cartDiscountRow').style.display = discount>0 ? 'flex' : 'none';
-  document.getElementById('cartDiscountVal').innerText = '- '+discount.toLocaleString('ar-EG')+' ج.م';
+  document.getElementById('cartDiscountVal').innerText = '- '+discount.toLocaleString('en-US')+' ج.م';
 
   const couponBox = document.getElementById('couponAppliedBox');
   const couponRow = document.getElementById('couponInputRow');
@@ -133,7 +133,7 @@ function updateCartUI(){
       return `<div class="cart-item">
         <div class="cart-item-details">
           <div class="cart-item-title">${p.name}</div>
-          <div class="cart-item-price">${(p.price*cart[id]).toLocaleString('ar-EG')} ج.م</div>
+          <div class="cart-item-price">${(p.price*cart[id]).toLocaleString('en-US')} ج.م</div>
           <div class="cart-item-qty">
             <button class="qty-btn" onclick="changeQty('${p.id}',-1)">-</button>
             <span>${cart[id]}</span>
@@ -266,11 +266,11 @@ async function completeWhatsappOrder(custInfo){
   if(custInfo.address) msg += `📍 *العنوان:* ${custInfo.address}\n`;
   msg += "\n";
   itemsSnapshot.forEach(it=>{
-    msg += `▪️ *${it.name}*\n   العدد: ${it.qty} | إجمالي: ${(it.price*it.qty).toLocaleString('ar-EG')} ج.م\n\n`;
+    msg += `▪️ *${it.name}*\n   العدد: ${it.qty} | إجمالي: ${(it.price*it.qty).toLocaleString('en-US')} ج.م\n\n`;
   });
   msg += "-------------------------\n";
-  if(result.discount>0) msg += `الخصم${appliedCoupon?' ('+appliedCoupon.code+')':''}: -${Number(result.discount).toLocaleString('ar-EG')} ج.م\n`;
-  msg += `💰 *الإجمالي:* ${Number(result.total).toLocaleString('ar-EG')} ج.م\n🔖 *مرجع الطلب:* ${result.order_ref}\n`;
+  if(result.discount>0) msg += `الخصم${appliedCoupon?' ('+appliedCoupon.code+')':''}: -${Number(result.discount).toLocaleString('en-US')} ج.م\n`;
+  msg += `💰 *الإجمالي:* ${Number(result.total).toLocaleString('en-US')} ج.م\n🔖 *مرجع الطلب:* ${result.order_ref}\n`;
   if(hasDigital) msg += `💾 الطلب يحتوي منتج رقمي - هيتبعتلك رابط التحميل هنا فور تأكيد الطلب.\n`;
   msg += `\nبرجاء تأكيد الطلب وتحديد ميعاد التسليم/التركيب المناسب.\nتقدر تتابع حالة طلبك في أي وقت من صفحة "تتبع الطلب" على الموقع برقم المرجع اللي فوق.`;
   clearCartAfterOrder();
@@ -308,11 +308,11 @@ async function confirmBankOrder(){
   if(custInfo.address) msg += `📍 *العنوان:* ${custInfo.address}\n`;
   msg += "\n";
   itemsSnapshot.forEach(it=>{
-    msg += `▪️ *${it.name}*\n   العدد: ${it.qty} | إجمالي: ${(it.price*it.qty).toLocaleString('ar-EG')} ج.م\n\n`;
+    msg += `▪️ *${it.name}*\n   العدد: ${it.qty} | إجمالي: ${(it.price*it.qty).toLocaleString('en-US')} ج.م\n\n`;
   });
   msg += "-------------------------\n";
-  if(result.discount>0) msg += `الخصم: -${Number(result.discount).toLocaleString('ar-EG')} ج.م\n`;
-  msg += `💰 *الإجمالي:* ${Number(result.total).toLocaleString('ar-EG')} ج.م\n🔖 *مرجع الطلب:* ${result.order_ref}\n`;
+  if(result.discount>0) msg += `الخصم: -${Number(result.discount).toLocaleString('en-US')} ج.م\n`;
+  msg += `💰 *الإجمالي:* ${Number(result.total).toLocaleString('en-US')} ج.م\n🔖 *مرجع الطلب:* ${result.order_ref}\n`;
   if(hasDigital) msg += `💾 الطلب يحتوي منتج رقمي - هيتبعتلك رابط التحميل هنا فور تأكيد التحويل.\n`;
   msg += `\nتم التحويل، مرفق صورة الإيصال. برجاء تأكيد الطلب.\nتقدر تتابع حالة طلبك في أي وقت من صفحة "تتبع الطلب" على الموقع برقم المرجع اللي فوق.`;
   pendingCustInfo = null;
@@ -342,7 +342,7 @@ async function lookupOrder(){
     if(error) throw error;
     const order = Array.isArray(data) ? data[0] : data;
     if(!order){ box.innerHTML = '<div class="track-err">لم يتم العثور على طلب بهذا الرقم المرجعي. تأكد من كتابته بالكامل.</div>'; return; }
-    const itemsHtml = (order.items||[]).map(it=>`<div class="row"><span>${it.name} × ${it.qty}</span><span>${(it.price*it.qty).toLocaleString('ar-EG')} ج.م</span></div>`).join('');
+    const itemsHtml = (order.items||[]).map(it=>`<div class="row"><span>${it.name} × ${it.qty}</span><span>${(it.price*it.qty).toLocaleString('en-US')} ج.م</span></div>`).join('');
     let downloadHtml = '';
     if(order.download_ready && order.digital_link){
       try{
@@ -355,7 +355,7 @@ async function lookupOrder(){
         <div class="row"><span>رقم المرجع</span><b class="mono">${order.order_ref}</b></div>
         <div class="row"><span>الحالة</span><span class="track-status-pill">${STATUS_LABELS_FE[order.status] || order.status}</span></div>
         ${itemsHtml}
-        <div class="row"><span>الإجمالي</span><b>${Number(order.total).toLocaleString('ar-EG')} ج.م</b></div>
+        <div class="row"><span>الإجمالي</span><b>${Number(order.total).toLocaleString('en-US')} ج.م</b></div>
         <div class="row"><span>تاريخ الطلب</span><span>${new Date(order.created_at).toLocaleDateString('ar-EG')}</span></div>
       </div>
       ${downloadHtml || (order.digital_link===null && (order.items||[]).length ? '' : '')}

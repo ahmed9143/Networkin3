@@ -181,6 +181,21 @@
 
       <div class="mega-trigger">
         <a class="nav-drop-label">الحلول ▾</a>
+        <!-- mobile-only fallback list: the two-column showcase below is hidden under 900px,
+             so without this the "الحلول" item was a dead tap on mobile with no menu and no navigation. -->
+        <div class="mega-panel mobile-sol-list">
+          <div class="nav-drop-list">
+            <a onclick="solutionAction('finder:home')"><span class="mega-ic">🏠</span> حلول المنازل</a>
+            <a onclick="solutionAction('finder:company')"><span class="mega-ic">🏢</span> حلول الشركات والمكاتب</a>
+            <a onclick="solutionAction('finder:factory')"><span class="mega-ic">🏭</span> حلول المصانع والمستودعات</a>
+            <a onclick="solutionAction('finder:hospital')"><span class="mega-ic">🏥</span> حلول المستشفيات والعيادات</a>
+            <a onclick="solutionAction('finder:parking')"><span class="mega-ic">🅿️</span> حلول الجراجات والمواقف</a>
+            <a onclick="solutionAction('finder:hotel')"><span class="mega-ic">🏨</span> حلول الفنادق</a>
+            <a onclick="solutionAction('finder:school')"><span class="mega-ic">🏫</span> حلول المدارس</a>
+            <a onclick="solutionAction('finder:retail')"><span class="mega-ic">🏪</span> حلول المحلات والمولات</a>
+            <a onclick="solutionAction('page:biometric')"><span class="mega-ic">🖐️</span> الحضور والتحكم بالدخول</a>
+          </div>
+        </div>
         <div class="mega-panel mega-panel-wide">
           <div class="mega-panel-inner">
             <div class="mega-col-list" id="megaSolList">
@@ -502,18 +517,15 @@
 
           
           <div class="eyebrow">Delta IT Solutions</div>
-          <h1><span>.Your IT. Simplified</span>كل حلول شركتك... في مكان واحد
-
-            
-Plan → Build → Secure → Support</h1>
+          <h1>
+            <span class="hero-en-line">Your IT. Simplified.</span>
+            <span class="hero-ar-line">كل حلول شركتك... في مكان واحد</span>
+          </h1>
           <div class="hero-flow">
-            <span class="hf-step"> <b>Manage</b></span><span class="hf-arrow">→</span>
-            <span class="hf-step"> <b>Deploy</b></span><span class="hf-arrow">→</span>
-            <span class="hf-step"> <b>Build</b></span><span class="hf-arrow">→</span>
-            <span class="hf-step"><b>Design</b></span>
-            
-            
-            
+            <span class="hf-step"><b>Plan</b></span><span class="hf-arrow">←</span>
+            <span class="hf-step"><b>Build</b></span><span class="hf-arrow">←</span>
+            <span class="hf-step"><b>Secure</b></span><span class="hf-arrow">←</span>
+            <span class="hf-step"><b>Support</b></span>
           </div> 
 
 
@@ -1433,7 +1445,7 @@ Plan → Build → Secure → Support</h1>
   </div>
 </footer>
 
-<a id="waFloat" onclick="openGeneralWhatsApp()" style="position:fixed;bottom:22px;left:22px;z-index:999;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px -8px rgba(37,211,102,.6);cursor:pointer;">
+<a id="waFloat" class="wa-float" onclick="openGeneralWhatsApp()">
   <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2.1c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.3-.5-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5-1.3c1.4.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3C4.2 15 3.8 13.5 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"/></svg>
 </a>
 

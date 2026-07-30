@@ -27,6 +27,7 @@ function navigateTo(page){
   window.scrollTo({top:0, behavior:'smooth'});
   document.getElementById('catNavMenu').classList.remove('mobile-open');
   const mtBtn = document.getElementById('menuToggle'); if(mtBtn) mtBtn.classList.remove('open');
+  document.body.classList.remove('mobile-nav-open');
   if(page === 'finder') resetFinder();
   if(page === 'tools') hideToolTabs();
   if(page === 'rack-builder') initRackBuilder();

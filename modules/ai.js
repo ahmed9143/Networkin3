@@ -118,12 +118,12 @@ function openSolutionDetail(sector){
     const p = findBestProduct(it.kw);
     if(p){
       total += (Number(p.price)||0) * it.qty;
-      return `<div class="finder-chip-row"><span>✔ ${it.label} × ${it.qty}</span><b>${p.name} — ${Number(p.price).toLocaleString('ar-EG')} ج.م/وحدة</b></div>`;
+      return `<div class="finder-chip-row"><span>✔ ${it.label} × ${it.qty}</span><b>${p.name} — ${Number(p.price).toLocaleString('en-US')} ج.م/وحدة</b></div>`;
     }
     return `<div class="finder-chip-row"><span>◻ ${it.label} × ${it.qty}</span><i>يحتاج تحديد من فريقنا</i></div>`;
   }).join('');
   document.getElementById('solDetailChecklist').innerHTML = rows;
-  document.getElementById('solDetailTotal').innerText = total>0 ? `من ${total.toLocaleString('ar-EG')} ج.م` : 'يحتاج معاينة لتحديد السعر';
+  document.getElementById('solDetailTotal').innerText = total>0 ? `من ${total.toLocaleString('en-US')} ج.م` : 'يحتاج معاينة لتحديد السعر';
 }
 function addSolutionBundleToCart(){
   const data = SOLUTION_DATA[currentSolutionSector];
@@ -164,14 +164,14 @@ function runAiSolutionBuilder(){
     const p = findBestProduct(it.kw);
     if(p){
       total += (Number(p.price)||0) * it.qty;
-      return `<div class="finder-chip-row"><span>✔ ${it.label} × ${it.qty}</span><b>${p.name} — ${Number(p.price).toLocaleString('ar-EG')} ج.م/وحدة</b></div>`;
+      return `<div class="finder-chip-row"><span>✔ ${it.label} × ${it.qty}</span><b>${p.name} — ${Number(p.price).toLocaleString('en-US')} ج.م/وحدة</b></div>`;
     }
     return `<div class="finder-chip-row"><span>◻ ${it.label} × ${it.qty}</span><i>يحتاج تحديد من فريقنا</i></div>`;
   }).join('');
 
   window.__aiBuilderItems = items;
   document.getElementById('aiBuilderChecklist').innerHTML = rows;
-  document.getElementById('aiBuilderTotal').innerText = total>0 ? `من ${total.toLocaleString('ar-EG')} ج.م` : 'يحتاج معاينة لتحديد السعر';
+  document.getElementById('aiBuilderTotal').innerText = total>0 ? `من ${total.toLocaleString('en-US')} ج.م` : 'يحتاج معاينة لتحديد السعر';
   document.getElementById('aiBuilderResult').style.display = 'block';
   document.getElementById('aiBuilderResult').scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -438,7 +438,7 @@ function renderFinderResults(){
     : `<div class="empty-state">مفيش كاميرات متاحة في الكتالوج دلوقتي مطابقة تمامًا - تواصل معنا وهنرشحلك بأيدينا.</div>`;
 
   const recorderHtml = recorder.product
-    ? `<p>الجهاز المقترح من كتالوجنا: <b>${recorder.product.name}</b> - ${Number(recorder.product.price).toLocaleString('ar-EG')} ج.م</p>`
+    ? `<p>الجهاز المقترح من كتالوجنا: <b>${recorder.product.name}</b> - ${Number(recorder.product.price).toLocaleString('en-US')} ج.م</p>`
     : `<p>محتاج <b>${recorder.recorderType} بـ ${recorder.channels} قناة</b> على الأقل. تواصل معنا نرشحلك موديل متاح بالمواصفات دي.</p>`;
 
   area.innerHTML = `

@@ -101,7 +101,7 @@ function renderRackBuilder(){
     <div class="rack-calc-card"><div class="v">${totalKg.toFixed(1)} kg</div><div class="l">⚖️ إجمالي الوزن</div></div>
     <div class="rack-calc-card"><div class="v">${btuHr.toLocaleString('en')}</div><div class="l">🌡️ BTU/hr تبريد مطلوب</div></div>
     <div class="rack-calc-card"><div class="v">${upsItems.length ? upsRuntimeMin+' د' : '—'}</div><div class="l">🔋 مدة تشغيل UPS تقديرية</div></div>
-    <div class="rack-calc-card"><div class="v">~${monthlyCost.toLocaleString('ar-EG')} ج.م</div><div class="l">💡 تكلفة كهرباء شهرية تقديرية</div></div>
+    <div class="rack-calc-card"><div class="v">~${monthlyCost.toLocaleString('en-US')} ج.م</div><div class="l">💡 تكلفة كهرباء شهرية تقديرية</div></div>
   `;
 
   /* ---- Visual elevation diagram ---- */

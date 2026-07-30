@@ -202,14 +202,14 @@ function calcProjectCost(){
   const min = cameras*CALC_RATES.camera.min + points*CALC_RATES.networkPoint.min + fp*CALC_RATES.fingerprint.min;
   const max = cameras*CALC_RATES.camera.max + points*CALC_RATES.networkPoint.max + fp*CALC_RATES.fingerprint.max;
 
-  document.getElementById('calcResultValue').innerText = `${min.toLocaleString('ar-EG')} - ${max.toLocaleString('ar-EG')} ج.م`;
+  document.getElementById('calcResultValue').innerText = `${min.toLocaleString('en-US')} - ${max.toLocaleString('en-US')} ج.م`;
   box.style.display = 'block';
 
   const parts = [];
   if(cameras) parts.push(`${cameras} كاميرا مراقبة`);
   if(points) parts.push(`${points} نقطة شبكة`);
   if(fp) parts.push(`${fp} جهاز بصمة/حضور`);
-  lastCalcSummary = `تقدير مبدئي للمشروع (${parts.join(' + ')}): ${min.toLocaleString('ar-EG')} - ${max.toLocaleString('ar-EG')} ج.م تقريبًا (توريد وتركيب، تقدير غير نهائي).`;
+  lastCalcSummary = `تقدير مبدئي للمشروع (${parts.join(' + ')}): ${min.toLocaleString('en-US')} - ${max.toLocaleString('en-US')} ج.م تقريبًا (توريد وتركيب، تقدير غير نهائي).`;
 }
 
 function useCalcInQuote(){

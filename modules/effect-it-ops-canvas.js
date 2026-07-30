@@ -332,6 +332,18 @@
   if(sessionStorage.getItem('promoBarDismissed') === '1'){ root.classList.add('hide'); return; }
   let OFFERS = DEFAULT_OFFERS;
   let i = 0, rotateTimer = null;
+
+  // Measures the bar's real rendered height (it varies: rotating offers of different
+  // lengths, admin-configured text with no "short" variant, text wrapping to 2-3 lines
+  // on narrow screens) and publishes it as --promo-h so the header/hero offset below
+  // always matches exactly instead of overlapping it.
+  function syncHeight(){
+    if(!root.classList.contains('show')) return;
+    document.documentElement.style.setProperty('--promo-h', root.offsetHeight + 'px');
+  }
+  const heightObserver = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(syncHeight) : null;
+  if(heightObserver) heightObserver.observe(root);
+
   function render(){
     const o = OFFERS[i];
     const useShort = window.innerWidth <= 700 && o.short;
@@ -343,22 +355,25 @@
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
       }
     };
+    requestAnimationFrame(syncHeight); // re-measure after the new text has laid out
   }
   window.dismissPromoBar = function(){
     root.classList.remove('show');
     document.body.classList.remove('has-promo');
+    document.documentElement.style.removeProperty('--promo-h');
     sessionStorage.setItem('promoBarDismissed', '1');
     setTimeout(()=> root.classList.add('hide'), 500);
     if(rotateTimer) clearInterval(rotateTimer);
+    if(heightObserver) heightObserver.disconnect();
   };
   function start(){
     render();
-    setTimeout(()=>{ root.classList.add('show'); document.body.classList.add('has-promo'); }, 1600);
+    setTimeout(()=>{ root.classList.add('show'); document.body.classList.add('has-promo'); syncHeight(); }, 1600);
     if(rotateTimer) clearInterval(rotateTimer);
     if(OFFERS.length > 1) rotateTimer = setInterval(()=>{ i = (i+1) % OFFERS.length; render(); }, 6500);
   }
   start();
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', ()=>{ render(); syncHeight(); });
   if(typeof sb !== 'undefined' && sb && sb.from){
     sb.from('site_settings').select('value').eq('key','promo_offers').maybeSingle()
       .then(({ data }) => {

@@ -19,7 +19,7 @@ function renderCategoryDistChart(){
   }
   section.style.display = '';
   const total = entries.reduce((s,e)=>s+e[1],0);
-  if(centerNum) centerNum.textContent = total.toLocaleString('ar-EG');
+  if(centerNum) centerNum.textContent = total.toLocaleString('en-US');
   const palette = ['#ff7a2f','#2f6fed','#1fae6b','#f4c542','#a855f7','#ec4899','#14b8a6','#94a3b8'];
   if(window._catChart) window._catChart.destroy();
   window._catChart = new Chart(canvas, {
@@ -199,7 +199,7 @@ function renderMegaShowcase(idx){
         <div class="mega-mini-prod" onclick="navigateTo('products'); openProductDetail('${p.id}')">
           <img class="mega-mini-thumb" src="${(p.images&&p.images[0])||p.image_url||'https://placehold.co/80/0E1628/8E9AAF?text=%20'}" alt="" loading="lazy" width="36" height="36">
           <span class="mega-mini-name">${p.name}</span>
-          <span class="mega-mini-price">${Number(p.price||0).toLocaleString('ar-EG')} ج.م</span>
+          <span class="mega-mini-price">${Number(p.price||0).toLocaleString('en-US')} ج.م</span>
         </div>`).join('') || '<div style="font-size:12px;color:var(--ink-soft);padding:10px 0;">لا توجد منتجات بعد</div>'}
       <a class="btn btn-outline mega-showcase-cta" style="margin-top:12px;" onclick="navigateTo('products'); selectCategoryFilter('${c.name}')">تصفح كل ${c.name} ←</a>
     </div>`;

@@ -843,7 +843,7 @@ function initCountUp(){
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
   function renderRow(row, i){
-    const priceHtml = row.price != null ? `<div class="cmdk-item-price">${Number(row.price).toLocaleString('ar-EG')} ج.م</div>` : '';
+    const priceHtml = row.price != null ? `<div class="cmdk-item-price">${Number(row.price).toLocaleString('en-US')} ج.م</div>` : '';
     const icHtml = row.img ? `<img src="${esc(row.img)}" alt="">` : esc(row.icon || '🔎');
     return `<div class="cmdk-item${i===activeIdx?' active':''}" data-idx="${i}">
         <div class="cmdk-item-ic">${icHtml}</div>

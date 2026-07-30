@@ -43,8 +43,8 @@ function productCardHTML(p){
         <div class="prod-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
         <div class="prod-name">${p.name}</div>
         <div class="prod-price-row">
-          <span class="prod-price">${Number(p.price).toLocaleString('ar-EG')} ج.م</span>
-          ${discount ? `<span class="prod-old">${Number(p.old_price).toLocaleString('ar-EG')} ج.م</span>` : ''}
+          <span class="prod-price">${Number(p.price).toLocaleString('en-US')} ج.م</span>
+          ${discount ? `<span class="prod-old">${Number(p.old_price).toLocaleString('en-US')} ج.م</span>` : ''}
         </div>
         <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}', this)">${isDigital ? '⬇️ اطلب وحمّل' : '🛒 أضف للسلة'}</button>
       </div>
@@ -90,8 +90,8 @@ function openQuickView(id){
         <div class="qv-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
         <h2 class="qv-name">${p.name}</h2>
         <div class="qv-price-row">
-          <span class="qv-price">${Number(p.price).toLocaleString('ar-EG')} ج.م</span>
-          ${discount ? `<span class="qv-old">${Number(p.old_price).toLocaleString('ar-EG')} ج.م</span>` : ''}
+          <span class="qv-price">${Number(p.price).toLocaleString('en-US')} ج.م</span>
+          ${discount ? `<span class="qv-old">${Number(p.old_price).toLocaleString('en-US')} ج.م</span>` : ''}
         </div>
         ${p.product_type==='digital' ? '<div class="digital-note">💾 منتج رقمي: هيتبعتلك رابط تحميل آمن على واتساب بعد تأكيد الدفع مباشرة.</div>' : `<div class="pd-stock ${p.stock>0?'in':'out'}" style="margin-bottom:14px;">${p.stock>0 ? '✓ متوفر بالمخزون' : '✕ غير متوفر حاليًا'}</div>`}
         <p class="qv-desc">${p.description || 'لا يوجد وصف تفصيلي لهذا المنتج حاليًا.'}</p>
@@ -143,8 +143,8 @@ function renderProductDetail(id){
       <div class="pd-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
       <h1 class="pd-name">${p.name}</h1>
       <div class="pd-price-row">
-        <span class="pd-price">${Number(p.price).toLocaleString('ar-EG')} ج.م</span>
-        ${discount ? `<span class="pd-old">${Number(p.old_price).toLocaleString('ar-EG')} ج.م</span>` : ''}
+        <span class="pd-price">${Number(p.price).toLocaleString('en-US')} ج.م</span>
+        ${discount ? `<span class="pd-old">${Number(p.old_price).toLocaleString('en-US')} ج.م</span>` : ''}
       </div>
       ${p.product_type==='digital' ? '<div class="digital-note">💾 منتج رقمي: هيتبعتلك رابط تحميل آمن على واتساب بعد تأكيد الدفع مباشرة، ومتاح لك تتابع حالة طلبك من صفحة "تتبع الطلب".</div>' : `<div class="pd-stock ${p.stock>0?'in':'out'}">${p.stock>0 ? '✓ متوفر بالمخزون' : '✕ غير متوفر حاليًا'}</div>`}
       <p class="pd-desc">${p.description || 'لا يوجد وصف تفصيلي لهذا المنتج حاليًا. تواصل معنا لمزيد من التفاصيل.'}</p>
@@ -342,7 +342,7 @@ function renderPriceFilter(){
   wrap.style.display = 'flex';
   const maxP = Math.ceil(Math.max(...prices));
   document.getElementById('priceMinInput').placeholder = '0';
-  document.getElementById('priceMaxInput').placeholder = maxP.toLocaleString('ar-EG');
+  document.getElementById('priceMaxInput').placeholder = maxP.toLocaleString('en-US');
 }
 
 function applyPriceFilter(){
@@ -382,7 +382,7 @@ function renderCompareTable(){
     {key:'name', label:'الاسم'},
     {key:'brand', label:'الماركة'},
     {key:'category', label:'الفئة'},
-    {key:'price', label:'السعر', fmt:v=>v?`${Number(v).toLocaleString('ar-EG')} ج.م`:'-'},
+    {key:'price', label:'السعر', fmt:v=>v?`${Number(v).toLocaleString('en-US')} ج.م`:'-'},
     {key:'description', label:'الوصف'}
   ];
   let html = '<tr><th>الخاصية</th>'+chosen.map(p=>`<th>${p.image?`<img src="${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 6px;">`:''}${p.name}</th>`).join('')+'</tr>';

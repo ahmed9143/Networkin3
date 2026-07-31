@@ -1,0 +1,329 @@
+/* ==========================================================================
+   mobile-redesign.css — Phase 1: Mobile / Tablet Experience Overhaul
+   Loaded AFTER css/styles.css. Only touches ≤980px (tablet) and ≤640px
+   (mobile) contexts, plus landscape + touch-target + a11y rules that are
+   safe at any width. Nothing here changes desktop (>980px) layout.
+   Tech stack unchanged: plain CSS, no build step, no new dependencies.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------
+   0. Tokens — a few extra variables scoped to this layer only
+   -------------------------------------------------------------------- */
+:root{
+  --touch-min: 44px;              /* Apple/Google minimum recommended touch target */
+  --mr-gap-xs: 8px;
+  --mr-gap-sm: 12px;
+  --mr-gap-md: 16px;
+  --mr-gap-lg: 24px;
+  --sheet-radius: 20px;
+}
+
+/* --------------------------------------------------------------------
+   1. Touch targets & tap feedback (all breakpoints, pointer:coarse)
+   -------------------------------------------------------------------- */
+@media (pointer:coarse){
+  .btn,
+  .filter-btn,
+  .qty-btn,
+  .copy-btn,
+  .price-filter-bar button,
+  .cat-icon,
+  .pd-thumb,
+  .menu-toggle,
+  .search-trigger,
+  .header-actions .item,
+  .catnav .mega-trigger>a,
+  .catnav .nav-drop-list a,
+  .wa-float{
+    min-height: var(--touch-min);
+  }
+  .btn, .filter-btn, .price-filter-bar button{ min-width: var(--touch-min); }
+  a, button, .cat-card, .prod-card .prod-hover-actions button, .qty-btn{
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active, .filter-btn:active, .cat-card:active, .prod-card:active{
+    transform: scale(.97);
+  }
+}
+
+/* ======================================================================
+   2. TABLET  (641px – 980px)
+   ====================================================================== */
+@media (max-width:980px){
+  .wrap{ padding-inline: 20px; }
+  .sec-head{ gap: 14px; margin-bottom: 18px; }
+  .sec-head h2{ font-size: 22px; }
+  .sec-head p{ font-size: 13px; }
+
+  /* Product/category grids: 3-up on tablet portrait, comfortable gaps */
+  .prod-grid,
+  .cat-grid{
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: var(--mr-gap-md);
+  }
+  .bento-card,.bento-wide,.bento-narrow{ grid-column: span 6; }
+
+  /* Product detail: stack gallery over info, keep reading order sane */
+  .pd-grid{ grid-template-columns: 1fr; gap: 24px; }
+  .pd-gallery-main{ aspect-ratio: 4/3; }
+
+  .foot-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px 20px; }
+  .about-grid,.contact-grid{ grid-template-columns: 1fr; gap: 22px; }
+
+  .cart-drawer,.wishlist-drawer{ width: 380px; }
+}
+
+/* ======================================================================
+   3. CATALOG / FILTERS → bottom-sheet on tablet + mobile
+   ====================================================================== */
+@media (max-width:980px){
+  /* Products grid must read first: sec-head, then grid, filters sit in a
+     detached sheet triggered by the toggle button (order doesn't need to
+     move the grid before the panel in the DOM because the panel is
+     position:fixed once open — but we still keep the toggle button visible
+     right under the heading for a clear entry point). */
+  .catalog-layout{ position: relative; }
+
+  .filters-toggle-btn{
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: var(--touch-min); padding: 0 18px;
+    border-radius: 999px; border: 1px solid var(--line);
+    background: var(--paper-2); color: var(--ink);
+    font-weight: 700; font-size: 13.5px; cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+  }
+  .filters-toggle-btn .fti{ font-size: 15px; }
+  .filters-toggle-count{
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 999px; background: var(--grad-brand); color: #fff;
+    font-size: 10.5px; font-weight: 800;
+  }
+
+  .filters-backdrop{
+    position: fixed; inset: 0; background: rgba(4,8,20,.55);
+    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s;
+    z-index: 240; backdrop-filter: blur(2px);
+  }
+  .filters-backdrop.is-open{ opacity: 1; visibility: visible; }
+
+  .filters-panel{
+    position: fixed; left: 0; right: 0; bottom: 0;
+    max-height: min(82vh, 640px);
+    background: var(--paper-2);
+    border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+    box-shadow: 0 -20px 50px -12px rgba(0,0,0,.4);
+    z-index: 241;
+    display: flex; flex-direction: column;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .filters-panel.is-open{ transform: translateY(0); }
+
+  .filters-panel-head{ flex: none; padding: 10px 18px 6px; }
+  .filters-panel-grabber{
+    display: block; width: 40px; height: 4px; border-radius: 4px;
+    background: var(--line); margin: 0 auto 10px;
+  }
+  .filters-panel-headrow{
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .filters-panel-headrow b{ font-size: 16px; }
+  .filters-panel-close{
+    width: var(--touch-min); height: var(--touch-min);
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; border: 1px solid var(--line);
+    background: var(--navy-800); color: var(--ink);
+    font-size: 15px; cursor: pointer;
+  }
+
+  .filters-panel-body{
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 14px 18px 10px;
+  }
+  .filters-panel-foot{
+    flex: none; display: flex; gap: 10px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom,0px));
+    border-top: 1px solid var(--line); background: var(--paper-2);
+  }
+  .filters-panel-foot .btn{ flex: 1; justify-content: center; padding: 12px 10px; }
+
+  /* Inside the sheet, filter chips/inputs get bigger touch targets and wrap cleanly */
+  .filters-panel .filters-bar,
+  .filters-panel .brand-filter-bar{ margin-bottom: 14px; }
+  .filters-panel .filter-btn{ padding: 10px 16px; font-size: 13px; }
+  .filters-panel .price-filter-bar{
+    flex-direction: column; align-items: stretch; margin-bottom: 4px;
+  }
+  .filters-panel .price-filter-bar input{ width: 100%; }
+  .filters-panel .price-filter-bar .apply-btn,
+  .filters-panel .price-filter-bar .clear-btn{ width: 100%; justify-content: center; padding: 12px; }
+
+  body.filters-sheet-open{ overflow: hidden; }
+}
+
+/* Desktop / wide-tablet: sheet chrome never applies, panel is just the
+   normal inline filter block, and the mobile-only toggle/backdrop stay hidden. */
+@media (min-width:981px){
+  .filters-toggle-btn,
+  .filters-backdrop{ display: none !important; }
+  .filters-panel{
+    position: static; transform: none; max-height: none; box-shadow: none;
+    background: transparent; border-radius: 0; display: block;
+  }
+  .filters-panel-head,.filters-panel-foot{ display: none; }
+  .filters-panel-body{ padding: 0; overflow: visible; }
+}
+
+/* ======================================================================
+   4. MOBILE  (≤640px)
+   ====================================================================== */
+@media (max-width:640px){
+  html{ font-size: 15px; }
+  .wrap{ padding-inline: 16px; }
+
+  /* ---- Typography scale ---- */
+  h1, .hero h1{ font-size: clamp(26px, 8vw, 34px); line-height: 1.25; }
+  h2, .sec-head h2{ font-size: 19px; line-height: 1.35; }
+  h3{ font-size: 16.5px; }
+  p, .sec-head p{ font-size: 13px; line-height: 1.7; }
+  .pd-name{ font-size: 20px; }
+  .pd-price{ font-size: 22px; }
+
+  /* ---- Spacing rhythm ---- */
+  section.wrap, .wrap{ margin-block: 26px; }
+  .sec-head{ flex-wrap: wrap; row-gap: 10px; margin-bottom: 16px; }
+  .cta-band{ flex-direction: column; text-align: center; gap: 14px; padding: 22px 18px; }
+  .cta-band .btn{ width: 100%; justify-content: center; }
+
+  /* ---- Grids: products first, comfortable 2-up cards ---- */
+  .prod-grid,
+  .cat-grid{
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: var(--mr-gap-sm);
+  }
+  .bento-card,.bento-wide,.bento-narrow{ grid-column: span 12; }
+
+  /* ---- Product cards ---- */
+  .prod-card{ border-radius: 14px; }
+  .prod-card .prod-thumb{ aspect-ratio: 1/1; }
+  .prod-card .prod-body{ padding: 10px 12px 12px; }
+  .prod-card .prod-name,
+  .prod-card b{ font-size: 12.5px; line-height: 1.45; }
+  .prod-card .prod-price,
+  .prod-card .pd-price{ font-size: 14px; }
+  .prod-hover-panel{
+    /* hover panels don't work with touch — always show the essential CTA
+       inline instead of relying on :hover on mobile */
+    position: static !important; transform: none !important;
+    pointer-events: auto !important; opacity: 1 !important;
+    margin-top: 8px; box-shadow: none; background: transparent; padding: 0;
+  }
+  .prod-hover-actions{ display: flex; gap: 6px; }
+  .prod-hover-actions button{
+    flex: 1; min-height: 38px; font-size: 11.5px; border-radius: 8px;
+  }
+
+  /* ---- Category cards ---- */
+  .cat-card{ padding: 16px 12px; }
+  .cat-card .cat-icon{ width: 44px; height: 44px; font-size: 20px; }
+  .cat-card b{ font-size: 13px; }
+  .cat-card span{ font-size: 11.5px; }
+
+  /* ---- Buttons ---- */
+  .btn{ padding: 12px 20px; font-size: 13.5px; border-radius: 10px; }
+  .sec-head .btn{ width: 100%; justify-content: center; order: 3; }
+  .finder-nav-row{ flex-direction: column-reverse; gap: 12px; align-items: stretch; }
+  .finder-nav-row .btn{ width: 100%; justify-content: center; }
+
+  /* ---- Cards / drawers full-bleed on small phones ---- */
+  .cart-drawer,.wishlist-drawer{ width: 100%; max-width: 100%; }
+  .finder-box{ padding: 18px 16px; }
+  .finder-options-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .finder-opt{ padding: 14px 10px; font-size: 13px; }
+
+  /* ---- Forms ---- */
+  .checkout-fields input,.checkout-fields textarea,
+  .price-filter-bar input{ font-size: 16px; /* prevents iOS auto-zoom on focus */ }
+
+  /* ---- Footer ---- */
+  .foot-grid{ grid-template-columns: 1fr; gap: 22px; padding-bottom: 24px; }
+  .newsletter{ flex-direction: column; }
+  .newsletter button{ padding: 12px; }
+  .bottom-bar{ flex-direction: column; text-align: center; padding: 16px 20px; }
+}
+
+@media (max-width:400px){
+  .prod-grid,.cat-grid{ gap: 8px; }
+  .finder-options-grid{ grid-template-columns: 1fr; }
+}
+
+/* ======================================================================
+   5. LANDSCAPE MODE (phones held sideways — short viewport height)
+   ====================================================================== */
+@media (max-width:980px) and (orientation:landscape) and (max-height:480px){
+  .hero{ padding-block: 26px; }
+  .hero-visual, .hero-hologram{ display: none; }
+  .filters-panel{ max-height: 92vh; }
+  .prod-grid,.cat-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .catnav .wrap.mobile-open{ max-height: 70vh; overflow-y: auto; }
+  .finder-box{ max-height: 82vh; overflow-y: auto; }
+  .cart-drawer,.wishlist-drawer{ width: 340px; }
+}
+
+/* ======================================================================
+   6. Footer — light-mode contrast fix
+   The footer is intentionally a dark band in both themes (matches the
+   header/hero and keeps brand contrast); previously in light mode its
+   background var (--navy-950) flipped to near-white while the text stayed
+   a fixed light color, making it nearly unreadable.
+   ====================================================================== */
+:root[data-theme="light"] footer{
+  background: #0b1220;
+  color: #cdd8ee;
+}
+:root[data-theme="light"] footer .foot-grid h4{ color:#fff; }
+:root[data-theme="light"] footer .foot-grid ul a{ color:#cdd8ee; opacity:.82; }
+:root[data-theme="light"] footer .foot-grid ul a:hover{ opacity:1; color: var(--cable-orange); }
+:root[data-theme="light"] footer .newsletter input{
+  background:#141d33; border-color:#1f2942; color:#fff;
+}
+:root[data-theme="light"] footer .bottom-bar{ border-top-color:#141d33; }
+
+/* ======================================================================
+   7. Loading states — skeleton shimmer for product cards / grids
+   ====================================================================== */
+@keyframes mrShimmer{
+  0%{ background-position: -300px 0; }
+  100%{ background-position: 300px 0; }
+}
+.mr-skeleton-card{
+  border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
+  background: var(--paper-2);
+}
+.mr-skeleton-card .mr-skel-thumb{ aspect-ratio: 1/1; }
+.mr-skeleton-card .mr-skel-thumb,
+.mr-skeleton-card .mr-skel-line{
+  background: linear-gradient(90deg, var(--navy-800) 25%, var(--navy-700) 37%, var(--navy-800) 63%);
+  background-size: 600px 100%;
+  animation: mrShimmer 1.4s ease-in-out infinite;
+}
+.mr-skeleton-card .mr-skel-line{ height: 11px; border-radius: 6px; margin: 10px 12px; }
+.mr-skeleton-card .mr-skel-line.w60{ width: 60%; }
+.mr-skeleton-card .mr-skel-line.w40{ width: 40%; }
+
+@media (prefers-reduced-motion: reduce){
+  .mr-skeleton-card .mr-skel-thumb,
+  .mr-skeleton-card .mr-skel-line{ animation: none; }
+}
+
+/* ======================================================================
+   8. Focus visibility (a11y — keyboard + switch-control users on tablets)
+   ====================================================================== */
+.filters-toggle-btn:focus-visible,
+.filters-panel-close:focus-visible,
+.btn:focus-visible,
+.filter-btn:focus-visible{
+  outline: 2px solid var(--cable-blue);
+  outline-offset: 2px;
+}

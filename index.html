@@ -202,6 +202,7 @@
   <nav class="catnav">
     <div class="wrap" id="catNavMenu">
       <a class="active" data-page="home" onclick="navigateTo('home')">الرئيسية</a>
+      <a class="nav-sale-link" onclick="openSaleOffers()"><span class="nav-sale-badge">SALE</span> العروض</a>
 
       <div class="mega-trigger">
         <a class="nav-drop-label">الحلول ▾</a>
@@ -468,6 +469,12 @@
 <main>
   <!-- HOME -->
   <div class="page-view active-page" id="page-home">
+    <div class="promo-banner-slider" id="promoBannerSlider" aria-hidden="true">
+      <div class="pbs-track" id="pbsTrack"></div>
+      <button class="pbs-arrow prev" id="pbsPrev" aria-label="السابق" style="display:none;">‹</button>
+      <button class="pbs-arrow next" id="pbsNext" aria-label="التالي" style="display:none;">›</button>
+      <div class="pbs-dots" id="pbsDots"></div>
+    </div>
     <section class="hero">
       <div class="hero-gradwash" aria-hidden="true"></div>
       <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
@@ -635,7 +642,7 @@
         <div><h2>الماركات اللي بنتعامل معاها</h2><p>توكيلات وتوريد لأشهر الماركات العالمية</p></div>
       </div>
       <div class="brand-stats reveal">
-        <div class="bs-item"><b class="count-up" data-target="18" data-prefix="+">0</b><span>علامة تجارية</span></div>
+        <div class="bs-item"><b class="count-up" data-target="18" data-prefix="+" data-brand-count>0</b><span>علامة تجارية</span></div>
         <div class="bs-item"><b class="count-up" data-target="500" data-prefix="+">0</b><span>مشروع منفذ</span></div>
         <div class="bs-item"><b class="count-up" data-target="14">0</b><span>سنة خبرة</span></div>
         <div class="bs-item"><b>24/7</b><span>دعم فني</span></div>
@@ -1090,6 +1097,9 @@
         <div class="tool-card" onclick="showToolTab('compare')"><div class="tool-ic">⚖️</div><h4>مقارنة المنتجات</h4><p>قارن بين منتجين أو تلاتة جنب بعض بكل التفاصيل</p></div>
         <div class="tool-card" onclick="showToolTab('quote')"><div class="tool-ic">🧾</div><h4>بناء عرض السعر</h4><p>ابني نظامك بنفسك بند بند واطبع أو ابعت العرض واتساب</p></div>
         <div class="tool-card" onclick="showToolTab('security')"><div class="tool-ic">🛡️</div><h4>تقييم درجة الأمان</h4><p>جاوب على أسئلة عن مبناك واحصل على Security Score فوري وتوصيات</p></div>
+        <div class="tool-card" onclick="showToolTab('netdoc')"><div class="tool-ic">📐</div><h4>مولّد توثيق الشبكة</h4><p>ولّد مخطط الشبكة، مخطط الراك، جدول IP وVLAN، خريطة البورتات وليبل الكابلات أوتوماتيك</p></div>
+        <div class="tool-card" onclick="showToolTab('compat')"><div class="tool-ic">✅</div><h4>محرك التوافق ومقارنة الماركات</h4><p>افحص توافق الكاميرا مع السويتش والـNVR (PoE، ONVIF، الباندويدث) وقارن المواصفات بدون تحيز</p></div>
+        <div class="tool-card" onclick="showToolTab('aidraw')"><div class="tool-ic">🤖</div><h4>قارئ المخططات الذكي (AI)</h4><p>ارفع مخطط AutoCAD بصيغة PDF والذكاء الاصطناعي يقترح عدد الكاميرات ونقاط الشبكة المناسبة</p></div>
       </div>
 
       <div class="tools-tab-bar" id="toolsTabBar" style="display:none;">
@@ -1100,6 +1110,9 @@
         <button class="tool-tab-btn" data-tool="compare" onclick="showToolTab('compare')">⚖️ مقارنة</button>
         <button class="tool-tab-btn" data-tool="quote" onclick="showToolTab('quote')">🧾 عرض السعر</button>
         <button class="tool-tab-btn" data-tool="security" onclick="showToolTab('security')">🛡️ درجة الأمان</button>
+        <button class="tool-tab-btn" data-tool="netdoc" onclick="showToolTab('netdoc')">📐 توثيق الشبكة</button>
+        <button class="tool-tab-btn" data-tool="compat" onclick="showToolTab('compat')">✅ التوافق والمقارنة</button>
+        <button class="tool-tab-btn" data-tool="aidraw" onclick="showToolTab('aidraw')">🤖 قارئ المخططات AI</button>
         <button class="tool-tab-btn" onclick="hideToolTabs()">✕ رجوع للأدوات</button>
       </div>
 
@@ -1249,6 +1262,176 @@
             </div>
           </div>
           <div id="secResultBox" style="margin-top:20px;"></div>
+        </div>
+      </div>
+
+      <!-- Network Auto-Documentation Generator -->
+      <div class="tool-tab-panel" id="toolTab-netdoc">
+        <div class="finder-box" style="max-width:100%;">
+          <h4 style="margin-top:0;">📐 مولّد التوثيق التلقائي للشبكة</h4>
+          <p class="finder-note">حدّد الأجهزة، وهنولّدلك فورًا: مخطط الشبكة، مخطط الراك، توزيع Patch Panel، ترقيم الكابلات، جدول الـIP، جدول الـVLAN، خريطة البورتات، وليبل لكل كابل — جاهزين للتصدير Excel وPDF.</p>
+          <div class="ndg-grid">
+            <div class="ndg-input-card">
+              <div class="form-group"><label>اسم المشروع / العميل</label><input type="text" id="ndgProjName" placeholder="مثال: فرع شركة دلتا - المعادي" value="مشروع تجريبي"></div>
+              <div class="form-group"><label>عدد السويتشات (Access Switches)</label><input type="number" id="ndgNSwitch" min="1" max="20" value="2"></div>
+              <div class="form-group"><label>منافذ كل سويتش</label>
+                <select id="ndgSwitchPorts">
+                  <option value="8">8 Ports</option>
+                  <option value="16">16 Ports</option>
+                  <option value="24" selected>24 Ports</option>
+                  <option value="48">48 Ports</option>
+                </select>
+              </div>
+              <div class="grid2-calc">
+                <div class="form-group"><label>عدد الكاميرات</label><input type="number" id="ndgNCam" min="0" value="16"></div>
+                <div class="form-group"><label>عدد الـAPs</label><input type="number" id="ndgNAP" min="0" value="3"></div>
+              </div>
+              <div class="grid2-calc">
+                <div class="form-group"><label>عدد الـNVR</label><input type="number" id="ndgNNVR" min="0" value="1"></div>
+                <div class="form-group"><label>Firewall؟</label>
+                  <select id="ndgHasFW">
+                    <option value="1" selected>نعم (1)</option>
+                    <option value="0">لا</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group"><label>عدد نقاط الشبكة العادية (Data Points / PCs)</label><input type="number" id="ndgNData" min="0" value="6"></div>
+              <button class="btn btn-cta" style="width:100%;" onclick="ndgGenerateAll()">⚡ توليد التوثيق الكامل</button>
+              <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="window.print()">🖨️ تصدير PDF (طباعة)</button>
+              <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="ndgExportExcel()">📊 تصدير Excel</button>
+            </div>
+
+            <div class="ndg-output-card" id="ndgPrintArea">
+              <div id="ndgEmptyState" class="ndg-empty">اضبط بيانات المشروع على الشمال واضغط "توليد التوثيق الكامل" 👈</div>
+              <div id="ndgResultsWrap" style="display:none;">
+                <div class="ndg-tabs" id="ndgTabsBar"></div>
+                <div id="ndgPanelsHost"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compatibility Engine + Brand Comparison + System Sounds -->
+      <div class="tool-tab-panel" id="toolTab-compat">
+        <div class="finder-box" style="max-width:100%;">
+          <h4 style="margin-top:0;">✅⚖️🔊 محرك التوافق + مقارنة الماركات + أصوات النظام</h4>
+          <p class="finder-note">أداة شغالة بمنطق هندسي حقيقي (PoE budget, ONVIF profiles, Codecs, Bandwidth) على قاعدة بيانات ابتدائية بمواصفات حقيقية من الداتاشيتات الرسمية.</p>
+          <div class="ce-notice">⚠️ <b>مهم قبل ما تستخدمها في مشروع حقيقي:</b> القاعدة دلوقتي فيها عدد محدود من الموديلات (اللي قدرت أتحقق من مواصفاتها من الداتاشيت الرسمي فعليًا، ومصدر كل رقم مكتوب جنبه). أي حقل مكتوب جنبه "غير مؤكد" معناه الشركة المصنعة معلنتش الرقم ده بوضوح في المصادر اللي وصلتلها — راجعه في الداتاشيت الرسمي قبل ما تعتمد عليه في تسعير أو تركيب فعلي.</div>
+
+          <div class="ce-subtabs">
+            <button class="ce-subtab-btn active" data-t="sounds" onclick="ceTab('sounds')">🔊 أصوات النظام</button>
+            <button class="ce-subtab-btn" data-t="engine" onclick="ceTab('engine')">✅ Compatibility Engine</button>
+            <button class="ce-subtab-btn" data-t="compare" onclick="ceTab('compare')">⚖️ مقارنة الماركات</button>
+          </div>
+
+          <div class="ce-panel active" id="ce-p-sounds">
+            <div class="ce-card">
+              <h4>أصوات مُولّدة بالكود (Web Audio API) — مفيش ملفات صوت خارجية ومفيش حقوق ملكية</h4>
+              <div class="ce-sound-grid">
+                <div class="ce-sound-box">
+                  <h5>🟢 System Online</h5>
+                  <p>يشتغل مرة واحدة لما الموقع يفتح</p>
+                  <button class="btn btn-outline" onclick="cePlayBoot()">▶ تشغيل</button>
+                </div>
+                <div class="ce-sound-box">
+                  <h5>🔀 Switching</h5>
+                  <p>لما تدخل قسم الشبكات</p>
+                  <button class="btn btn-outline" onclick="cePlaySwitching()">▶ تشغيل</button>
+                </div>
+                <div class="ce-sound-box">
+                  <h5>📡 Radar</h5>
+                  <p>لما تدخل قسم الأمن — بدون إزعاج</p>
+                  <button class="btn btn-outline" onclick="cePlayRadar()">▶ تشغيل</button>
+                </div>
+              </div>
+              <h4 style="margin-top:22px;">كود التركيب (لو حبيت تستخدمه في مكان تاني)</h4>
+              <pre class="ce-pre" id="ceSoundSnippet"></pre>
+              <button class="btn btn-cta" onclick="ceCopySnippet()">📋 نسخ الكود</button>
+            </div>
+          </div>
+
+          <div class="ce-panel" id="ce-p-engine">
+            <div class="ce-card">
+              <h4>1) اختار المكوّنات</h4>
+              <div class="grid2-calc" style="grid-template-columns:1fr 1fr 1fr;">
+                <div class="form-group"><label>الكاميرا</label><select id="ceCamSel"></select></div>
+                <div class="form-group"><label>عدد الكاميرات</label><input type="number" id="ceCamQty" value="16" min="1"></div>
+                <div class="form-group"><label>السويتش</label><select id="ceSwSel"></select></div>
+              </div>
+              <div class="form-group"><label>الـNVR</label><select id="ceNvrSel"></select></div>
+              <button class="btn btn-cta" style="width:100%;" onclick="ceRunEngine()">🔍 افحص التوافق</button>
+            </div>
+            <div id="ceEngineResult"></div>
+          </div>
+
+          <div class="ce-panel" id="ce-p-compare">
+            <div class="ce-card">
+              <h4>مقارنة الكاميرات المتاحة في القاعدة — بدون تحيز لأي ماركة</h4>
+              <div style="overflow-x:auto;" id="ceCompareTableHost"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Drawing Reader -->
+      <div class="tool-tab-panel" id="toolTab-aidraw">
+        <div class="finder-box">
+          <h4 style="margin-top:0;">🤖 قارئ المخططات الذكي</h4>
+          <p class="finder-note">ارفع مخطط AutoCAD (PDF) لأي مكان — والذكاء الاصطناعي هيقرأ المخطط ويقترح عليك عدد الكاميرات ونقاط الشبكة المناسبة تلقائيًا.</p>
+
+          <label class="adr-dropzone" id="adrDropzone" for="adrFileInput">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+            <b>اسحب ملف الـPDF هنا أو دوس للاختيار</b>
+            <small>يدعم مخططات AutoCAD المُصدَّرة كـ PDF — حتى 20 ميجا</small>
+          </label>
+          <input type="file" id="adrFileInput" accept="application/pdf" style="display:none;">
+
+          <div class="adr-preview-row" id="adrPreviewRow" style="display:none;">
+            <img id="adrPreviewThumb" src="" alt="">
+            <div>
+              <div class="adr-fname" id="adrPreviewName"></div>
+              <div class="adr-fsize" id="adrPreviewSize"></div>
+            </div>
+            <button class="adr-rm" id="adrRemoveFile" type="button">✕ إزالة</button>
+          </div>
+
+          <button class="btn btn-cta" style="width:100%;margin-top:16px;" id="adrAnalyzeBtn" disabled>✨ حلّل المخطط بالذكاء الاصطناعي</button>
+          <div class="adr-error-box" id="adrErrorBox"></div>
+
+          <div class="adr-state-box" id="adrLoadingBox">
+            <div class="adr-spinner"></div>
+            <div id="adrLoadingMsg">جاري قراءة المخطط...</div>
+          </div>
+
+          <div class="adr-result" id="adrResultBox">
+            <div class="adr-stat-grid">
+              <div class="adr-stat-card"><div class="adr-num" id="adrStatRooms">0</div><div class="adr-lbl">غرفة/مساحة</div></div>
+              <div class="adr-stat-card"><div class="adr-num" id="adrStatCams">0</div><div class="adr-lbl">كاميرا مقترحة</div></div>
+              <div class="adr-stat-card"><div class="adr-num" id="adrStatNet">0</div><div class="adr-lbl">نقطة شبكة</div></div>
+              <div class="adr-stat-card"><div class="adr-num" id="adrStatArea">-</div><div class="adr-lbl">المساحة التقديرية</div></div>
+            </div>
+
+            <section>
+              <h4 class="adr-sec-title">🏠 الغرف/المساحات المكتشفة</h4>
+              <div class="adr-room-list" id="adrRoomList"></div>
+            </section>
+
+            <section>
+              <h4 class="adr-sec-title">📋 التصميم المقترح</h4>
+              <div id="adrDeviceList"></div>
+              <div class="adr-total-box">
+                <span>الإجمالي التقديري</span>
+                <b id="adrTotalPrice">0 ج.م</b>
+              </div>
+              <div class="adr-note">⚠️ ده اقتراح مبدئي من الذكاء الاصطناعي بناءً على قراءة المخطط، ومش بديل عن معاينة فريقنا الهندسي على أرض الواقع لتأكيد المواقع الدقيقة للكاميرات ونقاط الشبكة.</div>
+            </section>
+
+            <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+              <button class="btn btn-cta" style="flex:1;" id="adrAddAllToCart">🛒 أضف كل المقترح للسلة</button>
+              <a class="btn btn-outline" href="https://wa.me/" id="adrWaBtn" target="_blank" style="flex:1;text-align:center;">💬 اطلب معاينة هندسية</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1466,6 +1649,8 @@
         <li><a onclick="navigateTo('downloads')">التنزيلات</a></li>
         <li><a onclick="navigateTo('contact')">اطلب معاينة</a></li>
         <li><a href="rack-scanner.html">🔍 ماسح الـRack (QR)</a></li>
+        <li><a href="compare-showcase.html">👁️ ColorVu مقابل الكاميرا العادية</a></li>
+        <li><a onclick="navigateTo('tools'); showToolTab('aidraw');">🤖 قارئ المخططات الذكي (AI)</a></li>
       </ul></div>
       <div><h4>أدلة ومقالات</h4><ul>
         <li><a href="best-cctv-cameras-for-home.html">أفضل كاميرات مراقبة للمنزل</a></li>
@@ -1573,6 +1758,10 @@
 <script src="modules/rack.js"></script>
 <script src="modules/boq.js"></script>
 <script src="modules/calculators.js"></script>
+<script src="modules/network-doc-generator.js"></script>
+<script src="modules/compatibility-engine.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="modules/ai-drawing-reader.js"></script>
 <script src="modules/cart.js"></script>
 <script src="modules/notifications.js"></script>
 <script src="modules/effects.js"></script>

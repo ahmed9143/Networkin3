@@ -77,30 +77,113 @@ const BRAND_LOGO_FILES = new Set([
 window.__brandLogoFallback = function(img){
   img.onerror = null;
   img.src = brandMonogramURI(img.dataset.brandName, parseInt(img.dataset.idx || '0', 10));
+  if(img.parentElement) img.parentElement.classList.remove('bc-real-logo');
   if(img.parentElement) img.parentElement.classList.add('bc-mono');
 };
+
+/* Real logos uploaded by the admin (لوحة التحكم -> إعدادات الموقع -> شعارات الماركات),
+   stored in Supabase `site_settings` under key 'brand_logos' as { [brandSlug]: imageUrl }.
+   Fetched once at load; renderBrandStrip() re-renders once this resolves so uploaded logos
+   replace the generated wordmark placeholder without needing any code changes. */
+window.__brandLogos = {};
+window.__brandLogosLoaded = false;
+(function loadBrandLogos(){
+  if(typeof sb === 'undefined' || !sb || !sb.from) return;
+  sb.from('site_settings').select('value').eq('key','brand_logos').maybeSingle()
+    .then(({ data }) => {
+      window.__brandLogos = (data && data.value && typeof data.value === 'object') ? data.value : {};
+      window.__brandLogosLoaded = true;
+      if(typeof renderBrandStrip === 'function') renderBrandStrip();
+    })
+    .catch(()=>{ window.__brandLogosLoaded = true; });
+})();
+/* Partner brands (شركاء وماركات) — an INDEPENDENT, admin-curated list of the brands
+   the business officially deals with, stored in Supabase site_settings under key
+   'partner_brands' as an ordered array: [{ id, name, slug, logo_url, link, active }].
+   This is deliberately separate from the product-derived brand list below: a brand
+   the business is an authorized reseller/distributor for (e.g. a new agency just
+   signed) should be able to show up on the homepage the same day, even before a
+   single matching product has been added to the catalog. Managed from
+   admin.html -> إعدادات الموقع -> الماركات الشريكة.
+   Falls back to the old product-derived list automatically if the admin hasn't
+   set up a partner list yet, so nothing breaks for sites that never touch this. */
+/* Ships with a starter list of the brands Ahmed currently deals with so the
+   section looks right on day one, before any admin edit is saved — same pattern
+   used for the top promo bar's DEFAULT_OFFERS. The admin panel (الماركات الشريكة)
+   lets him add/remove/reorder from here at any time; once he saves once, the
+   Supabase-stored list takes over completely. */
+const DEFAULT_PARTNER_BRANDS = [
+  { id:'hikvision', name:'Hikvision', slug:'hikvision', logo_url:'', active:true },
+  { id:'dahua', name:'Dahua', slug:'dahua', logo_url:'', active:true },
+  { id:'uniview', name:'Uniview (UNV)', slug:'uniview-unv', logo_url:'', active:true },
+  { id:'tiandy', name:'Tiandy', slug:'tiandy', logo_url:'', active:true }
+];
+window.__partnerBrands = DEFAULT_PARTNER_BRANDS;
+window.__partnerBrandsLoaded = false;
+(function loadPartnerBrands(){
+  if(typeof sb === 'undefined' || !sb || !sb.from) return;
+  sb.from('site_settings').select('value').eq('key','partner_brands').maybeSingle()
+    .then(({ data }) => {
+      const list = data && Array.isArray(data.value) && data.value.length ? data.value : DEFAULT_PARTNER_BRANDS;
+      window.__partnerBrands = list;
+      window.__partnerBrandsLoaded = true;
+      if(typeof renderBrandStrip === 'function') renderBrandStrip();
+    })
+    .catch(()=>{ window.__partnerBrandsLoaded = true; });
+})();
+
 function renderBrandStrip(){
   const strip = document.getElementById('brandStripTrack');
   const section = document.getElementById('brandStripSection');
+  const statEl = document.querySelector('#brandStripSection .bs-item b[data-brand-count]');
   if(!strip || !section) return;
-  const brands = [...new Set(products.map(p=>p.brand).filter(Boolean))].sort();
-  if(!brands.length){ section.style.display = 'none'; return; }
+
+  const curatedActive = (window.__partnerBrands || []).filter(b => b && b.name && b.active !== false);
+  const usingCurated = curatedActive.length > 0;
+  const productBrands = new Set([...new Set(products.map(p=>p.brand).filter(Boolean))].map(b=>brandSlug(b)));
+
+  // source list: curated admin list (in the order the admin set) when available,
+  // otherwise fall back to whatever brands currently exist across the product catalog.
+  const list = usingCurated
+    ? curatedActive.map(b => ({ name: b.name, slug: b.slug || brandSlug(b.name), logo_url: b.logo_url || '' }))
+    : [...new Set(products.map(p=>p.brand).filter(Boolean))].sort().map(name => ({ name, slug: brandSlug(name), logo_url: '' }));
+
+  if(!list.length){ section.style.display = 'none'; return; }
   section.style.display = 'block';
-  const chip = (b, idx) => {
+  if(statEl) statEl.setAttribute('data-target', String(list.length));
+
+  const chip = (item, idx) => {
+    const b = item.name;
     const safe = b.replace(/'/g,"\\'");
-    const slug = brandSlug(b);
+    const slug = item.slug;
+    const uploadedUrl = item.logo_url || (window.__brandLogos && window.__brandLogos[slug]);
     const hasPng = BRAND_LOGO_FILES.has(slug);
-    const logoImg = hasPng
-      ? `<img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)">`
-      : `<img src="${brandMonogramURI(b, idx)}" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy">`;
-    return `<div class="brand-chip${hasPng?'':' bc-mono'}" onclick="navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();">
+    let logoImg, chipClass;
+    if(uploadedUrl){
+      logoImg = `<img src="${uploadedUrl}" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)">`;
+      chipClass = ' bc-real-logo';
+    } else if(hasPng){
+      logoImg = `<img src="assets/brands/${slug}.png" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy" onerror="window.__brandLogoFallback(this)">`;
+      chipClass = '';
+    } else {
+      logoImg = `<img src="${brandMonogramURI(b, idx)}" data-slug="${slug}" data-idx="${idx}" data-brand-name="${b.replace(/"/g,'&quot;')}" alt="${b}" loading="lazy">`;
+      chipClass = ' bc-mono';
+    }
+    // only jump into the filtered product grid if this brand actually has products yet —
+    // otherwise land on the general products page instead of a misleading "0 results" view.
+    const hasProducts = productBrands.has(slug);
+    const onClick = hasProducts
+      ? `navigateTo('products'); filterByBrand('${safe}', null); renderBrandFilters();`
+      : `navigateTo('products');`;
+    return `<div class="brand-chip${chipClass}" onclick="${onClick}">
+      <span class="bc-partner-badge">شريك معتمد</span>
       <div class="bc-logo">${logoImg}</div>
       <span class="bc-tip">${brandCategory(b)}</span>
     </div>`;
   };
   // render the list twice back-to-back so the CSS animation can scroll exactly -50%
   // and loop seamlessly (right-to-left) with no visible seam or reset-jump
-  const once = brands.map(chip).join('');
+  const once = list.map(chip).join('');
   strip.innerHTML = once + once;
 }
 

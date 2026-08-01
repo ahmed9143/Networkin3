@@ -10,6 +10,7 @@ let currentBrandFilter = 'الكل';
 let currentSearchQuery = '';
 let priceMinFilter = null;
 let priceMaxFilter = null;
+let saleOnlyFilter = false;
 let appliedCoupon = null;
 let currentPayMethod = 'whatsapp_cod';
 const DEFAULT_TITLE = "Delta IT Solutions | حلول تقنية متكاملة: كاميرات، شبكات، بصمة، ربط فروع ودعم عن بعد";

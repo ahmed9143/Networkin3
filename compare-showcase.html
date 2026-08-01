@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+(function(){
+  try{
+    var mode = localStorage.getItem('it_theme_mode') || 'auto';
+    var theme = mode === 'auto' ? ((new Date().getHours()>=6 && new Date().getHours()<18) ? 'light' : 'dark') : mode;
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){}
+})();
+</script>
+<title>ColorVu مقابل الكاميرا العادية | Delta IT Solutions</title>
+<meta name="description" content="قارن بنفسك: كاميرا عادية مقابل ColorVu بالليل، وكاميرا رخيصة مقابل كاميرا احترافية.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="dark"]{--paper:#050816;--paper-2:#0c1330;--ink:#F4F7FB;--ink-soft:#8E9AAF;--line:rgba(255,255,255,.08);--blue:#2F7BFF;--purple:#8A5CFF;}
+  :root[data-theme="light"]{--paper:#f9fafc;--paper-2:#ffffff;--ink:#0b1220;--ink-soft:#5c6579;--line:#e3e7ef;--blue:#0098c2;--purple:#6a4bf0;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',sans-serif;line-height:1.8;}
+  a{color:var(--blue);}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px 70px;}
+  header{background:var(--paper-2);border-bottom:3px solid var(--purple);padding:16px 0;position:sticky;top:0;z-index:5;}
+  header .in{max-width:880px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .brand{display:flex;align-items:center;gap:8px;}
+  .brand svg{width:28px;height:28px;}
+  .brand b{font-size:15px;}
+  .back{font-size:13px;color:var(--ink-soft);text-decoration:none;}
+  main{padding-top:30px;}
+  h1{font-size:24px;margin:0 0 6px;}
+  .sub{color:var(--ink-soft);font-size:14px;margin-bottom:30px;}
+  section{margin-bottom:46px;}
+  section h2{font-size:18px;border-inline-start:4px solid var(--blue);padding-inline-start:10px;margin-bottom:14px;}
+  .hint{font-size:12.5px;color:var(--ink-soft);margin-top:6px;}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{padding:12px 20px;border-radius:12px;font-weight:700;font-size:13.5px;text-decoration:none;border:1px solid var(--line);}
+  .btn.primary{background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;border:none;}
+  .btn.ghost{color:var(--ink);background:var(--paper-2);}
+  footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="in">
+    <div class="brand">
+      <svg viewBox="0 0 100 100"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fed"/><stop offset="1" stop-color="#ff7a2f"/></linearGradient></defs><path d="M50 5 L88 19 V48 C88 72 70 88 50 95 C30 88 12 72 12 48 V19 Z" fill="url(#lg)"/><circle cx="50" cy="48" r="19" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="48" r="7" fill="#fff"/></svg>
+      <b>Delta IT Solutions</b>
+    </div>
+    <a class="back" href="index.html">↩ رجوع للموقع</a>
+  </div>
+</header>
+<main class="wrap">
+  <h1>👁️ شوف الفرق بعينك</h1>
+  <div class="sub">مقارنات حقيقية بتوضح ليه تقنية ColorVu وكاميرات المراقبة الاحترافية تستاهل الفرق في السعر.</div>
+
+  <section>
+    <h2>🎚️ قبل / بعد — من كاميرا عادية إلى ColorVu</h2>
+    <div id="colorvuSlider"></div>
+    <div class="hint">💡 ملحوظة للفريق: استبدل الصورتين (beforeImg / afterImg) في الكود بصور حقيقية من نفس الموقع ليلًا — واحدة بكاميرا عادية والتانية بكاميرا ColorVu، عشان المقارنة تبقى حقيقية 100%.</div>
+    <div class="cta-row">
+      <button class="btn primary" onclick="location.href='index.html'">🛒 شوف كاميرات ColorVu المتاحة</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>🌗 شاشة مقسومة — رخيصة مقابل احترافية بالليل</h2>
+    <div id="daynightSplit"></div>
+    <div class="hint">💡 استبدل الصورتين بلقطات ليلية حقيقية: كاميرا اقتصادية على اليمين، وكاميرا احترافية (Starlight/ColorVu) على اليسار.</div>
+  </section>
+</main>
+<footer>© Delta IT Solutions</footer>
+
+<script src="modules/compare-widgets.js"></script>
+<script>
+  /* Placeholder night-scene illustrations (SVG data URIs) so the widgets work immediately.
+     Swap these URLs for real before/after photography from an installed site. */
+  const NORMAL_CAM_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+      <defs><radialGradient id="g1" cx="50%" cy="55%" r="75%">
+        <stop offset="0%" stop-color="#1a2233"/><stop offset="100%" stop-color="#03050c"/></radialGradient></defs>
+      <rect width="800" height="450" fill="url(#g1)"/>
+      <g fill="#0d1420" opacity=".9"><rect x="0" y="300" width="800" height="150"/></g>
+      <g stroke="#233" stroke-width="2" opacity=".5">
+        <line x1="0" y1="330" x2="800" y2="330"/><line x1="0" y1="380" x2="800" y2="380"/>
+      </g>
+      <circle cx="620" cy="120" r="26" fill="#2a3550" opacity=".5"/>
+      <text x="400" y="230" fill="#3a4560" font-family="Cairo,Arial" font-size="20" text-anchor="middle">تفاصيل غير واضحة بالليل — لون رمادي ضبابي</text>
+    </svg>`);
+  const COLORVU_CAM_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+      <defs><radialGradient id="g2" cx="50%" cy="55%" r="80%">
+        <stop offset="0%" stop-color="#3a5a8f"/><stop offset="60%" stop-color="#1c3a5c"/><stop offset="100%" stop-color="#0b1830"/></radialGradient></defs>
+      <rect width="800" height="450" fill="url(#g2)"/>
+      <rect x="0" y="300" width="800" height="150" fill="#12351f"/>
+      <g stroke="#4a7a52" stroke-width="2" opacity=".7">
+        <line x1="0" y1="330" x2="800" y2="330"/><line x1="0" y1="380" x2="800" y2="380"/>
+      </g>
+      <circle cx="620" cy="120" r="26" fill="#ffcf5c"/>
+      <circle cx="620" cy="120" r="46" fill="#ffcf5c" opacity=".25"/>
+      <rect x="250" y="230" width="90" height="140" rx="10" fill="#c96b3e"/>
+      <text x="400" y="60" fill="#e9f2ff" font-family="Cairo,Arial" font-size="20" text-anchor="middle">ألوان واضحة كاملة حتى في الإضاءة المنخفضة</text>
+    </svg>`);
+  const CHEAP_CAM_NIGHT = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+      <rect width="800" height="450" fill="#04060c"/>
+      <circle cx="400" cy="220" r="140" fill="#161d2c" opacity=".8"/>
+      <text x="400" y="230" fill="#2c3548" font-family="Cairo,Arial" font-size="18" text-anchor="middle">رؤية ضعيفة — أبيض وأسود</text>
+    </svg>`);
+  const PRO_CAM_NIGHT = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+      <defs><radialGradient id="g3" cx="50%" cy="50%" r="75%">
+        <stop offset="0%" stop-color="#365580"/><stop offset="100%" stop-color="#0a1526"/></radialGradient></defs>
+      <rect width="800" height="450" fill="url(#g3)"/>
+      <circle cx="620" cy="90" r="24" fill="#ffd77a"/>
+      <rect x="300" y="230" width="80" height="130" rx="8" fill="#b85a34"/>
+      <text x="400" y="230" fill="#eaf1ff" font-family="Cairo,Arial" font-size="18" text-anchor="middle">تفاصيل وألوان واضحة</text>
+    </svg>`);
+
+  renderBeforeAfter('colorvuSlider', {
+    beforeImg: NORMAL_CAM_IMG,
+    afterImg: COLORVU_CAM_IMG,
+    beforeLabel: 'كاميرا عادية',
+    afterLabel: 'ColorVu',
+    startPct: 50
+  });
+
+  renderSplitCompare('daynightSplit', {
+    rightImg: CHEAP_CAM_NIGHT,
+    rightLabel: 'كاميرا رخيصة',
+    leftImg: PRO_CAM_NIGHT,
+    leftLabel: 'كاميرا احترافية'
+  });
+</script>
+</body>
+</html>

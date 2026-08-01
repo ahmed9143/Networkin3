@@ -3,7 +3,25 @@
 function renderFilters(){
   const bar = document.getElementById('filtersBar');
   const cats = [{name:'الكل', icon:'🗂️'}, ...categories];
-  bar.innerHTML = cats.map(c => `<button class="filter-btn ${c.name===currentCategoryFilter?'active':''}" onclick="filterByCat('${c.name}', this)"><span class="mega-ic" style="margin-inline-end:6px;">${c.icon || CAT_ICONS[c.name] || '📦'}</span>${c.name}</button>`).join('');
+  const saleCount = products.filter(p => p.old_price && p.old_price > p.price).length;
+  const saleChip = saleCount ? `<button class="filter-btn sale-filter-btn ${saleOnlyFilter?'active':''}" onclick="toggleSaleOnlyFilter(this)">🔥 العروض<span class="sale-chip-count">${saleCount}</span></button>` : '';
+  bar.innerHTML = saleChip + cats.map(c => `<button class="filter-btn ${c.name===currentCategoryFilter && !saleOnlyFilter?'active':''}" onclick="filterByCat('${c.name}', this)"><span class="mega-ic" style="margin-inline-end:6px;">${c.icon || CAT_ICONS[c.name] || '📦'}</span>${c.name}</button>`).join('');
+}
+
+function toggleSaleOnlyFilter(btnEl){
+  saleOnlyFilter = !saleOnlyFilter;
+  renderFilters();
+  renderProducts();
+}
+
+/* Called from the header "العروض" nav link and the SALE badge — jumps to the products
+   page with only discounted items (old_price > price) shown. */
+function openSaleOffers(){
+  navigateTo('products');
+  saleOnlyFilter = true;
+  currentCategoryFilter = 'الكل';
+  renderFilters();
+  renderProducts();
 }
 
 function isProductNew(p){
@@ -310,6 +328,7 @@ function renderFeatured(){
 function renderProducts(){
   const el = document.getElementById('allProductsGrid');
   let list = products;
+  if(saleOnlyFilter) list = list.filter(p => p.old_price && p.old_price > p.price);
   if(currentCategoryFilter && currentCategoryFilter !== 'الكل') list = list.filter(p => p.category === currentCategoryFilter);
   if(currentBrandFilter && currentBrandFilter !== 'الكل') list = list.filter(p => (p.brand||'') === currentBrandFilter);
   if(currentSearchQuery) list = list.filter(p => p.name.toLowerCase().includes(currentSearchQuery.toLowerCase()));
@@ -321,6 +340,7 @@ function renderProducts(){
 
 function filterByCat(cat, btnEl){
   currentCategoryFilter = cat;
+  saleOnlyFilter = false;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   if(btnEl) btnEl.classList.add('active');
   renderProducts();

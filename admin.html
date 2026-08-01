@@ -560,6 +560,37 @@
         </div>
       </div>
 
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🖼️ بنرات العروض الرئيسية (Hero Banners)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">سلايدر البنرات اللي بيظهر أول ما العميل يفتح الموقع (زي بنر خصم بكود كوبون، أو عرض ماركة معينة). ارفع الصورة، حط لينك اختياري (هيوديك عليه لو ضغط على البنر)، ورتّبهم زي ما تحب. لو مفيش بنرات، القسم مش بيظهر خالص للعميل.</p></div>
+          <button class="btn btn-primary" onclick="addHeroBannerRow()">+ إضافة بنر</button>
+        </div>
+        <div id="heroBannersList"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveHeroBanners()">💾 حفظ البنرات</button>
+          <span id="heroBannersSaveMsg" style="font-size:13px;"></span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🤝 الماركات الشريكة (اللي بنتعامل معاها)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">القسم ده هو "الماركات اللي بنتعامل معاها" اللي بتظهر في الصفحة الرئيسية — مستقل تمامًا عن المنتجات، يعني تقدر تضيف ماركة جديدة (زي توكيل جديد) وتظهر في الموقع فورًا حتى لو لسه مفيش منتجات ليها في الكتالوج. رتّب الماركات بالأسهم، ارفع شعار حقيقي لو متاح (وإلا هيظهر اسم الماركة بشكل نضيف لحد ما ترفعله صورة)، واستخدم "إخفاء" لو حابب توقف ظهور ماركة مؤقتًا من غير ما تمسحها.</p></div>
+          <button class="btn btn-primary" onclick="addPartnerBrandRow()">+ إضافة ماركة</button>
+        </div>
+        <div id="partnerBrandsList"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="savePartnerBrands()">💾 حفظ الماركات الشريكة</button>
+          <span id="partnerBrandsSaveMsg" style="font-size:13px;"></span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🏷️ شعارات ماركات المنتجات (تلقائي من الكتالوج)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">قسم قديم/إضافي: لو مش مستخدم "الماركات الشريكة" فوق، الموقع بيرجع تلقائيًا للماركات الموجودة فعليًا في منتجاتك ويقدر يورّي شعار مرفوع من هنا. لو "الماركات الشريكة" فوق فيها ماركات، هي اللي بتظهر بدل القسم ده.</p></div>
+        </div>
+        <div id="brandLogosList"></div>
+      </div>
+
       <div class="card">
         <div class="topline" style="margin-bottom:10px;">
           <div><h3 style="margin:0;">🎯 نصوص مساعد اختيار الكاميرا</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">عدّل عنوان كل سؤال ووصفه، وأيقونة/نص كل اختيار. ترتيب الاختيارات والقيمة الفعلية بتاعتها ثابتة (عشان الترشيح النهائي للمنتجات يفضل شغال صح) - إنت بس بتغيّر الكلام اللي بيظهر للعميل.</p></div>
@@ -1206,6 +1237,9 @@ async function loadAll(){
   renderDashboard();
   renderSolutionsMenuForm();
   renderPromoOffersForm();
+  renderBrandLogosForm();
+  renderPartnerBrandsForm();
+  renderHeroBannersForm();
   renderFinderCopyForm();
   renderReviewsAdmin();
   renderStockNotifyAdmin();
@@ -2560,6 +2594,249 @@ async function savePromoOffers(){
   msg.style.color = 'var(--ok,#2ecc71)';
   msg.innerText = '✓ اتحفظ بنجاح - التعديل هيظهر للعملاء فورًا';
   setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
+}
+
+/* ================= Hero banners (بنرات العروض الرئيسية) =================
+   Stored in Supabase site_settings under key 'hero_banners' as an array of
+   { image, link, alt }. Images are uploaded to the same public 'products' storage
+   bucket already used for product photos (under a banners/ prefix) so no new
+   bucket/policy setup is required in Supabase. */
+function renderHeroBannersForm(){
+  const list = document.getElementById('heroBannersList');
+  if(!list) return;
+  const banners = Array.isArray(siteSettings.hero_banners) ? siteSettings.hero_banners : [];
+  list.innerHTML = '';
+  banners.forEach(b => addHeroBannerRow(b));
+  if(!banners.length) list.innerHTML = '<p style="font-size:13px;color:var(--muted,#8994a8);">لسه معملتش بنرات. دوس "+ إضافة بنر" وابدأ.</p>';
+}
+
+function addHeroBannerRow(banner){
+  const list = document.getElementById('heroBannersList');
+  if(list.children.length === 1 && list.children[0].tagName === 'P') list.innerHTML = '';
+  const b = banner || { image:'', link:'', alt:'' };
+  const row = document.createElement('div');
+  row.className = 'hero-banner-row';
+  row.style.cssText = 'display:flex;gap:12px;align-items:center;border:1px solid var(--line,#232b3d);border-radius:10px;padding:10px;margin-bottom:10px;flex-wrap:wrap;';
+  row.innerHTML = `
+    <div class="hb-preview-wrap" style="width:140px;height:48px;border-radius:6px;overflow:hidden;background:var(--paper-2,#0d1522);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <img class="hb-preview" src="${b.image||''}" style="width:100%;height:100%;object-fit:cover;${b.image?'':'display:none;'}">
+      <span class="hb-preview-empty" style="font-size:11px;color:var(--muted,#8994a8);${b.image?'display:none;':''}">لا صورة</span>
+    </div>
+    <input type="file" accept="image/*" class="hb-file" onchange="handleHeroBannerFile(this)" style="max-width:180px;">
+    <input type="text" class="hb-link" placeholder="لينك عند الضغط (اختياري) - مثال: products أو https://..." value="${(b.link||'').replace(/"/g,'&quot;')}" style="flex:1;min-width:180px;">
+    <input type="text" class="hb-alt" placeholder="وصف الصورة (alt)" value="${(b.alt||'').replace(/"/g,'&quot;')}" style="flex:1;min-width:140px;">
+    <input type="hidden" class="hb-image-url" value="${(b.image||'').replace(/"/g,'&quot;')}">
+    <button class="btn" onclick="this.closest('.hero-banner-row').remove()" title="حذف هذا البنر">🗑️</button>`;
+  list.appendChild(row);
+}
+
+async function handleHeroBannerFile(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const row = inputEl.closest('.hero-banner-row');
+  const preview = row.querySelector('.hb-preview');
+  const previewEmpty = row.querySelector('.hb-preview-empty');
+  const urlField = row.querySelector('.hb-image-url');
+  try{
+    const compressed = await compressImage(file, 1920, 0.82);
+    const fileName = `banners/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+    const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+    if(upErr) throw upErr;
+    const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+    urlField.value = pub.publicUrl;
+    preview.src = pub.publicUrl;
+    preview.style.display = 'block';
+    previewEmpty.style.display = 'none';
+  }catch(err){
+    alert('حدث خطأ أثناء رفع الصورة: ' + err.message);
+  }
+}
+
+async function saveHeroBanners(){
+  const msg = document.getElementById('heroBannersSaveMsg');
+  const rows = document.querySelectorAll('#heroBannersList .hero-banner-row');
+  const banners = [];
+  rows.forEach(r => {
+    const image = r.querySelector('.hb-image-url').value.trim();
+    const link = r.querySelector('.hb-link').value.trim();
+    const alt = r.querySelector('.hb-alt').value.trim();
+    if(image) banners.push({ image, link: link || undefined, alt: alt || undefined });
+  });
+  const { error } = await sb.from('site_settings').upsert({ key:'hero_banners', value: banners, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.hero_banners = banners;
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - البنرات هتظهر للعملاء فورًا';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
+}
+
+/* ================= Brand logos (شعارات الماركات) =================
+   Stored in Supabase site_settings under key 'brand_logos' as { [brandSlug]: imageUrl }.
+   Brand list is derived live from existing products.brand values (same slugging logic as
+   modules/brands.js on the storefront) so there's nothing to keep in sync manually. */
+function adminBrandSlug(name){
+  return String(name).toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'-').replace(/^-+|-+$/g,'') || 'brand';
+}
+
+function renderBrandLogosForm(){
+  const list = document.getElementById('brandLogosList');
+  if(!list) return;
+  const brandNames = [...new Set(products.map(p=>p.brand).filter(Boolean))].sort();
+  const logos = (siteSettings.brand_logos && typeof siteSettings.brand_logos === 'object') ? siteSettings.brand_logos : {};
+  if(!brandNames.length){ list.innerHTML = '<p style="font-size:13px;color:var(--muted,#8994a8);">لسه مفيش منتجات بماركة محددة. حدّد ماركة للمنتجات الأول من تبويب المنتجات.</p>'; return; }
+  list.innerHTML = brandNames.map(name => {
+    const slug = adminBrandSlug(name);
+    const url = logos[slug] || '';
+    return `
+    <div class="brand-logo-row" data-slug="${slug}" style="display:flex;gap:12px;align-items:center;border:1px solid var(--line,#232b3d);border-radius:10px;padding:10px;margin-bottom:8px;flex-wrap:wrap;">
+      <div class="bl-preview-wrap" style="width:100px;height:44px;border-radius:6px;overflow:hidden;background:#f4f5f7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <img class="bl-preview" src="${url}" style="max-width:90%;max-height:90%;object-fit:contain;${url?'':'display:none;'}">
+        <span class="bl-preview-empty" style="font-size:16px;color:#999;${url?'display:none;':''}">${name.slice(0,2).toUpperCase()}</span>
+      </div>
+      <b style="min-width:120px;">${name}</b>
+      <input type="file" accept="image/*" onchange="uploadBrandLogo('${slug}', this)" style="max-width:200px;">
+      ${url ? `<button class="btn" onclick="removeBrandLogo('${slug}')" title="حذف الشعار وإرجاع الاسم النصي">🗑️ حذف الشعار</button>` : ''}
+      <span class="bl-save-msg" style="font-size:12px;"></span>
+    </div>`;
+  }).join('');
+}
+
+async function uploadBrandLogo(slug, inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const row = inputEl.closest('.brand-logo-row');
+  const msg = row.querySelector('.bl-save-msg');
+  msg.style.color = ''; msg.innerText = 'جاري الرفع...';
+  try{
+    const compressed = await compressImage(file, 600, 0.9);
+    const fileName = `brands/${slug}_${Date.now()}.png`;
+    const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+    if(upErr) throw upErr;
+    const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+    const logos = (siteSettings.brand_logos && typeof siteSettings.brand_logos === 'object') ? { ...siteSettings.brand_logos } : {};
+    logos[slug] = pub.publicUrl;
+    const { error } = await sb.from('site_settings').upsert({ key:'brand_logos', value: logos, updated_at: new Date().toISOString() });
+    if(error) throw error;
+    siteSettings.brand_logos = logos;
+    msg.style.color = 'var(--ok,#2ecc71)'; msg.innerText = '✓ اتحفظ';
+    renderBrandLogosForm();
+    setTimeout(()=>{ const m=document.querySelector(`.brand-logo-row[data-slug="${slug}"] .bl-save-msg`); if(m) m.innerText=''; }, 3000);
+  }catch(err){
+    msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'خطأ: ' + err.message;
+  }
+}
+
+async function removeBrandLogo(slug){
+  const logos = (siteSettings.brand_logos && typeof siteSettings.brand_logos === 'object') ? { ...siteSettings.brand_logos } : {};
+  delete logos[slug];
+  const { error } = await sb.from('site_settings').upsert({ key:'brand_logos', value: logos, updated_at: new Date().toISOString() });
+  if(error){ alert('حدث خطأ: ' + error.message); return; }
+  siteSettings.brand_logos = logos;
+  renderBrandLogosForm();
+}
+
+/* ================= الماركات الشريكة (Partner Brands) =================
+   Stored in Supabase site_settings under key 'partner_brands' as an ORDERED array:
+   [{ id, name, slug, logo_url, active }]. Independent of the products table on
+   purpose — see modules/brands.js for how the storefront consumes this (falls back
+   to product-derived brands automatically if this list is ever emptied/unset). */
+const DEFAULT_PARTNER_BRANDS = [
+  { id:'hikvision', name:'Hikvision', slug:'hikvision', logo_url:'', active:true },
+  { id:'dahua', name:'Dahua', slug:'dahua', logo_url:'', active:true },
+  { id:'uniview', name:'Uniview (UNV)', slug:'uniview-unv', logo_url:'', active:true },
+  { id:'tiandy', name:'Tiandy', slug:'tiandy', logo_url:'', active:true }
+];
+function partnerBrandSlug(name){
+  return String(name).toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'-').replace(/^-+|-+$/g,'') || 'brand';
+}
+
+function renderPartnerBrandsForm(){
+  const list = document.getElementById('partnerBrandsList');
+  if(!list) return;
+  const brands = (siteSettings.partner_brands && Array.isArray(siteSettings.partner_brands) && siteSettings.partner_brands.length)
+    ? siteSettings.partner_brands : DEFAULT_PARTNER_BRANDS;
+  list.innerHTML = '';
+  brands.forEach(b => addPartnerBrandRow(b));
+}
+
+function addPartnerBrandRow(brand){
+  const list = document.getElementById('partnerBrandsList');
+  if(list.children.length === 1 && list.children[0].tagName === 'P') list.innerHTML = '';
+  const b = brand || { id:'pb_'+Date.now(), name:'', slug:'', logo_url:'', active:true };
+  const row = document.createElement('div');
+  row.className = 'partner-brand-row';
+  row.dataset.id = b.id || ('pb_'+Date.now()+Math.random().toString(36).slice(2,6));
+  row.style.cssText = 'display:flex;gap:12px;align-items:center;border:1px solid var(--line,#232b3d);border-radius:10px;padding:10px;margin-bottom:8px;flex-wrap:wrap;'+(b.active===false?'opacity:.5;':'');
+  row.innerHTML = `
+    <div class="pb-order-btns" style="display:flex;flex-direction:column;gap:2px;">
+      <button class="btn" style="padding:2px 8px;font-size:11px;" onclick="movePartnerBrandRow(this,-1)" title="لأعلى">▲</button>
+      <button class="btn" style="padding:2px 8px;font-size:11px;" onclick="movePartnerBrandRow(this,1)" title="لأسفل">▼</button>
+    </div>
+    <div class="pb-preview-wrap" style="width:100px;height:44px;border-radius:6px;overflow:hidden;background:#f4f5f7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <img class="pb-preview" src="${b.logo_url||''}" style="max-width:90%;max-height:90%;object-fit:contain;${b.logo_url?'':'display:none;'}">
+      <span class="pb-preview-empty" style="font-size:11px;color:#999;${b.logo_url?'display:none;':''}">لا شعار</span>
+    </div>
+    <input type="text" class="pb-name" placeholder="اسم الماركة (مثال: Tiandy)" value="${(b.name||'').replace(/"/g,'&quot;')}" style="min-width:150px;flex:1;">
+    <input type="file" accept="image/*" class="pb-file" onchange="handlePartnerBrandFile(this)" style="max-width:190px;">
+    <input type="hidden" class="pb-logo-url" value="${(b.logo_url||'').replace(/"/g,'&quot;')}">
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;white-space:nowrap;">
+      <input type="checkbox" class="pb-active" ${b.active===false?'':'checked'} onchange="this.closest('.partner-brand-row').style.opacity=this.checked?'1':'.5'"> نشطة
+    </label>
+    <button class="btn" onclick="this.closest('.partner-brand-row').remove()" title="حذف الماركة دي">🗑️</button>`;
+  list.appendChild(row);
+}
+
+function movePartnerBrandRow(btnEl, dir){
+  const row = btnEl.closest('.partner-brand-row');
+  const list = document.getElementById('partnerBrandsList');
+  if(dir < 0 && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
+  else if(dir > 0 && row.nextElementSibling) list.insertBefore(row.nextElementSibling, row);
+}
+
+async function handlePartnerBrandFile(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const row = inputEl.closest('.partner-brand-row');
+  const preview = row.querySelector('.pb-preview');
+  const previewEmpty = row.querySelector('.pb-preview-empty');
+  const urlField = row.querySelector('.pb-logo-url');
+  try{
+    const compressed = await compressImage(file, 600, 0.9);
+    const fileName = `partner-brands/${Date.now()}_${Math.random().toString(36).slice(2,7)}.png`;
+    const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+    if(upErr) throw upErr;
+    const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+    urlField.value = pub.publicUrl;
+    preview.src = pub.publicUrl;
+    preview.style.display = 'block';
+    previewEmpty.style.display = 'none';
+  }catch(err){
+    alert('حدث خطأ أثناء رفع الشعار: ' + err.message);
+  }
+}
+
+async function savePartnerBrands(){
+  const msg = document.getElementById('partnerBrandsSaveMsg');
+  const rows = document.querySelectorAll('#partnerBrandsList .partner-brand-row');
+  const brands = [];
+  rows.forEach(r => {
+    const name = r.querySelector('.pb-name').value.trim();
+    if(!name) return;
+    brands.push({
+      id: r.dataset.id,
+      name,
+      slug: partnerBrandSlug(name),
+      logo_url: r.querySelector('.pb-logo-url').value.trim(),
+      active: r.querySelector('.pb-active').checked
+    });
+  });
+  if(!brands.length){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'لازم يكون في ماركة واحدة على الأقل باسم.'; return; }
+  const { error } = await sb.from('site_settings').upsert({ key:'partner_brands', value: brands, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.partner_brands = brands;
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - الماركات هتظهر بالترتيب ده في الصفحة الرئيسية فورًا';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 4500);
 }
 
 /* نفس بنية FINDER_STEPS الموجودة في index.html - القيم (value) دي ثابتة ومربوطة بمنطق

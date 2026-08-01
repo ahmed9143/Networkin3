@@ -47,6 +47,9 @@ function showToolTab(name){
   if(name==='compare') initCompareTool();
   if(name==='quote') initQuoteBuilder();
   if(name==='security') calcSecurityScore();
+  if(name==='netdoc' && typeof ndgInit==='function') ndgInit();
+  if(name==='compat' && typeof ceInit==='function') ceInit();
+  if(name==='aidraw' && typeof adrInit==='function') adrInit();
 }
 function hideToolTabs(){
   document.getElementById('toolsHubGrid').style.display = 'grid';

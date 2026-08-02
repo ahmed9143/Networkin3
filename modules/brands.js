@@ -181,9 +181,13 @@ function renderBrandStrip(){
       <span class="bc-tip">${brandCategory(b)}</span>
     </div>`;
   };
-  // render the list twice back-to-back so the CSS animation can scroll exactly -50%
-  // and loop seamlessly (right-to-left) with no visible seam or reset-jump
-  const once = list.map(chip).join('');
-  strip.innerHTML = once + once;
+  // static row now (no auto-scroll marquee) — render once; the side arrows below
+  // handle manual scrolling for lists that don't fully fit on screen.
+  strip.innerHTML = list.map(chip).join('');
+}
+function scrollBrandWall(dir){
+  const track = document.getElementById('brandStripTrack');
+  if(!track) return;
+  track.scrollBy({ left: dir * -260, behavior: 'smooth' });
 }
 

@@ -2824,10 +2824,14 @@ function addHeroBannerRow(banner){
   const q = s => String(s==null?'':s).replace(/"/g,'&quot;');
   const row = document.createElement('details');
   row.className = 'hb-card hero-banner-row';
-  row.open = !b.title && !bgImg; // new/empty rows start expanded
+  row.open = !b.title && !bgImg; // only truly empty rows start expanded
+  const thumb = bgImg ? `<img src="${q(bgImg)}" alt="" style="width:28px;height:20px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-inline-end:6px;">` : '';
+  const summaryLabel = b.title
+    ? `🎬 ${q(b.title)}`
+    : (bgImg ? `${thumb}بنر بدون عنوان (فيه صورة مرفوعة — من غير عنوان معناها إنه بيعرض الصورة زي ما هي)` : '🆕 بنر جديد (فاضي تمامًا)');
   row.innerHTML = `
     <summary>
-      <span>${b.title ? '🎬 ' + q(b.title) : '🆕 بنر جديد'} ${b.badge ? `<small style="opacity:.7;">[${q(b.badge)}]</small>` : ''} ${b.active===false ? '<small style="color:var(--danger);">(متوقف)</small>' : ''}</span>
+      <span>${summaryLabel} ${b.badge ? `<small style="opacity:.7;">[${q(b.badge)}]</small>` : ''} ${b.active===false ? '<small style="color:var(--danger);">(متوقف)</small>' : ''}</span>
       <button type="button" class="btn" onclick="event.preventDefault();event.stopPropagation();this.closest('.hero-banner-row').remove();refreshBannerPreview();" title="حذف هذا البنر">🗑️</button>
     </summary>
     <input type="hidden" class="hb-id" value="${q(b.id)}">

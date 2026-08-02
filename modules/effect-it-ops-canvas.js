@@ -384,69 +384,8 @@
   }
 })();
 
-/* ================= Hero promo banner slider =================
-   Full-width image banners at the top of the homepage (discount codes, brand offers, etc).
-   Editable by the admin from admin.html ("🎛️ إعدادات الموقع" -> "بنرات العروض الرئيسية"),
-   stored in Supabase `site_settings` under key 'hero_banners' as [{ image, link, alt }].
-   Section stays hidden entirely if no banners are configured. */
-(function(){
-  const root = document.getElementById('promoBannerSlider');
-  const track = document.getElementById('pbsTrack');
-  const dotsEl = document.getElementById('pbsDots');
-  const prevBtn = document.getElementById('pbsPrev');
-  const nextBtn = document.getElementById('pbsNext');
-  if(!root || !track || typeof sb === 'undefined' || !sb || !sb.from) return;
+/* Hero promo banner slider now lives in modules/banner-engine.js (Banner Engine). */
 
-  let banners = [];
-  let idx = 0;
-  let timer = null;
-
-  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  function go(action){
-    if(!action) return;
-    // internal page name (e.g. "products") vs a full URL
-    if(/^https?:\/\//i.test(action)) window.open(action, '_blank');
-    else if(typeof navigateTo === 'function') navigateTo(action);
-  }
-
-  function render(){
-    track.innerHTML = banners.map(b => `
-      <div class="pbs-slide" onclick="window.__pbsGo && window.__pbsGo('${esc((b.link||'').replace(/'/g,"\\'"))}')">
-        <img src="${esc(b.image)}" alt="${esc(b.alt||'عرض')}" loading="lazy">
-      </div>`).join('');
-    dotsEl.innerHTML = banners.map((_,i) => `<button class="pbs-dot ${i===0?'active':''}" onclick="window.__pbsGoto && window.__pbsGoto(${i})"></button>`).join('');
-    root.classList.toggle('has-banners', banners.length > 0);
-    root.setAttribute('aria-hidden', banners.length ? 'false' : 'true');
-    const showArrows = banners.length > 1;
-    prevBtn.style.display = showArrows ? 'flex' : 'none';
-    nextBtn.style.display = showArrows ? 'flex' : 'none';
-  }
-
-  function update(){
-    track.style.transform = `translateX(${idx * -100}%)`; // .pbs-track is forced direction:ltr in CSS, so this is a standard forward slide
-    document.querySelectorAll('#pbsDots .pbs-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
-  }
-
-  window.__pbsGo = go;
-  window.__pbsGoto = function(i){ idx = i; update(); restart(); };
-
-  function next(){ idx = (idx+1) % banners.length; update(); }
-  function prev(){ idx = (idx-1+banners.length) % banners.length; update(); }
-  function restart(){ if(timer) clearInterval(timer); if(banners.length > 1) timer = setInterval(next, 5000); }
-
-  prevBtn.addEventListener('click', (e)=>{ e.stopPropagation(); prev(); restart(); });
-  nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); next(); restart(); });
-
-  sb.from('site_settings').select('value').eq('key','hero_banners').maybeSingle()
-    .then(({ data }) => {
-      const list = data && Array.isArray(data.value) ? data.value.filter(b => b && b.image) : [];
-      if(!list.length) return; // section stays hidden
-      banners = list; idx = 0;
-      render(); update(); restart();
-    })
-    .catch(()=>{ /* section stays hidden on any error */ });
-})();
 
 /* ================= Admin-editable "الحلول" mega-menu =================
    Managed from admin.html ("🎛️ إعدادات الموقع" tab) without touching any code -

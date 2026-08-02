@@ -128,6 +128,9 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/mobile-redesign.css">
+<link rel="stylesheet" href="css/banner-engine.css">
+<link rel="stylesheet" href="css/hero-dynamic.css">
+<link rel="stylesheet" href="css/hero-polish.css">
 
 </head>
 <body>
@@ -477,6 +480,7 @@
     </div>
     <section class="hero">
       <div class="hero-gradwash" aria-hidden="true"></div>
+      <div class="hero-depth" aria-hidden="true"></div>
       <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
       <div class="hero-orbs" aria-hidden="true"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
       <div class="hero-noise" aria-hidden="true"></div>
@@ -564,10 +568,11 @@
           
           <p>مش مجرد كاميرات — منصة كاملة بتخليك تصمم نظام الأمان بنفسك، تحسب التغطية والتكلفة لحظيًا، وتتابع كل حاجة بعد التركيب من نفس المكان.</p>
           <div class="hero-ctas">
-            <a class="btn btn-cta magnetic" onclick="navigateTo('finder')">🤖 ساعدني أختار</a>
-            <a class="btn btn-primary magnetic" onclick="navigateTo('contact')">🏢 ابنِ مشروعك</a>
-            <a class="btn btn-outline magnetic" onclick="navigateTo('products')">📦 تصفح المنتجات</a>
+            <a class="btn btn-cta magnetic" onclick="navigateTo('contact')">🚀 ابدأ مشروعك الآن</a>
+            <a class="btn btn-primary magnetic" onclick="navigateTo('contact')">📅 اطلب معاينة موقع</a>
+            <a class="btn btn-outline magnetic" onclick="navigateTo('products')">🛒 تصفح المنتجات</a>
           </div>
+          <a class="hero-cta-aux" onclick="navigateTo('finder')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigateTo('finder');}">🤖 مش عارف تبدأ منين؟ خلّي الـ AI يرشّحلك</a>
           <div class="hero-trust">
             <div class="ht-item"><span class="ht-check">✓</span><div><b class="count-up" data-target="500" data-prefix="+">0</b><small>مشروع</small></div></div>
             <div class="ht-item"><span class="ht-check">✓</span><div><b>99.98%</b><small>Uptime</small></div></div>
@@ -1768,5 +1773,8 @@
 <script src="js/bootstrap.js"></script>
 <script src="modules/effect-magnetic-buttons.js"></script>
 <script src="modules/effect-it-ops-canvas.js"></script>
+<script src="modules/banner-engine.js"></script>
+<script src="modules/enterprise-experience.js"></script>
+<script src="js/hero-settings.js"></script>
 </body>
 </html>

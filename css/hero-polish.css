@@ -1,0 +1,145 @@
+/* ==========================================================================
+   hero-polish.css — Phase 2B (visual polish, hero + promo banner stay
+   separate DOM sections as decided). Loaded after hero-dynamic.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------
+   1. 8px spacing scale + unified shadow system (scoped tokens, additive)
+   -------------------------------------------------------------------- */
+:root{
+  --sp-1:4px; --sp-2:8px; --sp-3:16px; --sp-4:24px; --sp-5:32px; --sp-6:40px; --sp-7:56px; --sp-8:72px;
+  --shadow-sm: 0 2px 8px -2px rgba(0,0,0,.28);
+  --shadow-md: 0 10px 26px -10px rgba(0,0,0,.45);
+  --shadow-lg: 0 22px 54px -18px rgba(0,0,0,.55);
+  --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--cable-blue) 35%, transparent), 0 12px 30px -10px color-mix(in srgb, var(--cable-blue) 45%, transparent);
+}
+
+/* --------------------------------------------------------------------
+   2. Depth layers behind the hero — subtle animated grid + radial glow.
+      Sits below every existing hero layer (z-index:0), doesn't touch
+      the SVG network diagram, orbit, badge, or particle systems.
+   -------------------------------------------------------------------- */
+.hero-depth{
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.hero-depth::before{
+  /* faint moving grid */
+  content: "";
+  position: absolute; inset: -20% -20%;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--cable-blue) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--cable-blue) 14%, transparent) 1px, transparent 1px);
+  background-size: 46px 46px;
+  opacity: calc(.35 * var(--hero-glow, 1));
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  animation: heroGridDrift calc(40s * var(--hero-speed, 1)) linear infinite;
+}
+.hero-depth::after{
+  /* soft radial depth wash, distinct from the per-banner overlay */
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 78% 20%, color-mix(in srgb, var(--cable-orange) 16%, transparent), transparent 60%),
+              radial-gradient(ellipse 55% 45% at 15% 85%, color-mix(in srgb, var(--cable-blue) 18%, transparent), transparent 60%);
+  opacity: calc(var(--hero-glow, 1));
+}
+@keyframes heroGridDrift{ from{ transform: translate(0,0); } to{ transform: translate(46px, 46px); } }
+@media (prefers-reduced-motion: reduce){ .hero-depth::before{ animation: none; } }
+
+/* --------------------------------------------------------------------
+   3. Declutter — secondary floating widgets fade/rise in AFTER the core
+      content (headline + CTAs + primary network diagram), staggered, so
+      the first paint reads calm instead of "everything at once".
+   -------------------------------------------------------------------- */
+@keyframes heroReveal{
+  from{ opacity: 0; transform: translateY(10px) scale(.97); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+.hero-corner-badge,
+.hero-orbit,
+#heroHologram,
+.hero-hud,
+.hero-float-cam{
+  animation: heroReveal .6s cubic-bezier(.16,1,.3,1) both;
+}
+.hero-corner-badge{ animation-delay: .55s; }
+.hero-orbit{ animation-delay: .75s; }
+#heroHologram{ animation-delay: .9s; }
+.hero-hud{ animation-delay: 1.05s; }
+.hero-float-cam{ animation-delay: 1.2s; }
+
+@media (prefers-reduced-motion: reduce){
+  .hero-corner-badge,.hero-orbit,#heroHologram,.hero-hud,.hero-float-cam{ animation: none; }
+}
+
+/* --------------------------------------------------------------------
+   4. Typography refinement
+   -------------------------------------------------------------------- */
+.hero h1{
+  font-size: clamp(30px, 4.2vw, 46px);
+  line-height: 1.22;
+  letter-spacing: -.01em;
+}
+.hero p{
+  max-width: 460px;          /* narrower measure = easier reading, spec asked to "reduce subtitle width" */
+  line-height: 1.85;
+  margin-block: 0 var(--sp-4);
+}
+.eyebrow{ margin-bottom: var(--sp-3); }
+.hero-ctas{ margin-bottom: var(--sp-5); gap: var(--sp-3); }
+.hero-trust{ gap: var(--sp-4); }
+
+/* --------------------------------------------------------------------
+   5. CTA redesign — elevation on hover, light-sweep, clear keyboard focus.
+      Primary / Secondary / Tertiary roles map onto the existing
+      .btn-cta / .btn-primary / .btn-outline classes already used in
+      index.html, so no markup restructuring is required elsewhere on
+      the site — every other .btn-primary/.btn-outline instance also
+      benefits from the same elevation + focus polish.
+   -------------------------------------------------------------------- */
+.btn{
+  position: relative; overflow: hidden; isolation: isolate;
+  transition: transform .22s cubic-bezier(.16,1,.3,1), box-shadow .28s ease, filter .22s ease;
+}
+.btn::before{
+  /* light sweep */
+  content: "";
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 48%, transparent 66%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.btn:hover::before{ transition: transform .65s cubic-bezier(.16,1,.3,1); transform: translateX(120%); }
+.btn:active{ transform: translateY(0) scale(.98); }
+
+.hero-ctas .btn-cta,
+.hero-ctas .btn-primary{ box-shadow: var(--shadow-md); }
+.hero-ctas .btn-cta:hover,
+.hero-ctas .btn-primary:hover{ transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.hero-ctas .btn-outline{ box-shadow: var(--shadow-sm); }
+.hero-ctas .btn-outline:hover{ transform: translateY(-3px); border-color: var(--cable-blue); box-shadow: var(--shadow-md); }
+
+.btn:focus-visible{
+  outline: 2px solid var(--cable-blue);
+  outline-offset: 3px;
+}
+
+/* small tertiary text-link (AI helper) kept, just visually demoted so the
+   3 primary CTAs read first — functionality untouched */
+.hero-cta-aux{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; color: var(--ink-soft); text-decoration: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink-soft) 45%, transparent);
+  padding-bottom: 1px; margin-inline-start: var(--sp-2); cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.hero-cta-aux:hover{ color: var(--cable-orange); border-color: var(--cable-orange); }
+.hero-cta-aux:focus-visible{ outline: 2px solid var(--cable-blue); outline-offset: 3px; border-radius: 4px; }
+
+/* --------------------------------------------------------------------
+   6. Seam between the promo-banner strip and the hero below it — since
+      they stay two separate sections (not merged), this makes the
+      transition read as one cohesive top-of-page block.
+   -------------------------------------------------------------------- */
+.promo-banner-slider.has-banners{ box-shadow: var(--shadow-md); position: relative; z-index: 2; }
+.promo-banner-slider.has-banners + .hero{ margin-top: -1px; }

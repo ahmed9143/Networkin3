@@ -885,6 +885,85 @@
   .prod-badge-left.bestseller{background:#c9860c;}
   .prod-badge-left.new{background:var(--cable-blue);}
   .prod-badge-left.digital{background:#7a3ff2;}
+  .prod-badge-left.featured{background:linear-gradient(135deg,#F59E0B,#c9860c);}
+  .prod-badge-left.ai{background:linear-gradient(135deg,var(--ai-purple,#8A5CFF),#5b3fc9);}
+  .prod-card{transition:transform .18s ease, box-shadow .3s ease, border-color .3s ease;will-change:transform;}
+  .prod-thumb img{transition:opacity .4s ease, transform .5s cubic-bezier(.4,0,.2,1);opacity:0;background:linear-gradient(90deg,var(--navy-800) 25%,var(--navy-700) 37%,var(--navy-800) 63%);background-size:400% 100%;animation:prodImgSkeleton 1.4s ease-in-out infinite;}
+  .prod-thumb img.loaded{opacity:1;animation:none;background:none;}
+  @keyframes prodImgSkeleton{0%{background-position:100% 0}100%{background-position:0 0}}
+  .prod-chips{display:flex;gap:5px;flex-wrap:wrap;margin:2px 0 4px;}
+  .prod-chip{font-size:9.5px;font-weight:700;color:var(--cable-blue);background:color-mix(in srgb, var(--cable-blue) 14%, transparent);border:1px solid color-mix(in srgb, var(--cable-blue) 35%, transparent);padding:2px 7px;border-radius:20px;white-space:nowrap;}
+  .prod-hover-actions button{position:relative;overflow:hidden;}
+  .prod-hover-actions button:active::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.35);border-radius:inherit;animation:btnRipple .45s ease-out;}
+  @keyframes btnRipple{from{opacity:1;transform:scale(0)}to{opacity:0;transform:scale(2.2)}}
+  @media(prefers-reduced-motion:reduce){.prod-card{transition:none;}.prod-thumb img{transition:none;}}
+
+  /* ---- Quick View extras ---- */
+  .qv-thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;}
+  .qv-thumb{width:56px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:.6;transition:var(--transition);flex-shrink:0;}
+  .qv-thumb.active,.qv-thumb:hover{opacity:1;border-color:var(--cable-blue);}
+  .qv-specs-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px;}
+  .qv-specs-table td{padding:6px 8px;border-bottom:1px solid var(--line);}
+  .qv-specs-table td:first-child{color:var(--ink-soft);width:45%;}
+  .qv-downloads{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+  .qv-doc-link{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;background:var(--paper-2);border:1px solid var(--line);color:var(--ink);text-decoration:none;}
+  .qv-doc-link:hover{border-color:var(--cable-blue);}
+  .qv-warranty{font-size:12.5px;color:var(--ok);margin-bottom:8px;}
+  .qv-secondary-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .qv-secondary-actions button{flex:1;min-width:80px;font-size:11.5px;font-weight:700;padding:8px 6px;border-radius:8px;background:var(--paper-2);border:1px solid var(--line);color:var(--ink);cursor:pointer;transition:var(--transition);}
+  .qv-secondary-actions button:hover{border-color:var(--cable-blue);color:var(--cable-blue);}
+  .qv-related-section{margin-top:16px;}
+  .qv-related-section h4{font-size:13px;margin-bottom:8px;}
+  .qv-related-row{display:flex;gap:10px;overflow-x:auto;}
+  .qv-related-item{flex-shrink:0;width:84px;text-align:center;cursor:pointer;}
+  .qv-related-item img{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--line);}
+  .qv-related-item span{display:block;font-size:10.5px;margin-top:4px;line-height:1.3;}
+  .compat-chip-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .compat-chip{font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--line);}
+  .compat-chip.ok{color:var(--ok);border-color:var(--ok);}
+  .compat-chip.warn{color:#F59E0B;border-color:#F59E0B;}
+  .compat-chip.bad{color:var(--danger);border-color:var(--danger);}
+
+  /* ---- Comparison drawer ---- */
+  .cmp-drawer-bar{position:fixed;bottom:0;insetInline:0;left:0;right:0;z-index:60;display:none;gap:10px;align-items:center;
+    background:var(--paper-2);border-top:1px solid var(--line);padding:10px 16px;overflow-x:auto;box-shadow:0 -8px 24px rgba(0,0,0,.25);}
+  .cmp-drawer-bar.show{display:flex;}
+  .cmp-bar-chip{display:flex;align-items:center;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:5px 8px;flex-shrink:0;font-size:11.5px;white-space:nowrap;}
+  .cmp-bar-chip img{width:28px;height:28px;object-fit:cover;border-radius:6px;}
+  .cmp-bar-chip button{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:14px;}
+  .cmp-drawer-overlay{position:fixed;inset:0;background:rgba(5,8,22,.7);display:flex;align-items:center;justify-content:center;z-index:80;opacity:0;pointer-events:none;transition:var(--transition);padding:20px;}
+  .cmp-drawer-overlay.open{opacity:1;pointer-events:auto;}
+  .cmp-drawer-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:24px;max-width:920px;width:100%;max-height:86vh;overflow:auto;position:relative;}
+
+  /* ---- Floating project panel ---- */
+  .project-panel-toggle{position:fixed;bottom:20px;left:20px;z-index:55;display:none;align-items:center;gap:6px;
+    background:linear-gradient(120deg,var(--cable-blue),var(--ai-purple,#8A5CFF));color:#fff;border:none;border-radius:30px;
+    padding:12px 18px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(47,123,255,.35);}
+  .project-panel{position:fixed;bottom:80px;left:20px;z-index:56;width:280px;max-width:88vw;background:var(--paper-2);
+    border:1px solid var(--line);border-radius:var(--radius);padding:0;opacity:0;pointer-events:none;transform:translateY(12px);transition:var(--transition);box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  .project-panel.open{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .project-panel-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);}
+  .project-panel-head button{background:none;border:none;color:var(--ink-soft);font-size:18px;cursor:pointer;}
+  .project-panel-body{padding:12px 16px;}
+  .project-panel-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line);}
+
+  /* ---- Sort + grid density controls ---- */
+  .sort-grid-controls{display:flex;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap;}
+  .sort-grid-controls select{background:var(--paper-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:12.5px;}
+  .grid-density-toggle{display:flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:3px;}
+  .grid-density-toggle button{background:none;border:none;color:var(--ink-soft);width:30px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;}
+  .grid-density-toggle button.active{background:var(--cable-blue);color:#fff;}
+  .prod-grid.density-compact{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+  .prod-grid.density-compact .prod-body{padding:10px;}
+  .prod-grid.density-list{grid-template-columns:1fr;}
+  .prod-grid.density-list .prod-card{display:flex;flex-direction:row;align-items:center;}
+  .prod-grid.density-list .prod-thumb{width:140px;flex-shrink:0;}
+  .prod-grid.density-list .prod-body{flex:1;}
+
+  @media(max-width:720px){
+    .project-panel-toggle,.project-panel{left:12px;}
+    .cmp-drawer-bar{padding:8px 10px;}
+  }
   .digital-note{background:var(--cable-orange-dim);border:1px solid var(--cable-orange);color:var(--ink);font-size:12.5px;padding:10px 12px;border-radius:8px;margin:10px 0;line-height:1.8;}
   .wish-btn{position:absolute;bottom:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(8,21,37,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);z-index:2;line-height:1;}
   .wish-btn:hover{transform:scale(1.12);}
@@ -1609,10 +1688,14 @@
 /* ================= Real brand logo images (admin-uploaded) inside the brand strip/monogram chips =================
    Real uploaded logos show in full color on a light rounded card (matches the reference brand-row
    design), instead of the generated-wordmark white-silhouette treatment used as a placeholder. */
-.brand-chip.bc-real-logo .bc-logo{filter:none!important;opacity:1;background:#f4f5f7;border-radius:10px;padding:8px 16px;height:48px;}
+.brand-chip.bc-real-logo{ padding:0 14px; }
+.brand-chip.bc-real-logo .bc-logo{filter:none!important;opacity:1;background:#f4f5f7;border-radius:12px;padding:10px 18px;height:64px;width:100%;}
 .brand-chip.bc-real-logo:hover .bc-logo{filter:none!important;background:#eceef1;}
-.brand-chip.bc-real-logo .bc-logo img{max-height:28px;}
-.brand-chip.bc-real-logo .bc-logo img{filter:none;object-fit:contain;max-height:32px;}
+.brand-chip.bc-real-logo .bc-logo img{max-height:44px;max-width:100%;width:auto;filter:none;object-fit:contain;}
+@media(max-width:640px){
+  .brand-chip.bc-real-logo .bc-logo{height:48px;}
+  .brand-chip.bc-real-logo .bc-logo img{max-height:32px;}
+}
 
 /* ================= Embedded Smart Tools: Network Doc Generator / Compatibility Engine / AI Drawing Reader =================
    These three used to be standalone linked pages (network-doc-generator.html, compatibility-engine.html,

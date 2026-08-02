@@ -1,0 +1,60 @@
+/* ==========================================================================
+   hero-dynamic.css — Phase 2A (prerequisite #3)
+   Every visual "knob" the admin can now turn from 🎛️ إعدادات الموقع →
+   "إعدادات الهيرو" is exposed here as a CSS custom property with a default
+   equal to the current hardcoded look — so if hero_settings was never saved
+   in site_settings, the page looks 100% identical to before this file existed.
+   js/hero-settings.js is what actually sets these vars at runtime.
+   ========================================================================== */
+
+:root{
+  --hero-h-min: 560px;
+  --hero-h-pref: 85vh;
+  --hero-h-max: 900px;
+  --hero-glow: 1;          /* 0 = off, 1 = current intensity, up to 1.6 = stronger */
+  --hero-speed: 1;         /* animation-duration multiplier: 0.5 faster … 2 slower */
+  --hero-overlay-tint: 0;  /* extra global dark wash 0–60, on top of per-banner overlay */
+}
+
+.hero{
+  min-height: clamp(var(--hero-h-min), var(--hero-h-pref), var(--hero-h-max));
+  display: flex;
+  align-items: center;
+}
+
+/* Optional extra global tint, stacked above the existing gradient wash. Off by default. */
+.hero::after{
+  content: "";
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: #000;
+  opacity: calc(var(--hero-overlay-tint) / 100);
+  transition: opacity .4s ease;
+}
+
+/* Glow intensity: scales opacity of every ambient glow/orb/particle layer together. */
+.hero-orbs, .hero-particles, .hero-corner-badge .hcb-beam, .hero-corner-badge .hcb-pulse,
+.hero-corner-badge .hcb-radar, .hero-orbit{
+  opacity: calc(var(--hero-glow, 1) * var(--hero-el-base-opacity, 1));
+  transition: opacity .4s ease;
+}
+
+/* Animation speed multiplier — applied via calc() on top of each element's own
+   base duration (kept in a --dur custom property per element so JS/CSS never
+   need to know the original number). */
+.orb{ animation-duration: calc(var(--dur, 14s) * var(--hero-speed, 1)); }
+.hero-orbit .ho-ring1{ animation-duration: calc(14s * var(--hero-speed, 1)); }
+.hero-orbit .ho-ring2{ animation-duration: calc(20s * var(--hero-speed, 1)); }
+.hero-particles span{ animation-duration: calc(var(--dur, 6s) * var(--hero-speed, 1)); }
+.hcb-radar{ animation-duration: calc(3s * var(--hero-speed, 1)); }
+.hcb-pulse{ animation-duration: calc(2.2s * var(--hero-speed, 1)); }
+
+/* Element visibility toggles (admin checkboxes) — JS adds these classes to <section class="hero"> */
+.hero.hero-hide-particles .hero-particles{ display: none; }
+.hero.hero-hide-orbit .hero-orbit{ display: none; }
+.hero.hero-hide-badge .hero-corner-badge{ display: none; }
+
+@media (prefers-reduced-motion: reduce){
+  .orb, .hero-orbit .ho-ring1, .hero-orbit .ho-ring2, .hero-particles span, .hcb-radar, .hcb-pulse{
+    animation: none !important;
+  }
+}

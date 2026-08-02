@@ -33,32 +33,48 @@ function isProductNew(p){
 function productCardHTML(p){
   const discount = p.old_price && p.old_price > p.price;
   const cover = (p.images && p.images.length) ? p.images[0] : (p.image_url || 'https://placehold.co/400x400/10294f/9fb0d1?text=No+Image');
-  const badge = discount ? `<div class="prod-badge">خصم ${Math.round(100-(p.price/p.old_price*100))}%</div>` : (p.stock>0 ? `<div class="prod-badge stock">متوفر</div>` : `<div class="prod-badge" style="background:var(--danger);">غير متوفر</div>`);
   const isDigital = p.product_type === 'digital';
-  let secondaryBadge = '';
-  if(isDigital) secondaryBadge = `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
-  else if(p.is_bestseller) secondaryBadge = `<div class="prod-badge-left bestseller">🔥 الأكثر مبيعًا</div>`;
-  else if(isProductNew(p)) secondaryBadge = `<div class="prod-badge-left new">✨ جديد</div>`;
+  const inStock = (p.stock||0) > 0;
+
+  /* ---- top-right badge (availability / sale) ---- */
+  const badge = discount ? `<div class="prod-badge">خصم ${Math.round(100-(p.price/p.old_price*100))}%</div>` : (inStock ? `<div class="prod-badge stock">متوفر</div>` : `<div class="prod-badge" style="background:var(--danger);">غير متوفر</div>`);
+
+  /* ---- top-left stacked badges: featured / AI / bestseller / new / digital ---- */
+  let leftBadges = '';
+  if(isDigital) leftBadges += `<div class="prod-badge-left digital">💾 منتج رقمي</div>`;
+  if(p.featured) leftBadges += `<div class="prod-badge-left featured">⭐ مميز</div>`;
+  if(p.is_ai_recommended) leftBadges += `<div class="prod-badge-left ai">🤖 اختيار AI</div>`;
+  if(!isDigital && p.is_bestseller) leftBadges += `<div class="prod-badge-left bestseller">🔥 الأكثر مبيعًا</div>`;
+  if(!isDigital && isProductNew(p)) leftBadges += `<div class="prod-badge-left new">✨ جديد</div>`;
+
+  /* ---- recommendation chips (from metadata / tags) ---- */
+  const recTags = Array.isArray(p.recommendation_tags) ? p.recommendation_tags : (typeof p.recommendation_tags === 'string' ? p.recommendation_tags.split(',').map(s=>s.trim()).filter(Boolean) : []);
+  const chipsHTML = recTags.length ? `<div class="prod-chips">${recTags.slice(0,2).map(t=>`<span class="prod-chip">${t}</span>`).join('')}</div>` : '';
+
   const wished = isInWishlist(p.id);
   const shortDesc = (p.description || '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).slice(0,140);
+  const hasDatasheet = !!p.datasheet_url;
+
   return `
-    <div class="prod-card" data-cat="${categoryAccentKey(p)}" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">
+    <div class="prod-card" data-cat="${categoryAccentKey(p)}" onclick="openProductDetail('${p.id}')" style="cursor:pointer;" onmousemove="tiltProdCard(event,this)" onmouseleave="resetProdCard(this)">
       <div class="prod-thumb">
-        <img src="${cover}" alt="${p.name}" loading="lazy" width="300" height="300">
+        <img src="${cover}" alt="${p.name}" loading="lazy" width="300" height="300" onload="this.classList.add('loaded')">
         ${isDigital ? '' : badge}
-        ${secondaryBadge}
+        ${leftBadges}
         <button class="wish-btn ${wished?'active':''}" data-id="${p.id}" title="أضف للمفضلة" onclick="event.stopPropagation(); toggleWishlist('${p.id}')">${wished?'♥':'♡'}</button>
-        <button class="quick-view-btn" title="نظرة سريعة" onclick="event.stopPropagation(); openQuickView('${p.id}')">👁</button>
         <div class="prod-hover-panel">
           ${shortDesc ? `<p class="prod-hover-desc">${shortDesc}</p>` : ''}
           <div class="prod-hover-actions">
-            <button onclick="event.stopPropagation(); addToCompareFromCard('${p.id}')">⚖️ قارن</button>
-            <button onclick="event.stopPropagation(); addToQuoteFromCard('${p.id}')">🧾 لعرض السعر</button>
+            <button title="نظرة سريعة" onclick="event.stopPropagation(); openQuickView('${p.id}')">👁 نظرة</button>
+            <button title="قارن" onclick="event.stopPropagation(); typeof addToCompareDrawer==='function' ? addToCompareDrawer('${p.id}') : addToCompareFromCard('${p.id}')">⚖️ قارن</button>
+            ${hasDatasheet ? `<button title="داتا شيت" onclick="event.stopPropagation(); window.open('${p.datasheet_url}','_blank')">📄 داتا شيت</button>` : ''}
+            <button title="أضف لعرض السعر" onclick="event.stopPropagation(); addToQuoteFromCard('${p.id}')">➕ عرض سعر</button>
           </div>
         </div>
       </div>
       <div class="prod-body">
         <div class="prod-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
+        ${chipsHTML}
         <div class="prod-name">${p.name}</div>
         <div class="prod-price-row">
           <span class="prod-price">${Number(p.price).toLocaleString('en-US')} ج.م</span>
@@ -67,6 +83,21 @@ function productCardHTML(p){
         <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}', this)">${isDigital ? '⬇️ اطلب وحمّل' : '🛒 أضف للسلة'}</button>
       </div>
     </div>`;
+}
+
+/* Subtle GPU-accelerated 3D tilt on hover (desktop only, respects reduced-motion) */
+function tiltProdCard(e, el){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(window.matchMedia('(hover: none)').matches) return; /* skip on touch */
+  const r = el.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width - 0.5;
+  const y = (e.clientY - r.top) / r.height - 0.5;
+  requestAnimationFrame(()=>{
+    el.style.transform = `perspective(900px) rotateX(${(-y*4).toFixed(2)}deg) rotateY(${(x*4).toFixed(2)}deg) translateY(-4px)`;
+  });
+}
+function resetProdCard(el){
+  requestAnimationFrame(()=>{ el.style.transform = ''; });
 }
 
 function addToCompareFromCard(id){
@@ -86,7 +117,7 @@ function addToQuoteFromCard(id){
   if(!p) return;
   navigateTo('tools');
   showToolTab('quote');
-  qbItems.push({id:++qbCounter, name:p.name, qty:1, price:Number(p.price)||0});
+  qbItems.push({id:++qbCounter, name:p.name, qty:1, price:Number(p.price)||0, productId:p.id});
   renderQuoteTable();
 }
 
@@ -94,16 +125,65 @@ function openProductDetail(id){
   location.hash = 'product-' + id;
 }
 
+function qvSelectThumb(i){
+  const p = window._qvCurrent; if(!p) return;
+  const images = (p.images && p.images.length) ? p.images : (p.image_url ? [p.image_url] : ['https://placehold.co/600x600/10294f/9fb0d1?text=No+Image']);
+  const main = document.getElementById('qvMainImg');
+  if(main && images[i]) main.src = images[i];
+  document.querySelectorAll('.qv-thumb').forEach((t,idx)=>t.classList.toggle('active', idx===i));
+}
+
+function qvShare(id){
+  const url = location.origin + location.pathname + '#product-' + id;
+  if(navigator.share){ navigator.share({title:document.title, url}).catch(()=>{}); }
+  else { navigator.clipboard.writeText(url); alert('اتنسخ رابط المنتج'); }
+}
+
+/* Reads structured specs (jsonb column on products table) into a clean label:value list.
+   Falls back gracefully — a product with no specs simply skips this section. */
+function qvSpecsRows(p){
+  const specs = p.specs && typeof p.specs === 'object' ? p.specs : null;
+  if(!specs || !Object.keys(specs).length) return '';
+  const LABELS = {resolution:'الدقة', poe:'PoE', poe_watts:'استهلاك PoE', lens:'العدسة', storage:'التخزين',
+    storage_bays:'عدد سلوتات التخزين', power:'الطاقة', dimensions:'الأبعاد', ai_features:'ميزات AI',
+    ports:'عدد المنافذ', poe_budget_watts:'ميزانية PoE للسويتش', channels_supported:'عدد القنوات المدعومة', rack_units:'وحدات الراك (U)'};
+  const rows = Object.entries(specs).filter(([,v])=>v!==null && v!=='' && !(Array.isArray(v)&&!v.length))
+    .map(([k,v])=>`<tr><td>${LABELS[k]||k}</td><td>${Array.isArray(v)?v.join('، '):v}</td></tr>`).join('');
+  return rows ? `<table class="qv-specs-table">${rows}</table>` : '';
+}
+
+function qvDownloadsRow(p){
+  const links = [];
+  if(p.datasheet_url) links.push(`<a href="${p.datasheet_url}" target="_blank" class="qv-doc-link">📄 الداتا شيت</a>`);
+  if(p.installation_guide_url) links.push(`<a href="${p.installation_guide_url}" target="_blank" class="qv-doc-link">🛠️ دليل التركيب</a>`);
+  if(p.video_url) links.push(`<a href="${p.video_url}" target="_blank" class="qv-doc-link">🎬 فيديو المنتج</a>`);
+  return links.length ? `<div class="qv-downloads">${links.join('')}</div>` : '';
+}
+
+function qvRelatedProducts(p, key, title){
+  const ids = Array.isArray(p[key]) ? p[key] : [];
+  const list = ids.map(id=>products.find(x=>String(x.id)===String(id))).filter(Boolean).slice(0,4);
+  if(!list.length) return '';
+  return `<div class="qv-related-section"><h4>${title}</h4><div class="qv-related-row">
+    ${list.map(rp=>`<div class="qv-related-item" onclick="openQuickView('${rp.id}')">
+      <img src="${(rp.images&&rp.images[0])||rp.image_url||'https://placehold.co/120x120/10294f/9fb0d1?text=No+Image'}" alt="${rp.name}">
+      <span>${rp.name}</span>
+    </div>`).join('')}
+  </div></div>`;
+}
+
 function openQuickView(id){
   const p = products.find(x => String(x.id) === String(id));
   if(!p) return;
+  window._qvCurrent = p;
   const images = (p.images && p.images.length) ? p.images : (p.image_url ? [p.image_url] : ['https://placehold.co/600x600/10294f/9fb0d1?text=No+Image']);
   const discount = p.old_price && p.old_price > p.price;
   const box = document.getElementById('quickViewBox');
+  const thumbsHTML = images.length > 1 ? `<div class="qv-thumbs">${images.map((img,i)=>`<img class="qv-thumb ${i===0?'active':''}" src="${img}" onclick="qvSelectThumb(${i})" alt="صورة ${i+1}">`).join('')}</div>` : '';
   box.innerHTML = `
     <button class="qv-close" onclick="closeQuickView()">×</button>
     <div class="qv-grid">
-      <div class="qv-img"><img src="${images[0]}" alt="${p.name}" width="600" height="600"></div>
+      <div class="qv-img"><img id="qvMainImg" src="${images[0]}" alt="${p.name}" width="600" height="600">${thumbsHTML}</div>
       <div class="qv-body">
         <div class="qv-cat">${p.category || ''}${p.brand ? ' · '+p.brand : ''}</div>
         <h2 class="qv-name">${p.name}</h2>
@@ -112,12 +192,23 @@ function openQuickView(id){
           ${discount ? `<span class="qv-old">${Number(p.old_price).toLocaleString('en-US')} ج.م</span>` : ''}
         </div>
         ${p.product_type==='digital' ? '<div class="digital-note">💾 منتج رقمي: هيتبعتلك رابط تحميل آمن على واتساب بعد تأكيد الدفع مباشرة.</div>' : `<div class="pd-stock ${p.stock>0?'in':'out'}" style="margin-bottom:14px;">${p.stock>0 ? '✓ متوفر بالمخزون' : '✕ غير متوفر حاليًا'}</div>`}
+        ${p.warranty_text ? `<div class="qv-warranty">🛡️ ${p.warranty_text}</div>` : ''}
         <p class="qv-desc">${p.description || 'لا يوجد وصف تفصيلي لهذا المنتج حاليًا.'}</p>
-        <div style="display:flex;gap:10px;">
+        ${qvSpecsRows(p)}
+        ${qvDownloadsRow(p)}
+        <div style="display:flex;gap:10px;margin-top:10px;">
           <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="addToCart('${p.id}', this); closeQuickView();">${p.product_type==='digital'?'⬇️ اطلب الآن':'🛒 أضف للسلة'}</button>
           <button class="wish-btn inline ${isInWishlist(p.id)?'active':''}" title="أضف للمفضلة" onclick="toggleWishlist('${p.id}'); openQuickView('${p.id}');">${isInWishlist(p.id)?'♥':'♡'}</button>
         </div>
+        <div class="qv-secondary-actions">
+          <button onclick="addToQuoteFromCard('${p.id}')">➕ عرض سعر</button>
+          <button onclick="typeof addToCompareDrawer==='function' ? addToCompareDrawer('${p.id}') : addToCompareFromCard('${p.id}')">⚖️ قارن</button>
+          <button onclick="navigateTo('contact'); closeQuickView();">📅 طلب معاينة</button>
+          <button onclick="qvShare('${p.id}')">🔗 شير</button>
+        </div>
         <a class="btn btn-outline" style="width:100%;justify-content:center;margin-top:10px;" onclick="closeQuickView(); openProductDetail('${p.id}');">عرض التفاصيل الكاملة</a>
+        ${typeof renderCompatibleChips==='function' ? renderCompatibleChips(p) : ''}
+        ${qvRelatedProducts(p, 'related_product_ids', '🔁 منتجات ذات صلة')}
       </div>
     </div>`;
   document.getElementById('quickViewOverlay').classList.add('open');

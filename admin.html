@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="shortcut icon" href="favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/banner-engine.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -289,6 +290,20 @@
   .pg-controls button:disabled{opacity:.4;cursor:not-allowed;}
   tr.low-stock-row td{background:#ff7a2f14;}
   tr.out-stock-row td{background:#ff5c5c14;}
+  /* ===== Banner Engine editor/preview (site settings tab) ===== */
+  .btn-cta{background:var(--cable-orange);color:#fff;}
+  .bnr-preview-devbtn{padding:8px 12px;font-size:12.5px;background:var(--paper-2);border:1px solid var(--line);color:var(--ink-soft);}
+  .bnr-preview-devbtn.active{background:var(--cable-blue);color:#fff;border-color:var(--cable-blue);}
+  #bannerPreviewFrame{position:relative;overflow:hidden;border-radius:28px;border:1px solid var(--line);}
+  #bannerPreviewFrame .pbs-slide.bnr-card{height:380px;}
+  .hb-card{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;background:var(--paper-2);}
+  .hb-card summary{cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .hb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px;}
+  .hb-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-soft);}
+  .hb-grid input, .hb-grid select, .hb-grid textarea{width:100%;}
+  .hb-grid .hb-full{grid-column:1/-1;}
+  .hb-media-preview{width:100%;height:60px;border-radius:8px;overflow:hidden;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-soft);}
+  .hb-media-preview img{width:100%;height:100%;object-fit:cover;}
 </style>
 </head>
 <body>
@@ -562,7 +577,29 @@
 
       <div class="card" style="margin-bottom:20px;">
         <div class="topline" style="margin-bottom:10px;">
-          <div><h3 style="margin:0;">🖼️ بنرات العروض الرئيسية (Hero Banners)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">سلايدر البنرات اللي بيظهر أول ما العميل يفتح الموقع (زي بنر خصم بكود كوبون، أو عرض ماركة معينة). ارفع الصورة، حط لينك اختياري (هيوديك عليه لو ضغط على البنر)، ورتّبهم زي ما تحب. لو مفيش بنرات، القسم مش بيظهر خالص للعميل.</p></div>
+          <div><h3 style="margin:0;">🎛️ إعدادات الهيرو (Hero Settings)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">تحكم في شكل قسم الهيرو نفسه (الطول، الوهج/Glow، سرعة الأنيميشن، وإظهار/إخفاء العناصر العائمة) — من غير ما تلمس كود. بتتحفظ في Supabase وبتتطبق فورًا لكل الزوار.</p></div>
+        </div>
+        <div class="hb-grid">
+          <label>أدنى ارتفاع (px)<input type="number" id="heroHMin" value="560" min="360" max="900"></label>
+          <label>الارتفاع المفضّل (% من الشاشة)<input type="number" id="heroHPref" value="85" min="40" max="100"></label>
+          <label>أقصى ارتفاع (px)<input type="number" id="heroHMax" value="900" min="500" max="1200"></label>
+          <label>شدة الوهج (Glow) %<input type="range" id="heroGlow" min="0" max="160" value="82" oninput="this.nextElementSibling.textContent=this.value+'%'"><span style="font-size:11px;">82%</span></label>
+          <label>سرعة الأنيميشن %<input type="range" id="heroSpeed" min="25" max="200" value="100" oninput="this.nextElementSibling.textContent=this.value+'%'"><span style="font-size:11px;">100% (أعلى = أبطأ)</span></label>
+          <label>تعتيم إضافي عام % <input type="range" id="heroOverlayTint" min="0" max="60" value="0" oninput="this.nextElementSibling.textContent=this.value+'%'"><span style="font-size:11px;">0%</span></label>
+          <label style="flex-direction:row;align-items:center;gap:8px;"><input type="checkbox" id="heroHideParticles" style="width:auto;"> إخفاء الـ Particles</label>
+          <label style="flex-direction:row;align-items:center;gap:8px;"><input type="checkbox" id="heroHideOrbit" style="width:auto;"> إخفاء الـ Orbit (القمر الصناعي)</label>
+          <label style="flex-direction:row;align-items:center;gap:8px;"><input type="checkbox" id="heroHideBadge" style="width:auto;"> إخفاء بطاقة كشف AI</label>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveHeroSettings()">💾 حفظ إعدادات الهيرو</button>
+          <button class="btn" onclick="resetHeroSettingsForm()">↺ الوضع الافتراضي</button>
+          <span id="heroSettingsSaveMsg" style="font-size:13px;"></span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">🎬 Banner Engine — بنرات الهيرو الرئيسية</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">كل بنر هنا Card كامل مش صورة فاضية: عنوان، وصف، Badge، زرار أساسي وزرار ثانوي، خلفية صورة أو فيديو، صورة منتج عائمة، لون مميز، Overlay، Layout، تأثير خلفية، جدولة (تاريخ بداية/نهاية)، أولوية عرض، و A/B Testing. لو مفيش بنرات فعّالة، القسم مش بيظهر خالص للعميل.</p></div>
           <button class="btn btn-primary" onclick="addHeroBannerRow()">+ إضافة بنر</button>
         </div>
         <div id="heroBannersList"></div>
@@ -570,6 +607,34 @@
           <button class="btn btn-primary" onclick="saveHeroBanners()">💾 حفظ البنرات</button>
           <span id="heroBannersSaveMsg" style="font-size:13px;"></span>
         </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">📱 معاينة حية (Live Preview)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">شكل البنرات فعليًا قبل ما تحفظ — بدّل بين Desktop / Tablet / Mobile.</p></div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn bnr-preview-devbtn active" data-dev="desktop" onclick="setBannerPreviewDevice('desktop')">🖥️ Desktop</button>
+            <button class="btn bnr-preview-devbtn" data-dev="tablet" onclick="setBannerPreviewDevice('tablet')">📱 Tablet</button>
+            <button class="btn bnr-preview-devbtn" data-dev="mobile" onclick="setBannerPreviewDevice('mobile')">📲 Mobile</button>
+            <button class="btn" onclick="refreshBannerPreview()">🔄 تحديث المعاينة</button>
+          </div>
+        </div>
+        <div id="bannerPreviewFrame" class="promo-banner-slider has-banners" style="margin:0 auto;max-width:1400px;transition:max-width .3s ease;">
+          <div class="pbs-track" id="bannerPreviewTrack"></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted,#8994a8);margin-top:10px;">* المعاينة بتاخد أول بنر Active بس، عشان تشوف شكل الـ Layout والتأثير المختارين بسرعة.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="topline" style="margin-bottom:10px;">
+          <div><h3 style="margin:0;">📊 تحليلات البنرات (Analytics)</h3><p style="margin:2px 0 0;font-size:13px;color:var(--muted,#8994a8);">مشاهدات وضغطات كل بنر، ومقارنة A/B Testing لو فعّلته. البيانات بتتجمع تلقائي من زيارات الموقع.</p></div>
+          <button class="btn" onclick="loadBannerAnalytics()">🔄 تحديث</button>
+        </div>
+        <table>
+          <thead><tr><th>البنر</th><th>A/B Group</th><th>مشاهدات (Views)</th><th>ضغطات (Clicks)</th><th>CTR</th><th>آخر نشاط</th></tr></thead>
+          <tbody id="bannerAnalyticsBody"><tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr></tbody>
+        </table>
+        <p id="bannerAnalyticsBest" style="font-size:13px;margin-top:10px;color:var(--ok,#1fae6b);"></p>
       </div>
 
       <div class="card" style="margin-bottom:20px;">
@@ -925,6 +990,37 @@
 
     <div class="checkbox-row"><input type="checkbox" id="prodFeatured"><label for="prodFeatured">إظهار كمنتج مميز في الرئيسية</label></div>
     <div class="checkbox-row"><input type="checkbox" id="prodBestseller"><label for="prodBestseller">🔥 وضع علامة "الأكثر مبيعًا" على المنتج</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="prodAiRecommended"><label for="prodAiRecommended">🤖 وضع علامة "اختيار AI"</label></div>
+
+    <div class="field">
+      <label>Chips التوصية (مفصولة بفاصلة، مثال: Enterprise, Outdoor, Best Value)</label>
+      <input type="text" id="prodRecommendationTags" placeholder="Enterprise, Outdoor, Best Value">
+    </div>
+    <div class="field">
+      <label>ترتيب الرواج (رقم أعلى = يظهر الأول عند الفرز بـ"الأكثر رواجًا")</label>
+      <input type="number" id="prodPopularity" min="0" placeholder="0">
+    </div>
+    <div class="field">
+      <label>رابط الداتا شيت (PDF)</label>
+      <input type="text" id="prodDatasheetUrl" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>رابط دليل التركيب</label>
+      <input type="text" id="prodInstallGuideUrl" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>رابط فيديو المنتج</label>
+      <input type="text" id="prodVideoUrl" placeholder="https://youtube.com/...">
+    </div>
+    <div class="field">
+      <label>نص الضمان</label>
+      <input type="text" id="prodWarrantyText" placeholder="ضمان 3 سنوات من الموزع المعتمد">
+    </div>
+    <div class="field">
+      <label>المواصفات التقنية (JSON) — تُستخدم في المقارنة ومحرك التوافق</label>
+      <textarea id="prodSpecsJson" rows="4" placeholder='{"resolution":"4MP","poe_watts":6.5,"lens":"2.8mm","storage":"1TB","power":"12VDC","dimensions":"10x10x8cm","ai_features":["Person Detection","Line Crossing"],"ports":24,"poe_budget_watts":195,"channels_supported":8,"rack_units":1}' style="font-family:monospace;font-size:11.5px;direction:ltr;text-align:left;"></textarea>
+      <small style="display:block;color:var(--ink-soft);font-size:11.5px;margin-top:4px;">اختياري — لو سبتها فاضية المنتج هيتعرض عادي بس من غير جدول مواصفات في المقارنة/Quick View.</small>
+    </div>
     <div class="error-msg" id="productModalError"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeProductModal()">إلغاء</button>
@@ -1239,6 +1335,7 @@ async function loadAll(){
   renderPromoOffersForm();
   renderBrandLogosForm();
   renderPartnerBrandsForm();
+  renderHeroSettingsForm();
   renderHeroBannersForm();
   renderFinderCopyForm();
   renderReviewsAdmin();
@@ -1678,6 +1775,14 @@ function openProductModal(p){
     document.getElementById('prodBrand').value = p.brand || '';
     document.getElementById('prodFeatured').checked = !!p.featured;
     document.getElementById('prodBestseller').checked = !!p.is_bestseller;
+    document.getElementById('prodAiRecommended').checked = !!p.is_ai_recommended;
+    document.getElementById('prodRecommendationTags').value = Array.isArray(p.recommendation_tags) ? p.recommendation_tags.join(', ') : '';
+    document.getElementById('prodPopularity').value = p.popularity_score ?? 0;
+    document.getElementById('prodDatasheetUrl').value = p.datasheet_url || '';
+    document.getElementById('prodInstallGuideUrl').value = p.installation_guide_url || '';
+    document.getElementById('prodVideoUrl').value = p.video_url || '';
+    document.getElementById('prodWarrantyText').value = p.warranty_text || '';
+    document.getElementById('prodSpecsJson').value = (p.specs && Object.keys(p.specs).length) ? JSON.stringify(p.specs, null, 2) : '';
     document.getElementById('prodType').value = p.product_type || 'physical';
     document.getElementById('prodInstallationType').value = p.installation_type || '';
     document.getElementById('prodConnectionType').value = p.connection_type || '';
@@ -1710,6 +1815,14 @@ function openProductModal(p){
     document.getElementById('prodBioType').value = '';
     document.getElementById('prodBioUse').value = '';
     document.getElementById('prodRecPriority').value = 0;
+    document.getElementById('prodAiRecommended').checked = false;
+    document.getElementById('prodRecommendationTags').value = '';
+    document.getElementById('prodPopularity').value = 0;
+    document.getElementById('prodDatasheetUrl').value = '';
+    document.getElementById('prodInstallGuideUrl').value = '';
+    document.getElementById('prodVideoUrl').value = '';
+    document.getElementById('prodWarrantyText').value = '';
+    document.getElementById('prodSpecsJson').value = '';
     document.querySelectorAll('.prodTagCheckbox').forEach(cb => cb.checked = false);
     currentProdDigitalPath = null;
     document.getElementById('digitalFileCurrentLabel').innerText = '';
@@ -1792,6 +1905,19 @@ async function saveProduct(){
       bio_use: document.getElementById('prodBioUse').value || null,
       tags: Array.from(document.querySelectorAll('.prodTagCheckbox:checked')).map(cb => cb.value),
       recommendation_priority: parseInt(document.getElementById('prodRecPriority').value) || 0,
+      is_ai_recommended: document.getElementById('prodAiRecommended').checked,
+      recommendation_tags: document.getElementById('prodRecommendationTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+      popularity_score: parseInt(document.getElementById('prodPopularity').value) || 0,
+      datasheet_url: document.getElementById('prodDatasheetUrl').value.trim() || null,
+      installation_guide_url: document.getElementById('prodInstallGuideUrl').value.trim() || null,
+      video_url: document.getElementById('prodVideoUrl').value.trim() || null,
+      warranty_text: document.getElementById('prodWarrantyText').value.trim() || null,
+      specs: (function(){
+        const raw = document.getElementById('prodSpecsJson').value.trim();
+        if(!raw) return {};
+        try{ return JSON.parse(raw); }
+        catch(e){ throw new Error('صيغة JSON في حقل المواصفات غلط — راجعها (مثال صحيح موجود كـ placeholder في الحقل)'); }
+      })(),
       images: images,
       image_url: images[0] || null,
       product_type: productType,
@@ -2596,11 +2722,74 @@ async function savePromoOffers(){
   setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
 }
 
-/* ================= Hero banners (بنرات العروض الرئيسية) =================
+/* ================= Hero Settings (إعدادات الهيرو العامة) =================
+   Stored in Supabase site_settings under key 'hero_settings' (jsonb object).
+   Read at runtime by js/hero-settings.js and applied as CSS custom
+   properties (see css/hero-dynamic.css). localStorage on the storefront is
+   only a paint-cache — this admin form always reads/writes Supabase directly. */
+const HERO_SETTINGS_DEFAULTS = {
+  height_min: 560, height_pref: 85, height_max: 900,
+  glow: 82, speed: 100, overlay_tint: 0,
+  hide_particles: false, hide_orbit: false, hide_badge: false
+};
+function renderHeroSettingsForm(){
+  const s = Object.assign({}, HERO_SETTINGS_DEFAULTS, siteSettings.hero_settings || {});
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  const setChecked = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
+  set('heroHMin', s.height_min); set('heroHPref', s.height_pref); set('heroHMax', s.height_max);
+  set('heroGlow', s.glow); set('heroSpeed', s.speed); set('heroOverlayTint', s.overlay_tint);
+  setChecked('heroHideParticles', s.hide_particles);
+  setChecked('heroHideOrbit', s.hide_orbit);
+  setChecked('heroHideBadge', s.hide_badge);
+  ['heroGlow','heroSpeed','heroOverlayTint'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.nextElementSibling) el.nextElementSibling.textContent = el.value + '%';
+  });
+}
+function resetHeroSettingsForm(){ siteSettings.hero_settings = {}; renderHeroSettingsForm(); }
+async function saveHeroSettings(){
+  const msg = document.getElementById('heroSettingsSaveMsg');
+  const g = id => Number(document.getElementById(id).value);
+  const gc = id => document.getElementById(id).checked;
+  const value = {
+    height_min: g('heroHMin'), height_pref: g('heroHPref'), height_max: g('heroHMax'),
+    glow: g('heroGlow'), speed: g('heroSpeed'), overlay_tint: g('heroOverlayTint'),
+    hide_particles: gc('heroHideParticles'), hide_orbit: gc('heroHideOrbit'), hide_badge: gc('heroHideBadge')
+  };
+  const { error } = await sb.from('site_settings').upsert({ key:'hero_settings', value, updated_at: new Date().toISOString() });
+  if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
+  siteSettings.hero_settings = value;
+  msg.style.color = 'var(--ok,#2ecc71)';
+  msg.innerText = '✓ اتحفظ بنجاح - هيتطبق فورًا لكل الزوار (الكاش المحلي هيتحدث أول ما يفتحوا الموقع)';
+  setTimeout(()=>{ if(msg) msg.innerText=''; }, 5000);
+}
+
+/* ================= Banner Engine (بنرات العروض الرئيسية) =================
    Stored in Supabase site_settings under key 'hero_banners' as an array of
-   { image, link, alt }. Images are uploaded to the same public 'products' storage
-   bucket already used for product photos (under a banners/ prefix) so no new
-   bucket/policy setup is required in Supabase. */
+   rich banner objects (see modules/banner-engine.js for the exact schema +
+   how it's rendered on the storefront). Old-style { image, link, alt } rows
+   still load fine into this editor — missing fields just show as empty/default.
+   Images & videos upload to the same public 'products' storage bucket already
+   used for product photos (under a banners/ prefix), no new bucket needed. */
+const HB_BADGES = ['', 'NEW', 'SALE', 'AI', 'HOT', 'LIMITED', 'BEST SELLER'];
+const HB_LAYOUTS = [['split','Split (نص + منتج)'],['left','نص يسار'],['right','نص يمين'],['center','Center'],['product-focus','Product Focus'],['glass','Glass'],['video','Video'],['minimal','Minimal (صورة فقط)']];
+const HB_EFFECTS = [['gradient','Animated Gradient'],['particles','Particles'],['grid','Grid'],['glow','Glow'],['sweep','Light Sweep'],['circuit','Circuit'],['network','Network'],['hexagon','Hexagon'],['dots','Dots'],['none','بدون']];
+const HB_CATEGORIES = [['','بدون (لون مخصص)'],['networking','Networking (أزرق)'],['cctv','CCTV (سماوي)'],['access','Access Control (بنفسجي)'],['fire','Fire Alarm (برتقالي)'],['servers','Servers (أخضر)']];
+const HB_ALIGNS = [['','افتراضي (حسب الـ Layout)'],['start','يمين/يسار (Start)'],['center','في النص'],['end','الطرف التاني (End)']];
+const HB_PRODUCT_POS = [['','افتراضي (حسب الـ Layout)'],['right','يمين'],['center','في النص'],['floating','عائم فوق الخلفية'],['bottom','تحت النص'],['custom','مخصص (X/Y%)']];
+const HB_ANIMATIONS = [['fade','Fade'],['slide','Slide'],['float','Float'],['scale','Scale'],['parallax','Parallax'],['zoom','Zoom']];
+const HB_THEME_PRESETS = [['dark','Dark'],['light','Light'],['blue','Blue'],['purple','Purple'],['orange','Orange'],['auto','Auto (حسب القسم)']];
+const HB_MOBILE_LAYOUTS = [['stack','Stack (افتراضي)'],['image-first','الصورة الأول'],['content-first','النص الأول'],['overlay','Overlay (الصورة خلفية كاملة)']];
+/* Quick "Banner Templates" — one click sets a coherent bundle of layout
+   fields instead of the visitor's photo dictating the design every time. */
+const HB_TEMPLATES = {
+  t1_split_classic:   { label:'Template 1 — Split كلاسيك',  layout:'split',         text_align:'start',  content_width:46, product_position:'right',    animation:'slide'    },
+  t2_product_left:     { label:'Template 2 — منتج شمال',      layout:'right',         text_align:'end',    content_width:48, product_position:'',        animation:'fade'     },
+  t3_centered:          { label:'Template 3 — Centered',       layout:'center',        text_align:'center', content_width:60, product_position:'center',   animation:'scale'    },
+  t4_minimal_glass:      { label:'Template 4 — Minimal Glass',  layout:'glass',         text_align:'start',  content_width:42, product_position:'floating', animation:'fade'     }
+};
+
+
 function renderHeroBannersForm(){
   const list = document.getElementById('heroBannersList');
   if(!list) return;
@@ -2608,26 +2797,152 @@ function renderHeroBannersForm(){
   list.innerHTML = '';
   banners.forEach(b => addHeroBannerRow(b));
   if(!banners.length) list.innerHTML = '<p style="font-size:13px;color:var(--muted,#8994a8);">لسه معملتش بنرات. دوس "+ إضافة بنر" وابدأ.</p>';
+  refreshBannerPreview();
+  loadBannerAnalytics();
+}
+
+function hbOptions(list, current){
+  return list.map(([v,l]) => `<option value="${v}" ${v===(current||'')?'selected':''}>${l}</option>`).join('');
 }
 
 function addHeroBannerRow(banner){
   const list = document.getElementById('heroBannersList');
   if(list.children.length === 1 && list.children[0].tagName === 'P') list.innerHTML = '';
-  const b = banner || { image:'', link:'', alt:'' };
-  const row = document.createElement('div');
-  row.className = 'hero-banner-row';
-  row.style.cssText = 'display:flex;gap:12px;align-items:center;border:1px solid var(--line,#232b3d);border-radius:10px;padding:10px;margin-bottom:10px;flex-wrap:wrap;';
+  const b = Object.assign({
+    id:'', title:'', subtitle:'', badge:'', category:'', accent_color:'', overlay:45,
+    layout:'split', effect:'gradient', priority:0, duration:5, active:true,
+    start_date:'', end_date:'', ab_test_id:'', ab_group:'',
+    image:'', link:'', alt:'', background_image:'', background_video:'', product_image:'',
+    countdown_target:'', countdown_label:'العرض ينتهي خلال',
+    text_align:'', content_width:'', product_position:'', product_x:'', product_y:'',
+    animation:'fade', theme_preset:'dark', mobile_layout:'stack',
+    cta_primary:{label:'',link:''}, cta_secondary:{label:'',link:''}
+  }, banner || {});
+  const bgImgRaw = b.background_image || b.image || '';
+  const bgImg = hbPickImg(bgImgRaw);
+  const bgImgFieldValue = (bgImgRaw && typeof bgImgRaw === 'object') ? JSON.stringify(bgImgRaw) : bgImgRaw;
+  const q = s => String(s==null?'':s).replace(/"/g,'&quot;');
+  const row = document.createElement('details');
+  row.className = 'hb-card hero-banner-row';
+  row.open = !b.title && !bgImg; // new/empty rows start expanded
   row.innerHTML = `
-    <div class="hb-preview-wrap" style="width:140px;height:48px;border-radius:6px;overflow:hidden;background:var(--paper-2,#0d1522);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <img class="hb-preview" src="${b.image||''}" style="width:100%;height:100%;object-fit:cover;${b.image?'':'display:none;'}">
-      <span class="hb-preview-empty" style="font-size:11px;color:var(--muted,#8994a8);${b.image?'display:none;':''}">لا صورة</span>
+    <summary>
+      <span>${b.title ? '🎬 ' + q(b.title) : '🆕 بنر جديد'} ${b.badge ? `<small style="opacity:.7;">[${q(b.badge)}]</small>` : ''} ${b.active===false ? '<small style="color:var(--danger);">(متوقف)</small>' : ''}</span>
+      <button type="button" class="btn" onclick="event.preventDefault();event.stopPropagation();this.closest('.hero-banner-row').remove();refreshBannerPreview();" title="حذف هذا البنر">🗑️</button>
+    </summary>
+    <input type="hidden" class="hb-id" value="${q(b.id)}">
+    <div class="hb-templates" style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;">
+      ${Object.entries(HB_TEMPLATES).map(([key,t]) => `<button type="button" class="btn" onclick="event.preventDefault();applyHeroBannerTemplate(this,'${key}')" title="يطبّق Layout + محاذاة + مساحة نص + مكان منتج + أنميشن جاهزين">${q(t.label)}</button>`).join('')}
     </div>
-    <input type="file" accept="image/*" class="hb-file" onchange="handleHeroBannerFile(this)" style="max-width:180px;">
-    <input type="text" class="hb-link" placeholder="لينك عند الضغط (اختياري) - مثال: products أو https://..." value="${(b.link||'').replace(/"/g,'&quot;')}" style="flex:1;min-width:180px;">
-    <input type="text" class="hb-alt" placeholder="وصف الصورة (alt)" value="${(b.alt||'').replace(/"/g,'&quot;')}" style="flex:1;min-width:140px;">
-    <input type="hidden" class="hb-image-url" value="${(b.image||'').replace(/"/g,'&quot;')}">
-    <button class="btn" onclick="this.closest('.hero-banner-row').remove()" title="حذف هذا البنر">🗑️</button>`;
+    <div class="hb-grid">
+      <label class="hb-full">صورة الخلفية (Background Image)
+        <div class="hb-media-preview"><img class="hb-preview" src="${q(bgImg)}" style="${bgImg?'':'display:none;'}"><span class="hb-preview-empty" style="${bgImg?'display:none;':''}">لا صورة</span></div>
+        <input type="file" accept="image/*" class="hb-file" onchange="handleHeroBannerFile(this)">
+        <input type="hidden" class="hb-image-url" value="${q(bgImgFieldValue)}">
+        <small style="font-size:11px;color:var(--muted,#8994a8);">${bgImgRaw && typeof bgImgRaw==='object' ? '✓ 3 مقاسات (موبايل/تابلت/ديسكتوب)' : 'بيترفع تلقائيًا بـ 3 مقاسات منفصلة (Desktop/Tablet/Mobile)'}</small>
+      </label>
+      <label>فيديو الخلفية MP4 (اختياري - autoplay/muted/loop)
+        <input type="file" accept="video/mp4" class="hb-video-file" onchange="handleHeroBannerVideoFile(this)">
+        <input type="hidden" class="hb-video-url" value="${q(b.background_video)}">
+        <small style="font-size:11px;color:var(--muted,#8994a8);">${b.background_video ? '✓ فيه فيديو مرفوع' : ''}</small>
+      </label>
+      <label>صورة المنتج - PNG شفاف (اختياري - لو مفيش، الخلفية بتفضل لوحدها بدون منتج)
+        <input type="file" accept="image/png" class="hb-product-file" onchange="handleHeroBannerProductFile(this)">
+        <input type="hidden" class="hb-product-url" value="${q(b.product_image)}">
+        <small style="font-size:11px;color:var(--muted,#8994a8);">${b.product_image ? '✓ فيه صورة منتج مرفوعة' : 'ارفع PNG شفاف الخلفية للحصول على أفضل نتيجة (مش صورة إعلان جاهزة)'}</small>
+      </label>
+      <label>العنوان (Title)<input type="text" class="hb-title" value="${q(b.title)}" placeholder="Smart Access Control"></label>
+      <label class="hb-full">الوصف (Subtitle)<textarea class="hb-subtitle" rows="2" placeholder="أنظمة دخول احترافية للشركات والمستشفيات">${q(b.subtitle)}</textarea></label>
+      <label>Badge<select class="hb-badge">${hbOptions(HB_BADGES.map(v=>[v,v||'بدون']), b.badge)}</select></label>
+      <label>زرار أساسي - النص<input type="text" class="hb-cta1-label" value="${q(b.cta_primary && b.cta_primary.label)}" placeholder="تسوق الآن"></label>
+      <label>زرار أساسي - اللينك<input type="text" class="hb-cta1-link" value="${q(b.cta_primary && b.cta_primary.link)}" placeholder="products أو https://..."></label>
+      <label>زرار ثانوي - النص<input type="text" class="hb-cta2-label" value="${q(b.cta_secondary && b.cta_secondary.label)}" placeholder="طلب معاينة"></label>
+      <label>زرار ثانوي - اللينك<input type="text" class="hb-cta2-link" value="${q(b.cta_secondary && b.cta_secondary.link)}" placeholder="contact أو https://..."></label>
+      <label>القسم (Theme تلقائي)<select class="hb-category">${hbOptions(HB_CATEGORIES, b.category)}</select></label>
+      <label>لون مخصص (يتجاوز التصنيف)<input type="color" class="hb-accent" value="${q(b.accent_color || '#2F7BFF')}"></label>
+      <label>Overlay (تعتيم الخلفية %)<input type="range" min="0" max="90" class="hb-overlay" value="${q(b.overlay)}" oninput="this.nextElementSibling.textContent=this.value+'%'"><span style="font-size:11px;">${q(b.overlay)}%</span></label>
+      <label>Layout<select class="hb-layout">${hbOptions(HB_LAYOUTS, b.layout)}</select></label>
+      <label>تأثير الخلفية (Effect)<select class="hb-effect">${hbOptions(HB_EFFECTS, b.effect)}</select></label>
+      <label>محاذاة النص (Text Align)<select class="hb-align">${hbOptions(HB_ALIGNS, b.text_align)}</select></label>
+      <label>عرض منطقة النص (Content Width %)<input type="range" min="30" max="80" class="hb-content-width" value="${q(b.content_width || 45)}" oninput="this.nextElementSibling.textContent=this.value+'%'"><span style="font-size:11px;">${q(b.content_width || 45)}%</span></label>
+      <label>مكان المنتج (Product Position)<select class="hb-product-pos" onchange="this.closest('.hb-grid').querySelector('.hb-product-xy').style.display=this.value==='custom'?'flex':'none';">${hbOptions(HB_PRODUCT_POS, b.product_position)}</select></label>
+      <label class="hb-full hb-product-xy" style="display:${b.product_position==='custom'?'flex':'none'};gap:12px;">
+        <span style="flex:1;">X% <input type="number" min="0" max="100" class="hb-product-x" value="${q(b.product_x != null ? b.product_x : 50)}"></span>
+        <span style="flex:1;">Y% <input type="number" min="0" max="100" class="hb-product-y" value="${q(b.product_y != null ? b.product_y : 50)}"></span>
+      </label>
+      <label>الأنميشن (Animation)<select class="hb-animation">${hbOptions(HB_ANIMATIONS, b.animation || 'fade')}</select></label>
+      <label>الثيم (Theme)<select class="hb-theme">${hbOptions(HB_THEME_PRESETS, b.theme_preset || 'dark')}</select></label>
+      <label>شكل الموبايل (Mobile Layout)<select class="hb-mobile-layout">${hbOptions(HB_MOBILE_LAYOUTS, b.mobile_layout || 'stack')}</select></label>
+      <label>الأولوية (Priority) - أعلى رقم يظهر أول<input type="number" class="hb-priority" value="${q(b.priority)}"></label>
+      <label>مدة العرض بالثانية<input type="number" min="2" class="hb-duration" value="${q(b.duration || 5)}"></label>
+      <label>تاريخ البداية (اختياري)<input type="date" class="hb-start" value="${q(b.start_date)}"></label>
+      <label>تاريخ النهاية (اختياري)<input type="date" class="hb-end" value="${q(b.end_date)}"></label>
+      <label>عداد تنازلي - وقت الانتهاء (اختياري)<input type="datetime-local" class="hb-countdown-target" value="${q(b.countdown_target)}"></label>
+      <label>عداد تنازلي - النص فوقه<input type="text" class="hb-countdown-label" value="${q(b.countdown_label || 'العرض ينتهي خلال')}" placeholder="العرض ينتهي خلال"></label>
+      <label>A/B Test ID (اختياري - نفس الـ ID للبنرين اللي بتقارن بينهم)<input type="text" class="hb-ab-id" value="${q(b.ab_test_id)}" placeholder="promo-summer-2026"></label>
+      <label>A/B Group<select class="hb-ab-group"><option value="" ${!b.ab_group?'selected':''}>بدون</option><option value="a" ${b.ab_group==='a'?'selected':''}>A</option><option value="b" ${b.ab_group==='b'?'selected':''}>B</option></select></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;"><input type="checkbox" class="hb-active" ${b.active!==false?'checked':''} style="width:auto;"> فعّال (Active)</label>
+      <label class="hb-full">وصف الصورة (alt - لإمكانية الوصول/SEO)<input type="text" class="hb-alt" value="${q(b.alt)}" placeholder="نظام تحكم دخول ذكي"></label>
+    </div>`;
+  row.addEventListener('toggle', refreshBannerPreview);
+  row.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('change', refreshBannerPreview));
   list.appendChild(row);
+  refreshBannerPreview();
+}
+
+/* One click sets a coherent bundle of layout fields (layout/align/content
+   width/product position/animation) so the visitor's uploaded photo never
+   has to dictate the banner's design by itself. */
+function applyHeroBannerTemplate(btn, key){
+  const t = HB_TEMPLATES[key];
+  if(!t) return;
+  const row = btn.closest('.hero-banner-row');
+  const set = (sel, val) => { const el = row.querySelector(sel); if(el && val !== undefined) el.value = val; };
+  set('.hb-layout', t.layout);
+  set('.hb-align', t.text_align);
+  set('.hb-content-width', t.content_width);
+  const cw = row.querySelector('.hb-content-width'); if(cw && cw.nextElementSibling) cw.nextElementSibling.textContent = t.content_width + '%';
+  set('.hb-product-pos', t.product_position);
+  const pp = row.querySelector('.hb-product-pos'); if(pp) pp.dispatchEvent(new Event('change'));
+  set('.hb-animation', t.animation);
+  refreshBannerPreview();
+}
+
+async function hbUploadFile(file, kind){
+  const compressed = kind === 'image' ? await compressImage(file, 1920, 0.82) : file;
+  const fileName = `banners/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+  const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+  if(upErr) throw upErr;
+  const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+  return pub.publicUrl;
+}
+
+/* Background images specifically get 3 real resized variants (not just one
+   compressed copy) so mobile visitors never download a 1920px hero photo.
+   Returns { mobile, tablet, desktop } — all 3 public URLs in Storage. */
+const HB_RESPONSIVE_SIZES = [
+  { key:'mobile',  maxDim:640,  quality:0.78 },
+  { key:'tablet',  maxDim:1200, quality:0.80 },
+  { key:'desktop', maxDim:1920, quality:0.82 }
+];
+async function hbUploadResponsiveImage(file){
+  const out = {};
+  for(const s of HB_RESPONSIVE_SIZES){
+    const compressed = await compressImage(file, s.maxDim, s.quality);
+    const fileName = `banners/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${s.key}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+    const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
+    if(upErr) throw upErr;
+    const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
+    out[s.key] = pub.publicUrl;
+  }
+  return out;
+}
+/* Old rows may still have background_image as a plain URL string — this
+   keeps every reader (admin preview + storefront) working either way. */
+function hbPickImg(v){
+  if(!v) return '';
+  if(typeof v === 'object') return v.desktop || v.tablet || v.mobile || '';
+  return v;
 }
 
 async function handleHeroBannerFile(inputEl){
@@ -2638,36 +2953,170 @@ async function handleHeroBannerFile(inputEl){
   const previewEmpty = row.querySelector('.hb-preview-empty');
   const urlField = row.querySelector('.hb-image-url');
   try{
-    const compressed = await compressImage(file, 1920, 0.82);
-    const fileName = `banners/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
-    const { error: upErr } = await sb.storage.from('products').upload(fileName, compressed, { upsert:true });
-    if(upErr) throw upErr;
-    const { data: pub } = sb.storage.from('products').getPublicUrl(fileName);
-    urlField.value = pub.publicUrl;
-    preview.src = pub.publicUrl;
-    preview.style.display = 'block';
-    previewEmpty.style.display = 'none';
-  }catch(err){
-    alert('حدث خطأ أثناء رفع الصورة: ' + err.message);
-  }
+    preview.style.opacity = '.5';
+    const sizes = await hbUploadResponsiveImage(file); // {mobile,tablet,desktop}
+    urlField.value = JSON.stringify(sizes);
+    preview.src = sizes.desktop; preview.style.display = 'block'; preview.style.opacity = '1'; previewEmpty.style.display = 'none';
+    refreshBannerPreview();
+  }catch(err){ alert('حدث خطأ أثناء رفع الصورة: ' + err.message); }
+}
+
+async function handleHeroBannerVideoFile(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const row = inputEl.closest('.hero-banner-row');
+  const urlField = row.querySelector('.hb-video-url');
+  try{ urlField.value = await hbUploadFile(file, 'video'); refreshBannerPreview(); }
+  catch(err){ alert('حدث خطأ أثناء رفع الفيديو: ' + err.message); }
+}
+
+async function handleHeroBannerProductFile(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const row = inputEl.closest('.hero-banner-row');
+  const urlField = row.querySelector('.hb-product-url');
+  try{ urlField.value = await hbUploadFile(file, 'image'); refreshBannerPreview(); }
+  catch(err){ alert('حدث خطأ أثناء رفع صورة المنتج: ' + err.message); }
+}
+
+function collectHeroBannersFromForm(){
+  const rows = document.querySelectorAll('#heroBannersList .hero-banner-row');
+  const banners = [];
+  rows.forEach((r,i) => {
+    const imageRaw = r.querySelector('.hb-image-url').value.trim();
+    let image = imageRaw;
+    if(imageRaw && (imageRaw[0] === '{')){
+      try{ image = JSON.parse(imageRaw); }catch(e){ image = imageRaw; } // fall back to plain string if malformed
+    }
+    const video = r.querySelector('.hb-video-url').value.trim();
+    if(!imageRaw && !video) return;
+    const g = sel => r.querySelector(sel).value.trim();
+    const id = g('.hb-id') || ('b_' + Date.now().toString(36) + i);
+    r.querySelector('.hb-id').value = id;
+    banners.push({
+      id, title: g('.hb-title'), subtitle: r.querySelector('.hb-subtitle').value.trim(),
+      badge: g('.hb-badge'), background_image: image, background_video: video,
+      product_image: g('.hb-product-url'), alt: g('.hb-alt'),
+      cta_primary: (g('.hb-cta1-label') ? { label: g('.hb-cta1-label'), link: g('.hb-cta1-link') } : null),
+      cta_secondary: (g('.hb-cta2-label') ? { label: g('.hb-cta2-label'), link: g('.hb-cta2-link') } : null),
+      category: g('.hb-category'), accent_color: g('.hb-accent'),
+      overlay: Number(g('.hb-overlay')) || 0, layout: g('.hb-layout'), effect: g('.hb-effect'),
+      text_align: g('.hb-align') || null,
+      content_width: Number(g('.hb-content-width')) || null,
+      product_position: g('.hb-product-pos') || null,
+      product_x: g('.hb-product-pos') === 'custom' ? (Number(g('.hb-product-x')) || 50) : null,
+      product_y: g('.hb-product-pos') === 'custom' ? (Number(g('.hb-product-y')) || 50) : null,
+      animation: g('.hb-animation') || 'fade',
+      theme_preset: g('.hb-theme') || 'dark',
+      mobile_layout: g('.hb-mobile-layout') || 'stack',
+      priority: Number(g('.hb-priority')) || 0, duration: Number(g('.hb-duration')) || 5,
+      start_date: g('.hb-start') || null, end_date: g('.hb-end') || null,
+      ab_test_id: g('.hb-ab-id') || null, ab_group: g('.hb-ab-group') || null,
+      countdown_target: g('.hb-countdown-target') || null, countdown_label: g('.hb-countdown-label') || null,
+      active: r.querySelector('.hb-active').checked
+    });
+  });
+  return banners;
 }
 
 async function saveHeroBanners(){
   const msg = document.getElementById('heroBannersSaveMsg');
-  const rows = document.querySelectorAll('#heroBannersList .hero-banner-row');
-  const banners = [];
-  rows.forEach(r => {
-    const image = r.querySelector('.hb-image-url').value.trim();
-    const link = r.querySelector('.hb-link').value.trim();
-    const alt = r.querySelector('.hb-alt').value.trim();
-    if(image) banners.push({ image, link: link || undefined, alt: alt || undefined });
-  });
+  const banners = collectHeroBannersFromForm();
   const { error } = await sb.from('site_settings').upsert({ key:'hero_banners', value: banners, updated_at: new Date().toISOString() });
   if(error){ msg.style.color = 'var(--danger,#e5484d)'; msg.innerText = 'حدث خطأ أثناء الحفظ: ' + error.message; return; }
   siteSettings.hero_banners = banners;
   msg.style.color = 'var(--ok,#2ecc71)';
   msg.innerText = '✓ اتحفظ بنجاح - البنرات هتظهر للعملاء فورًا';
   setTimeout(()=>{ if(msg) msg.innerText=''; }, 4000);
+}
+
+/* ---------- Live preview (desktop/tablet/mobile) — mirrors modules/banner-engine.js rendering ---------- */
+const HB_THEME = { networking:'#2F7BFF', cctv:'#0EA5E9', access:'#7C3AED', fire:'#F59E0B', servers:'#10B981' };
+function hbEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hbEffectMarkup(effect){
+  const map = { particles:'<span class="bnr-fx bnr-fx-particles"><i></i><i></i><i></i><i></i><i></i><i></i></span>', grid:'<span class="bnr-fx bnr-fx-grid"></span>', glow:'<span class="bnr-fx bnr-fx-glow"></span>', sweep:'<span class="bnr-fx bnr-fx-sweep"></span>', circuit:'<span class="bnr-fx bnr-fx-circuit"></span>', network:'<span class="bnr-fx bnr-fx-network"></span>', hexagon:'<span class="bnr-fx bnr-fx-hexagon"></span>', dots:'<span class="bnr-fx bnr-fx-dots"></span>', gradient:'<span class="bnr-fx bnr-fx-gradient"></span>', none:'' };
+  return map[effect] != null ? map[effect] : map.gradient;
+}
+function hbCardHTML(b){
+  const accent = b.accent_color || HB_THEME[b.category] || '#2F7BFF';
+  const bgLayer = b.background_video ? `<video class="bnr-bg-media" autoplay muted loop playsinline src="${hbEsc(b.background_video)}"></video>` : (b.background_image ? `<img class="bnr-bg-media" src="${hbEsc(hbPickImg(b.background_image))}" alt="">` : '');
+  const badge = b.badge ? `<span class="bnr-badge">${hbEsc(b.badge)}</span>` : '';
+  const product = b.product_image ? `<div class="bnr-product"><img src="${hbEsc(b.product_image)}" alt=""></div>` : '';
+  let ctas = '';
+  if(b.cta_primary && b.cta_primary.label) ctas += `<button class="btn btn-cta bnr-cta bnr-cta-primary">${hbEsc(b.cta_primary.label)}</button>`;
+  if(b.cta_secondary && b.cta_secondary.label) ctas += `<button class="btn btn-outline bnr-cta bnr-cta-secondary">${hbEsc(b.cta_secondary.label)}</button>`;
+  let countdown = '';
+  if(b.countdown_target){
+    const t = new Date(b.countdown_target).getTime();
+    if(t && !isNaN(t) && t > Date.now()){
+      countdown = `<div class="bnr-countdown" data-target="${t}">
+        ${b.countdown_label ? `<span class="bnr-countdown-label">${hbEsc(b.countdown_label)}</span>` : ''}
+        <div class="bnr-countdown-units">
+          <div class="bnr-cd-cell" data-unit="d"><span class="bnr-cd-num">00</span><span class="bnr-cd-key">يوم</span></div>
+          <div class="bnr-cd-cell" data-unit="h"><span class="bnr-cd-num">00</span><span class="bnr-cd-key">ساعة</span></div>
+          <div class="bnr-cd-cell" data-unit="m"><span class="bnr-cd-num">00</span><span class="bnr-cd-key">دقيقة</span></div>
+          <div class="bnr-cd-cell" data-unit="s"><span class="bnr-cd-num">00</span><span class="bnr-cd-key">ثانية</span></div>
+        </div>
+      </div>`;
+    }
+  }
+  return `<div class="pbs-slide bnr-card active bnr-layout-${hbEsc(b.layout||'split')}" data-animation="${hbEsc(b.animation||'fade')}" data-theme="${hbEsc(b.theme_preset||'dark')}" data-mobile-layout="${hbEsc(b.mobile_layout||'stack')}" ${b.text_align?`data-align="${hbEsc(b.text_align)}"`:''} ${b.product_position?`data-product-pos="${hbEsc(b.product_position)}"`:''} style="--bnr-accent:${hbEsc(accent)};${b.content_width?`--bnr-content-w:${b.content_width}%;`:''}${b.product_position==='custom'&&b.product_x!=null?`--bnr-product-x:${b.product_x}%;`:''}${b.product_position==='custom'&&b.product_y!=null?`--bnr-product-y:${b.product_y}%;`:''}">
+    <div class="bnr-bg-wrap">${bgLayer}<span class="bnr-overlay" style="--bnr-overlay-a:${Math.max(0,Math.min(100,b.overlay||0))/100}"></span></div>
+    ${hbEffectMarkup(b.effect)}
+    <div class="bnr-content">${badge}${b.title?`<h3 class="bnr-title">${hbEsc(b.title)}</h3>`:''}${b.subtitle?`<p class="bnr-subtitle">${hbEsc(b.subtitle)}</p>`:''}${countdown}${ctas?`<div class="bnr-ctas">${ctas}</div>`:''}</div>
+    ${product}
+  </div>`;
+}
+function hbTickCountdowns(){
+  document.querySelectorAll('#bannerPreviewTrack .bnr-countdown').forEach(el => {
+    const target = Number(el.dataset.target);
+    const diff = target - Date.now();
+    if(diff <= 0){ el.classList.add('bnr-countdown-ended'); return; }
+    const pad = n => String(n).padStart(2,'0');
+    const set = (unit, val) => { const n = el.querySelector(`[data-unit="${unit}"] .bnr-cd-num`); if(n) n.textContent = pad(val); };
+    set('d', Math.floor(diff / 86400000));
+    set('h', Math.floor((diff % 86400000) / 3600000));
+    set('m', Math.floor((diff % 3600000) / 60000));
+    set('s', Math.floor((diff % 60000) / 1000));
+  });
+}
+setInterval(hbTickCountdowns, 1000);
+function refreshBannerPreview(){
+  const track = document.getElementById('bannerPreviewTrack');
+  if(!track) return;
+  const banners = collectHeroBannersFromForm().filter(b => b.active !== false);
+  track.innerHTML = banners.length ? hbCardHTML(banners[0]) : '<p style="padding:40px;text-align:center;color:var(--muted,#8994a8);">لا يوجد بنر فعّال للمعاينة</p>';
+  hbTickCountdowns();
+}
+function setBannerPreviewDevice(dev){
+  document.querySelectorAll('.bnr-preview-devbtn').forEach(b => b.classList.toggle('active', b.dataset.dev === dev));
+  const frame = document.getElementById('bannerPreviewFrame');
+  const widths = { desktop:'1400px', tablet:'760px', mobile:'380px' };
+  frame.style.maxWidth = widths[dev] || '1400px';
+}
+
+/* ---------- Analytics: reads from public.banner_stats (see migration 005) ---------- */
+async function loadBannerAnalytics(){
+  const body = document.getElementById('bannerAnalyticsBody');
+  const bestEl = document.getElementById('bannerAnalyticsBest');
+  if(!body) return;
+  body.innerHTML = '<tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr>';
+  const { data, error } = await sb.from('banner_stats').select('*').order('views', { ascending:false });
+  if(error){ body.innerHTML = `<tr class="empty-row"><td colspan="6">حدث خطأ: ${error.message} (تأكد إنك شغّلت supabase-migration-005-banner-engine.sql)</td></tr>`; return; }
+  if(!data || !data.length){ body.innerHTML = '<tr class="empty-row"><td colspan="6">لسه مفيش بيانات — هتظهر أول ما زوار يشوفوا البنرات.</td></tr>'; if(bestEl) bestEl.textContent = ''; return; }
+  const titleFor = id => { const b = (siteSettings.hero_banners||[]).find(x => x.id === id); return b ? (b.title || id) : id; };
+  body.innerHTML = data.map(row => `<tr>
+    <td>${hbEsc(titleFor(row.banner_id))}</td>
+    <td>${row.ab_group ? row.ab_group.toUpperCase() : '—'}</td>
+    <td>${row.views}</td>
+    <td>${row.clicks}</td>
+    <td>${row.ctr_pct}%</td>
+    <td>${row.last_event_at ? new Date(row.last_event_at).toLocaleString('ar-EG') : '—'}</td>
+  </tr>`).join('');
+  if(bestEl){
+    const best = [...data].sort((a,b)=>b.clicks-a.clicks)[0];
+    bestEl.textContent = best && best.clicks ? `🏆 أكثر بنر ضغطات: ${titleFor(best.banner_id)} (${best.clicks} ضغطة، CTR ${best.ctr_pct}%)` : '';
+  }
 }
 
 /* ================= Brand logos (شعارات الماركات) =================
